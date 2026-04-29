@@ -24,10 +24,10 @@ impl MockStdLib {
 }
 
 impl RocoStdLib for MockStdLib {
-    fn move_to_scene(&mut self, scene_id: i64) -> Result<bool> {
-        println!("Moving to scene {}", scene_id);
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()> {
+        println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
         self.scene_id = scene_id;
-        Ok(true)
+        Ok(())
     }
 
     fn get_current_scene(&mut self) -> Result<i64> {
@@ -255,7 +255,7 @@ fn main() -> Result<()> {
         log("Starting battle script");
 
         // 移动到战斗场景
-        move_to_scene(42);
+        move_to_scene(42, 5000);
 
         // 战斗循环
         let round = 0;

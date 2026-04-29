@@ -37,9 +37,9 @@ struct MyStdLib {
 }
 
 impl RocoStdLib for MyStdLib {
-    fn move_to_scene(&mut self, scene_id: i64) -> Result<bool> {
-        // 实现场景切换
-        Ok(true)
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()> {
+        // 实现场景切换（同步阻塞，超时返回错误）
+        Ok(())
     }
     
     fn get_my_hp(&self) -> Result<i64> {
@@ -62,7 +62,7 @@ let mut engine = RocoEngine::new(stdlib);
 
 let script = r#"
     fn test_battle() {
-        move_to_scene(102);
+        move_to_scene(102, 5000);
         
         while !is_finished() {
             if get_my_hp() < 100 {
@@ -88,7 +88,7 @@ match engine.eval(script) {
 ## 标准库函数
 
 ### 场景相关
-- `move_to_scene(scene_id: i64) -> bool`
+- `move_to_scene(scene_id: i64, timeout_ms: i64)` - 同步阻塞切换场景，超时返回错误
 - `get_current_scene() -> i64`
 
 ### 宠物管理

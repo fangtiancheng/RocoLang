@@ -16,15 +16,15 @@ impl ErrorTestStdLib {
 }
 
 impl RocoStdLib for ErrorTestStdLib {
-    fn move_to_scene(&mut self, scene_id: i64) -> Result<bool> {
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()> {
         if self.should_fail {
             Err(RocoError::StdLibError(format!(
                 "Failed to move to scene {}",
                 scene_id
             )))
         } else {
-            println!("Moving to scene {}", scene_id);
-            Ok(true)
+            println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
+            Ok(())
         }
     }
 
@@ -202,7 +202,7 @@ fn main() -> Result<()> {
     println!("=== Test 1: Normal execution ===");
     let script1 = r#"
         log("Test normal execution");
-        move_to_scene(42);
+        move_to_scene(42, 5000);
         let hp = get_my_hp();
         log("HP: " + hp);
         true
@@ -222,7 +222,7 @@ fn main() -> Result<()> {
         log("Test error handling");
 
         try {
-            move_to_scene(99);
+            move_to_scene(99, 5000);
             log("This should not print");
         } catch (err) {
             log("Caught error: " + err);

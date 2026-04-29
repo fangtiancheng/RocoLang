@@ -6,6 +6,9 @@ use std::sync::{Arc, Mutex};
 use crate::error::{Result, RocoError};
 use crate::stdlib::RocoStdLib;
 
+/// Print callback 类型别名
+type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
+
 /// 将 RocoError 转换为 Rhai 错误
 fn to_rhai_error(err: RocoError) -> Box<EvalAltResult> {
     EvalAltResult::ErrorRuntime(err.to_string().into(), rhai::Position::NONE).into()
@@ -25,6 +28,7 @@ macro_rules! call_stdlib {
 /// RocoLang 脚本引擎
 pub struct RocoEngine {
     engine: Engine,
+    print_callback: Option<PrintCallback>,
 }
 
 impl RocoEngine {
@@ -40,7 +44,42 @@ impl RocoEngine {
         // 注册所有标准库函数
         Self::register_stdlib(&mut engine, stdlib);
 
-        Self { engine }
+        Self {
+            engine,
+            print_callback: None,
+        }
+    }
+
+    /// 设置 print 输出回调
+    ///
+    /// 当脚本调用 print() 或 debug() 时，会调用此回调函数
+    pub fn set_print_callback<F>(&mut self, callback: F)
+    where
+        F: FnMut(&str) + Send + 'static,
+    {
+        let callback = Arc::new(Mutex::new(callback));
+        self.print_callback = Some(callback.clone());
+
+        // 设置 Rhai 的 on_print 回调
+        let print_cb = callback.clone();
+        self.engine.on_print(move |text| {
+            if let Ok(mut cb) = print_cb.lock() {
+                cb(text);
+            }
+        });
+
+        // 设置 Rhai 的 on_debug 回调（用于 debug() 函数）
+        let debug_cb = callback;
+        self.engine.on_debug(move |text, source, pos| {
+            if let Ok(mut cb) = debug_cb.lock() {
+                let msg = if let Some(src) = source {
+                    format!("[DEBUG {}:{}] {}", src, pos, text)
+                } else {
+                    format!("[DEBUG] {}", text)
+                };
+                cb(&msg);
+            }
+        });
     }
 
     /// 注册标准库函数到 Rhai 引擎
@@ -77,9 +116,7 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("clear_lineup", move || {
-                call_stdlib!(stdlib, clear_lineup)
-            });
+            engine.register_fn("clear_lineup", move || call_stdlib!(stdlib, clear_lineup));
         }
 
         {

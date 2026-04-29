@@ -1,5 +1,5 @@
 use roco_lang::{
-    BattleInfo, BattleResult, Result, RocoEngine, RocoError, RocoStdLib, RoundResult,
+    BattleInfo, BattleResult, Result, RocoEngine, RocoError, RocoStdLib, RoundResult, SkillInfo,
     SpiritBagInfo, SpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -28,7 +28,7 @@ impl RocoStdLib for ErrorTestStdLib {
         }
     }
 
-    fn get_current_scene(&self) -> Result<i64> {
+    fn get_current_scene(&mut self) -> Result<i64> {
         Ok(1)
     }
 
@@ -48,11 +48,11 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
-    fn get_spirit_bag(&self) -> Result<SpiritBagInfo> {
+    fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo> {
         Ok(SpiritBagInfo { spirits: vec![] })
     }
 
-    fn get_lineup(&self) -> Result<Vec<SpiritInfo>> {
+    fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
         Ok(vec![])
     }
 
@@ -60,8 +60,8 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
-    fn forget_skill(&mut self, _position: i64, _slot: i64) -> Result<bool> {
-        Ok(true)
+    fn get_skills(&mut self, _position: i64) -> Result<[Option<SkillInfo>; 4]> {
+        Ok([None, None, None, None])
     }
 
     fn equip_item(&mut self, _position: i64, _item_name: &str) -> Result<bool> {
@@ -114,18 +114,18 @@ impl RocoStdLib for ErrorTestStdLib {
         })
     }
 
-    fn get_battle_result(&self) -> Result<BattleResult> {
+    fn get_battle_result(&mut self) -> Result<BattleResult> {
         Ok(BattleResult {
             winner: None,
             total_rounds: 0,
         })
     }
 
-    fn get_battle_history(&self) -> Result<String> {
+    fn get_battle_history(&mut self) -> Result<String> {
         Ok("{}".to_string())
     }
 
-    fn get_my_hp(&self) -> Result<i64> {
+    fn get_my_hp(&mut self) -> Result<i64> {
         if self.should_fail {
             Err(RocoError::StdLibError("HP query failed".to_string()))
         } else {
@@ -133,23 +133,23 @@ impl RocoStdLib for ErrorTestStdLib {
         }
     }
 
-    fn get_my_max_hp(&self) -> Result<i64> {
+    fn get_my_max_hp(&mut self) -> Result<i64> {
         Ok(100)
     }
 
-    fn get_rival_hp(&self) -> Result<i64> {
+    fn get_rival_hp(&mut self) -> Result<i64> {
         Ok(100)
     }
 
-    fn get_rival_max_hp(&self) -> Result<i64> {
+    fn get_rival_max_hp(&mut self) -> Result<i64> {
         Ok(100)
     }
 
-    fn get_my_pp(&self, _slot: i64) -> Result<i64> {
+    fn get_my_pp(&mut self, _slot: i64) -> Result<i64> {
         Ok(10)
     }
 
-    fn get_my_spirit_info(&self, _position: i64) -> Result<SpiritInfo> {
+    fn get_my_spirit_info(&mut self, _position: i64) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
             catch_time: 0,
             name: "Test".to_string(),
@@ -159,7 +159,7 @@ impl RocoStdLib for ErrorTestStdLib {
         })
     }
 
-    fn get_rival_spirit_info(&self) -> Result<SpiritInfo> {
+    fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
             catch_time: 0,
             name: "Rival".to_string(),
@@ -169,24 +169,24 @@ impl RocoStdLib for ErrorTestStdLib {
         })
     }
 
-    fn is_finished(&self) -> Result<bool> {
+    fn is_finished(&mut self) -> Result<bool> {
         Ok(false)
     }
 
-    fn get_current_round(&self) -> Result<i64> {
+    fn get_current_round(&mut self) -> Result<i64> {
         Ok(0)
     }
 
-    fn sleep(&self, _ms: i64) -> Result<()> {
+    fn sleep(&mut self, _ms: i64) -> Result<()> {
         Ok(())
     }
 
-    fn log(&self, message: &str) -> Result<()> {
+    fn log(&mut self, message: &str) -> Result<()> {
         println!("[LOG] {}", message);
         Ok(())
     }
 
-    fn assert(&self, condition: bool, message: &str) -> Result<()> {
+    fn assert(&mut self, condition: bool, message: &str) -> Result<()> {
         if !condition {
             Err(RocoError::AssertionError(message.to_string()))
         } else {

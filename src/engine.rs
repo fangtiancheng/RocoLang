@@ -11,23 +11,14 @@ fn to_rhai_error(err: RocoError) -> Box<EvalAltResult> {
     EvalAltResult::ErrorRuntime(err.to_string().into(), rhai::Position::NONE).into()
 }
 
-/// 辅助宏：安全地获取 stdlib 锁并调用需要 &mut self 的方法
-macro_rules! call_stdlib_mut {
-    ($stdlib:expr, $method:ident $(, $arg:expr)*) => {
-        $stdlib
-            .lock()
-            .map_err(|e| to_rhai_error(RocoError::Other(format!("Lock error: {}", e))))
-            .and_then(|mut guard| guard.$method($($arg),*).map_err(to_rhai_error))
-    };
-}
-
-/// 辅助宏：安全地获取 stdlib 锁并调用只需要 &self 的方法
+/// 辅助宏：安全地获取 stdlib 锁并调用方法
+/// 所有方法现在都需要 &mut self
 macro_rules! call_stdlib {
     ($stdlib:expr, $method:ident $(, $arg:expr)*) => {
         $stdlib
             .lock()
             .map_err(|e| to_rhai_error(RocoError::Other(format!("Lock error: {}", e))))
-            .and_then(|guard| guard.$method($($arg),*).map_err(to_rhai_error))
+            .and_then(|mut guard| guard.$method($($arg),*).map_err(to_rhai_error))
     };
 }
 
@@ -38,7 +29,12 @@ pub struct RocoEngine {
 
 impl RocoEngine {
     /// 创建新的 RocoEngine
-    pub fn new(stdlib: Arc<Mutex<dyn RocoStdLib>>) -> Self {
+    ///
+    /// stdlib 必须用 Arc<Mutex<>> 包装，因为：
+    /// 1. Rhai 的多个函数闭包需要共享同一个 stdlib（Arc）
+    /// 2. 所有 stdlib 方法都需要 &mut self（Mutex）
+    /// 3. Rhai 要求闭包是 Sync（Mutex 而非 RefCell）
+    pub fn new<T: RocoStdLib + 'static>(stdlib: Arc<Mutex<T>>) -> Self {
         let mut engine = Engine::new();
 
         // 注册所有标准库函数
@@ -48,12 +44,12 @@ impl RocoEngine {
     }
 
     /// 注册标准库函数到 Rhai 引擎
-    fn register_stdlib(engine: &mut Engine, stdlib: Arc<Mutex<dyn RocoStdLib>>) {
+    fn register_stdlib<T: RocoStdLib + 'static>(engine: &mut Engine, stdlib: Arc<Mutex<T>>) {
         // ========== 场景相关 ==========
         {
             let stdlib = stdlib.clone();
             engine.register_fn("move_to_scene", move |scene_id: i64| {
-                call_stdlib_mut!(stdlib, move_to_scene, scene_id)
+                call_stdlib!(stdlib, move_to_scene, scene_id)
             });
         }
 
@@ -68,28 +64,28 @@ impl RocoEngine {
         {
             let stdlib = stdlib.clone();
             engine.register_fn("fetch_spirit", move |catch_time: i64| {
-                call_stdlib_mut!(stdlib, fetch_spirit, catch_time)
+                call_stdlib!(stdlib, fetch_spirit, catch_time)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("fetch_spirit_by_id", move |spirit_id: i64| {
-                call_stdlib_mut!(stdlib, fetch_spirit_by_id, spirit_id)
+                call_stdlib!(stdlib, fetch_spirit_by_id, spirit_id)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("clear_lineup", move || {
-                call_stdlib_mut!(stdlib, clear_lineup)
+                call_stdlib!(stdlib, clear_lineup)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("store_spirit", move |position: i64| {
-                call_stdlib_mut!(stdlib, store_spirit, position)
+                call_stdlib!(stdlib, store_spirit, position)
             });
         }
 
@@ -97,21 +93,21 @@ impl RocoEngine {
         {
             let stdlib = stdlib.clone();
             engine.register_fn("learn_skill", move |position: i64, skill_id: i64| {
-                call_stdlib_mut!(stdlib, learn_skill, position, skill_id)
+                call_stdlib!(stdlib, learn_skill, position, skill_id)
             });
         }
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("forget_skill", move |position: i64, slot: i64| {
-                call_stdlib_mut!(stdlib, forget_skill, position, slot)
+            engine.register_fn("get_skills", move |position: i64| {
+                call_stdlib!(stdlib, get_skills, position)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("equip_item", move |position: i64, item_name: &str| {
-                call_stdlib_mut!(stdlib, equip_item, position, item_name)
+                call_stdlib!(stdlib, equip_item, position, item_name)
             });
         }
 
@@ -119,55 +115,55 @@ impl RocoEngine {
         {
             let stdlib = stdlib.clone();
             engine.register_fn("invite_pk", move |target_uin: i64| {
-                call_stdlib_mut!(stdlib, invite_pk, target_uin)
+                call_stdlib!(stdlib, invite_pk, target_uin)
             });
         }
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("accept_pk", move || call_stdlib_mut!(stdlib, accept_pk));
+            engine.register_fn("accept_pk", move || call_stdlib!(stdlib, accept_pk));
         }
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("reject_pk", move || call_stdlib_mut!(stdlib, reject_pk));
+            engine.register_fn("reject_pk", move || call_stdlib!(stdlib, reject_pk));
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("use_skill", move |skill_id: i64| {
-                call_stdlib_mut!(stdlib, use_skill, skill_id)
+                call_stdlib!(stdlib, use_skill, skill_id)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("use_item", move |item_name: &str| {
-                call_stdlib_mut!(stdlib, use_item, item_name)
+                call_stdlib!(stdlib, use_item, item_name)
             });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("change_spirit", move |position: i64| {
-                call_stdlib_mut!(stdlib, change_spirit, position)
+                call_stdlib!(stdlib, change_spirit, position)
             });
         }
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("defend", move || call_stdlib_mut!(stdlib, defend));
+            engine.register_fn("defend", move || call_stdlib!(stdlib, defend));
         }
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("escape", move || call_stdlib_mut!(stdlib, escape));
+            engine.register_fn("escape", move || call_stdlib!(stdlib, escape));
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("wait_round_end", move || {
-                call_stdlib_mut!(stdlib, wait_round_end)
+                call_stdlib!(stdlib, wait_round_end)
             });
         }
 

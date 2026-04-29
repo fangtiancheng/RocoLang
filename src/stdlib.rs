@@ -9,14 +9,17 @@ use crate::types::*;
 ///
 /// 所有预定义函数都在这里声明
 /// 服务器侧和客户端侧需要各自实现
-pub trait RocoStdLib: Send + Sync {
+///
+/// 注意：只要求 Send，不要求 Sync，因为每个脚本实例都有独立的 stdlib，
+/// 不需要在多个线程间共享同一个实例。
+pub trait RocoStdLib: Send {
     // ==================== 场景相关 ====================
 
     /// 移动到指定场景
     fn move_to_scene(&mut self, scene_id: i64) -> Result<bool>;
 
     /// 获取当前场景 ID
-    fn get_current_scene(&self) -> Result<i64>;
+    fn get_current_scene(&mut self) -> Result<i64>;
 
     // ==================== 宠物管理 ====================
 
@@ -33,18 +36,18 @@ pub trait RocoStdLib: Send + Sync {
     fn store_spirit(&mut self, position: i64) -> Result<bool>;
 
     /// 获取背包信息
-    fn get_spirit_bag(&self) -> Result<SpiritBagInfo>;
+    fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo>;
 
     /// 获取当前阵容
-    fn get_lineup(&self) -> Result<Vec<SpiritInfo>>;
+    fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
 
     // ==================== 技能/装备 ====================
 
     /// 学习技能
     fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool>;
 
-    /// 遗忘技能
-    fn forget_skill(&mut self, position: i64, slot: i64) -> Result<bool>;
+    /// 获取指定位置宠物的技能列表（最多4个技能）
+    fn get_skills(&mut self, position: i64) -> Result<[Option<SkillInfo>; 4]>;
 
     /// 装备道具
     fn equip_item(&mut self, position: i64, item_name: &str) -> Result<bool>;
@@ -79,48 +82,48 @@ pub trait RocoStdLib: Send + Sync {
     fn wait_round_end(&mut self) -> Result<RoundResult>;
 
     /// 获取战斗结果
-    fn get_battle_result(&self) -> Result<BattleResult>;
+    fn get_battle_result(&mut self) -> Result<BattleResult>;
 
     /// 获取战斗历史（JSON 字符串）
-    fn get_battle_history(&self) -> Result<String>;
+    fn get_battle_history(&mut self) -> Result<String>;
 
     // ==================== 状态查询 ====================
 
     /// 获取我方当前血量
-    fn get_my_hp(&self) -> Result<i64>;
+    fn get_my_hp(&mut self) -> Result<i64>;
 
     /// 获取我方最大血量
-    fn get_my_max_hp(&self) -> Result<i64>;
+    fn get_my_max_hp(&mut self) -> Result<i64>;
 
     /// 获取对手当前血量
-    fn get_rival_hp(&self) -> Result<i64>;
+    fn get_rival_hp(&mut self) -> Result<i64>;
 
     /// 获取对手最大血量
-    fn get_rival_max_hp(&self) -> Result<i64>;
+    fn get_rival_max_hp(&mut self) -> Result<i64>;
 
     /// 获取我方技能 PP
-    fn get_my_pp(&self, slot: i64) -> Result<i64>;
+    fn get_my_pp(&mut self, slot: i64) -> Result<i64>;
 
     /// 获取我方宠物信息
-    fn get_my_spirit_info(&self, position: i64) -> Result<SpiritInfo>;
+    fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo>;
 
     /// 获取对手宠物信息（可见部分）
-    fn get_rival_spirit_info(&self) -> Result<SpiritInfo>;
+    fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo>;
 
     /// 战斗是否结束
-    fn is_finished(&self) -> Result<bool>;
+    fn is_finished(&mut self) -> Result<bool>;
 
     /// 获取当前回合数
-    fn get_current_round(&self) -> Result<i64>;
+    fn get_current_round(&mut self) -> Result<i64>;
 
     // ==================== 工具函数 ====================
 
     /// 休眠（毫秒）
-    fn sleep(&self, ms: i64) -> Result<()>;
+    fn sleep(&mut self, ms: i64) -> Result<()>;
 
     /// 日志输出
-    fn log(&self, message: &str) -> Result<()>;
+    fn log(&mut self, message: &str) -> Result<()>;
 
     /// 断言
-    fn assert(&self, condition: bool, message: &str) -> Result<()>;
+    fn assert(&mut self, condition: bool, message: &str) -> Result<()>;
 }

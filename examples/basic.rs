@@ -1,5 +1,5 @@
 use roco_lang::{
-    BattleInfo, BattleResult, Result, RocoEngine, RocoStdLib, RoundResult, SpiritBagInfo,
+    BattleInfo, BattleResult, Result, RocoEngine, RocoStdLib, RoundResult, SkillInfo, SpiritBagInfo,
     SpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -75,9 +75,24 @@ impl RocoStdLib for MockStdLib {
         Ok(true)
     }
 
-    fn forget_skill(&mut self, position: i64, slot: i64) -> Result<bool> {
-        println!("Forgetting skill at position {} slot {}", position, slot);
-        Ok(true)
+    fn get_skills(&mut self, position: i64) -> Result<[Option<SkillInfo>; 4]> {
+        println!("Getting skills at position {}", position);
+        Ok([
+            Some(SkillInfo {
+                skill_id: 101,
+                skill_name: "火焰冲击".to_string(),
+                pp: 10,
+                max_pp: 15,
+            }),
+            Some(SkillInfo {
+                skill_id: 102,
+                skill_name: "烈焰风暴".to_string(),
+                pp: 5,
+                max_pp: 10,
+            }),
+            None,
+            None,
+        ])
     }
 
     fn equip_item(&mut self, position: i64, item_name: &str) -> Result<bool> {

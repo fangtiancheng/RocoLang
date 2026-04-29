@@ -42,3 +42,12 @@ pub struct BattleResult {
     pub winner: Option<i64>,
     pub total_rounds: i64,
 }
+
+/// 技能信息
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillInfo {
+    pub skill_id: i64,
+    pub skill_name: String,
+    pub pp: i64,
+    pub max_pp: i64,
+}

@@ -87,8 +87,8 @@ impl RocoEngine {
         // ========== 场景相关 ==========
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("move_to_scene", move |scene_id: i64| {
-                call_stdlib!(stdlib, move_to_scene, scene_id)
+            engine.register_fn("move_to_scene", move |scene_id: i64, timeout_ms: i64| {
+                call_stdlib!(stdlib, move_to_scene, scene_id, timeout_ms)
             });
         }
 

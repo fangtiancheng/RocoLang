@@ -15,8 +15,16 @@ use crate::types::*;
 pub trait RocoStdLib: Send {
     // ==================== 场景相关 ====================
 
-    /// 移动到指定场景
-    fn move_to_scene(&mut self, scene_id: i64) -> Result<bool>;
+    /// 移动到指定场景（同步阻塞，等待服务器确认）
+    ///
+    /// # 参数
+    /// - scene_id: 目标场景 ID
+    /// - timeout_ms: 超时时间（毫秒）
+    ///
+    /// # 返回
+    /// - Ok(()): 成功移动到目标场景
+    /// - Err: 移动失败或超时
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()>;
 
     /// 获取当前场景 ID
     fn get_current_scene(&mut self) -> Result<i64>;

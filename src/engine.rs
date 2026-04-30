@@ -116,6 +116,13 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("challenge_wild_spirit", move |spirit_id: i64| {
+                call_stdlib!(stdlib, challenge_wild_spirit, spirit_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("clear_lineup", move || call_stdlib!(stdlib, clear_lineup));
         }
 
@@ -127,6 +134,25 @@ impl RocoEngine {
         }
 
         // ========== 技能/装备 ==========
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_spirit_bag", move || {
+                call_stdlib!(stdlib, get_spirit_bag)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_lineup", move || call_stdlib!(stdlib, get_lineup));
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_lineup_count", move || {
+                call_stdlib!(stdlib, get_lineup_count)
+            });
+        }
+
         {
             let stdlib = stdlib.clone();
             engine.register_fn("learn_skill", move |position: i64, skill_id: i64| {
@@ -245,6 +271,13 @@ impl RocoEngine {
             let stdlib = stdlib.clone();
             engine.register_fn("get_my_pp", move |slot: i64| {
                 call_stdlib!(stdlib, get_my_pp, slot)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_my_power_skill", move || {
+                call_stdlib!(stdlib, get_my_power_skill)
             });
         }
 

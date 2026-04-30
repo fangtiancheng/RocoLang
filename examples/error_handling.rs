@@ -4,7 +4,7 @@ use roco_lang::{
 };
 use std::sync::{Arc, Mutex};
 
-/// Mock 实现，故意在某些情况下返回错误
+/// Mock implementation that intentionally fails in some scenarios.
 struct ErrorTestStdLib {
     should_fail: bool,
 }
@@ -16,15 +16,14 @@ impl ErrorTestStdLib {
 }
 
 impl RocoStdLib for ErrorTestStdLib {
-    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()> {
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         if self.should_fail {
-            Err(RocoError::StdLibError(format!(
-                "Failed to move to scene {}",
-                scene_id
-            )))
+            Err(RocoError::ServerRejected(
+                "move_to_scene rejected".to_string(),
+            ))
         } else {
             println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
-            Ok(())
+            Ok(scene_id)
         }
     }
 
@@ -37,6 +36,10 @@ impl RocoStdLib for ErrorTestStdLib {
     }
 
     fn fetch_spirit_by_id(&mut self, _spirit_id: i64) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn challenge_wild_spirit(&mut self, _spirit_id: i64) -> Result<bool> {
         Ok(true)
     }
 
@@ -54,6 +57,10 @@ impl RocoStdLib for ErrorTestStdLib {
 
     fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
         Ok(vec![])
+    }
+
+    fn get_lineup_count(&mut self) -> Result<i64> {
+        Ok(0)
     }
 
     fn learn_skill(&mut self, _position: i64, _skill_id: i64) -> Result<bool> {
@@ -149,6 +156,10 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(10)
     }
 
+    fn get_my_power_skill(&mut self) -> Result<i64> {
+        Ok(101)
+    }
+
     fn get_my_spirit_info(&mut self, _position: i64) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
             catch_time: 0,
@@ -209,13 +220,13 @@ fn main() -> Result<()> {
     "#;
 
     match engine.eval(script1) {
-        Ok(result) => println!("✓ Script succeeded: {:?}\n", result),
-        Err(e) => println!("✗ Script failed: {}\n", e),
+        Ok(result) => println!("Script succeeded: {:?}\n", result),
+        Err(e) => println!("Script failed: {}\n", e),
     }
 
     println!("=== Test 2: Error handling with try-catch ===");
 
-    // 设置 should_fail 标志
+    // Enable the failure flag.
     stdlib.lock().unwrap().should_fail = true;
 
     let script2 = r#"
@@ -233,20 +244,20 @@ fn main() -> Result<()> {
     "#;
 
     match engine.eval(script2) {
-        Ok(result) => println!("✓ Script succeeded with error handling: {:?}\n", result),
-        Err(e) => println!("✗ Script failed: {}\n", e),
+        Ok(result) => println!("Script succeeded with error handling: {:?}\n", result),
+        Err(e) => println!("Script failed: {}\n", e),
     }
 
     println!("=== Test 3: Unhandled error ===");
     let script3 = r#"
         log("Test unhandled error");
-        get_my_hp();  // 这会失败
+        get_my_hp();  // This will fail.
         log("This should not print");
     "#;
 
     match engine.eval(script3) {
-        Ok(result) => println!("✗ Script should have failed but succeeded: {:?}\n", result),
-        Err(e) => println!("✓ Script failed as expected: {}\n", e),
+        Ok(result) => println!("Script should have failed but succeeded: {:?}\n", result),
+        Err(e) => println!("Script failed as expected: {}\n", e),
     }
 
     println!("=== Test 4: Assert failure ===");
@@ -267,8 +278,8 @@ fn main() -> Result<()> {
     "#;
 
     match engine.eval(script4) {
-        Ok(result) => println!("✓ Assert test succeeded: {:?}\n", result),
-        Err(e) => println!("✗ Assert test failed: {}\n", e),
+        Ok(result) => println!("Assert test succeeded: {:?}\n", result),
+        Err(e) => println!("Assert test failed: {}\n", e),
     }
 
     Ok(())

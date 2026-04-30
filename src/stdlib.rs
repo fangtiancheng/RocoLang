@@ -22,9 +22,8 @@ pub trait RocoStdLib: Send {
     /// - timeout_ms: 超时时间（毫秒）
     ///
     /// # 返回
-    /// - Ok(()): 成功移动到目标场景
-    /// - Err: 移动失败或超时
-    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()>;
+    /// Success returns the confirmed scene id. Failure returns `RocoError`.
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64>;
 
     /// 获取当前场景 ID
     fn get_current_scene(&mut self) -> Result<i64>;
@@ -38,6 +37,8 @@ pub trait RocoStdLib: Send {
     fn fetch_spirit_by_id(&mut self, spirit_id: i64) -> Result<bool>;
 
     /// 清空当前阵容
+    fn challenge_wild_spirit(&mut self, spirit_id: i64) -> Result<bool>;
+
     fn clear_lineup(&mut self) -> Result<bool>;
 
     /// 将指定位置的宠物放回仓库
@@ -48,6 +49,8 @@ pub trait RocoStdLib: Send {
 
     /// 获取当前阵容
     fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
+
+    fn get_lineup_count(&mut self) -> Result<i64>;
 
     // ==================== 技能/装备 ====================
 
@@ -113,6 +116,8 @@ pub trait RocoStdLib: Send {
     fn get_my_pp(&mut self, slot: i64) -> Result<i64>;
 
     /// 获取我方宠物信息
+    fn get_my_power_skill(&mut self) -> Result<i64>;
+
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo>;
 
     /// 获取对手宠物信息（可见部分）

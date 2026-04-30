@@ -1,28 +1,18 @@
-//! 错误类型定义
+//! Error types for RocoLang.
 
 use std::fmt;
 
 pub type Result<T> = std::result::Result<T, RocoError>;
 
-/// RocoLang 错误类型
 #[derive(Debug, Clone)]
 pub enum RocoError {
-    /// 脚本执行错误
     ScriptError(String),
-
-    /// 标准库函数调用错误
     StdLibError(String),
-
-    /// 网络错误
+    InvalidParam(String),
     NetworkError(String),
-
-    /// 超时错误
     TimeoutError(String),
-
-    /// 断言失败
+    ServerRejected(String),
     AssertionError(String),
-
-    /// 其他错误
     Other(String),
 }
 
@@ -31,8 +21,10 @@ impl fmt::Display for RocoError {
         match self {
             RocoError::ScriptError(msg) => write!(f, "Script error: {}", msg),
             RocoError::StdLibError(msg) => write!(f, "StdLib error: {}", msg),
+            RocoError::InvalidParam(msg) => write!(f, "Invalid parameter: {}", msg),
             RocoError::NetworkError(msg) => write!(f, "Network error: {}", msg),
             RocoError::TimeoutError(msg) => write!(f, "Timeout error: {}", msg),
+            RocoError::ServerRejected(msg) => write!(f, "Server rejected: {}", msg),
             RocoError::AssertionError(msg) => write!(f, "Assertion failed: {}", msg),
             RocoError::Other(msg) => write!(f, "Error: {}", msg),
         }

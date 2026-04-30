@@ -4,7 +4,7 @@ use roco_lang::{
 };
 use std::sync::{Arc, Mutex};
 
-/// Mock 实现，用于演示
+/// Mock implementation used by examples.
 struct MockStdLib {
     scene_id: i64,
     my_hp: i64,
@@ -24,10 +24,10 @@ impl MockStdLib {
 }
 
 impl RocoStdLib for MockStdLib {
-    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<()> {
+    fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
         self.scene_id = scene_id;
-        Ok(())
+        Ok(scene_id)
     }
 
     fn get_current_scene(&mut self) -> Result<i64> {
@@ -41,6 +41,11 @@ impl RocoStdLib for MockStdLib {
 
     fn fetch_spirit_by_id(&mut self, spirit_id: i64) -> Result<bool> {
         println!("Fetching spirit with id {}", spirit_id);
+        Ok(true)
+    }
+
+    fn challenge_wild_spirit(&mut self, spirit_id: i64) -> Result<bool> {
+        println!("Challenging wild spirit {}", spirit_id);
         Ok(true)
     }
 
@@ -58,7 +63,7 @@ impl RocoStdLib for MockStdLib {
         Ok(SpiritBagInfo {
             spirits: vec![SpiritInfo {
                 catch_time: 123456,
-                name: "火神".to_string(),
+                name: "Fire Spirit".to_string(),
                 level: 50,
                 hp: 100,
                 max_hp: 100,
@@ -68,6 +73,10 @@ impl RocoStdLib for MockStdLib {
 
     fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
         Ok(vec![])
+    }
+
+    fn get_lineup_count(&mut self) -> Result<i64> {
+        Ok(1)
     }
 
     fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool> {
@@ -80,13 +89,13 @@ impl RocoStdLib for MockStdLib {
         Ok([
             Some(SkillInfo {
                 skill_id: 101,
-                skill_name: "火焰冲击".to_string(),
+                skill_name: "Flame Strike".to_string(),
                 pp: 10,
                 max_pp: 15,
             }),
             Some(SkillInfo {
                 skill_id: 102,
-                skill_name: "烈焰风暴".to_string(),
+                skill_name: "Flame Storm".to_string(),
                 pp: 5,
                 max_pp: 10,
             }),
@@ -199,11 +208,15 @@ impl RocoStdLib for MockStdLib {
         Ok(10)
     }
 
+    fn get_my_power_skill(&mut self) -> Result<i64> {
+        Ok(101)
+    }
+
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo> {
         println!("Getting spirit info at position {}", position);
         Ok(SpiritInfo {
             catch_time: 123456,
-            name: "火神".to_string(),
+            name: "Fire Spirit".to_string(),
             level: 50,
             hp: self.my_hp,
             max_hp: 100,
@@ -213,7 +226,7 @@ impl RocoStdLib for MockStdLib {
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
             catch_time: 0,
-            name: "对手宠物".to_string(),
+            name: "Rival Spirit".to_string(),
             level: 50,
             hp: self.rival_hp,
             max_hp: 100,
@@ -250,14 +263,14 @@ fn main() -> Result<()> {
     let stdlib = Arc::new(Mutex::new(MockStdLib::new()));
     let mut engine = RocoEngine::new(stdlib);
 
-    // 简单的战斗脚本
+    // Simple battle script.
     let script = r#"
         log("Starting battle script");
 
-        // 移动到战斗场景
+        // Move to the battle scene.
         move_to_scene(42, 5000);
 
-        // 战斗循环
+        // Battle loop.
         let round = 0;
         while !is_finished() && round < 10 {
             log("Round " + round);

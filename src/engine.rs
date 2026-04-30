@@ -44,6 +44,7 @@ impl RocoEngine {
     /// 3. Rhai 要求闭包是 Sync（Mutex 而非 RefCell）
     pub fn new<T: RocoStdLib + 'static>(stdlib: Arc<Mutex<T>>) -> Self {
         let mut engine = Engine::new();
+        engine.set_max_expr_depths(0, 0);
 
         // 注册所有标准库函数
         Self::register_stdlib(&mut engine, stdlib);

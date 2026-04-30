@@ -49,6 +49,11 @@ impl RocoStdLib for MockStdLib {
         Ok(true)
     }
 
+    fn challenge_boss(&mut self, boss_code: i64) -> Result<bool> {
+        println!("Challenging boss {}", boss_code);
+        Ok(true)
+    }
+
     fn clear_lineup(&mut self) -> Result<bool> {
         println!("Clearing lineup");
         Ok(true)
@@ -231,8 +236,8 @@ impl RocoStdLib for MockStdLib {
         Ok(true)
     }
 
-    fn escape(&mut self) -> Result<bool> {
-        println!("Escaping");
+    fn combat_escape(&mut self) -> Result<bool> {
+        println!("Escaping from combat");
         Ok(true)
     }
 

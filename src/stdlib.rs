@@ -66,6 +66,8 @@ pub trait RocoStdLib: Send {
     /// 清空当前阵容
     fn challenge_wild_spirit(&mut self, spirit_id: i64) -> Result<bool>;
 
+    fn challenge_boss(&mut self, boss_code: i64) -> Result<bool>;
+
     fn clear_lineup(&mut self) -> Result<bool>;
 
     /// 将指定位置的宠物放回仓库
@@ -171,7 +173,21 @@ pub trait RocoStdLib: Send {
     fn defend(&mut self) -> Result<bool>;
 
     /// 逃跑
-    fn escape(&mut self) -> Result<bool>;
+    fn combat_escape(&mut self) -> Result<bool>;
+
+    fn try_combat_escape(&mut self) -> Result<ActionResult> {
+        match self.get_combat_actions() {
+            Ok(actions) if actions.can_escape => {}
+            Ok(_) => return Ok(ActionResult::unavailable("combat escape unavailable")),
+            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+        }
+
+        match self.combat_escape() {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("combat_escape returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
 
     /// 等待回合结束
     fn wait_round_end(&mut self) -> Result<RoundResult>;

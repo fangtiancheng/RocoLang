@@ -44,6 +44,10 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
+    fn challenge_boss(&mut self, _boss_code: i64) -> Result<bool> {
+        Ok(true)
+    }
+
     fn clear_lineup(&mut self) -> Result<bool> {
         Ok(true)
     }
@@ -123,7 +127,7 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
-    fn escape(&mut self) -> Result<bool> {
+    fn combat_escape(&mut self) -> Result<bool> {
         Ok(true)
     }
 

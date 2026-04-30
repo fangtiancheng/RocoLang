@@ -152,6 +152,13 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("challenge_boss", move |boss_code: i64| {
+                call_stdlib!(stdlib, challenge_boss, boss_code)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("clear_lineup", move || call_stdlib!(stdlib, clear_lineup));
         }
 
@@ -301,7 +308,14 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("escape", move || call_stdlib!(stdlib, escape));
+            engine.register_fn("combat_escape", move || call_stdlib!(stdlib, combat_escape));
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("try_combat_escape", move || {
+                call_stdlib!(stdlib, try_combat_escape)
+            });
         }
 
         {

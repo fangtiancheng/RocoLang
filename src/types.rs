@@ -53,10 +53,37 @@ pub struct RoundResult {
 }
 
 /// 战斗结果
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct BattleResult {
     pub winner: Option<i64>,
     pub total_rounds: i64,
+    pub finish_code: i64,
+    pub trainer_exp: i64,
+    pub next_level_trainer_exp: i64,
+    pub honour_point: i64,
+    pub exp_add_bits: i64,
+    pub obtained_items: Vec<BagItemInfo>,
+    pub spirit_results: Vec<BattleSpiritResult>,
+    pub captured_spirits: Vec<BattleCapturedSpirit>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BattleSpiritResult {
+    pub position: i64,
+    pub exp: i64,
+    pub level_delta: i64,
+    pub level: i64,
+    pub next_exp: i64,
+    pub effort: i64,
+    pub new_skill_ids: Vec<i64>,
+    pub evolve_spirit_id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BattleCapturedSpirit {
+    pub spirit_id: i64,
+    pub level: i64,
+    pub disposition: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

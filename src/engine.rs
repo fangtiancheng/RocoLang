@@ -6,8 +6,9 @@ use std::sync::{Arc, Mutex};
 use crate::error::{Result, RocoError};
 use crate::stdlib::RocoStdLib;
 use crate::types::{
-    ActionResult, BagItemInfo, CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
-    StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
+    CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo, StaticSkillInfo,
+    StaticSpiritInfo,
 };
 
 /// Print callback 类型别名
@@ -156,13 +157,15 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("get_bag_items", move || call_stdlib!(stdlib, get_bag_items));
+            engine.register_fn("get_bag_items", move || {
+                call_stdlib!(stdlib, get_bag_items).map(|items| Self::to_array(&items))
+            });
         }
 
         {
             let stdlib = stdlib.clone();
             engine.register_fn("get_combat_lineup", move || {
-                call_stdlib!(stdlib, get_combat_lineup)
+                call_stdlib!(stdlib, get_combat_lineup).map(|spirits| Self::to_array(&spirits))
             });
         }
 
@@ -460,22 +463,10 @@ impl RocoEngine {
 
     fn register_builtin_helpers(engine: &mut Engine) {
         engine.register_fn("len", |array: &mut Array| array.len() as i64);
-        engine.register_fn("len", |spirits: &mut Vec<SpiritInfo>| spirits.len() as i64);
-        engine.register_fn("len", |skills: &mut Vec<SpiritSkillInfo>| {
-            skills.len() as i64
-        });
-        engine.register_fn("len", |items: &mut Vec<BagItemInfo>| items.len() as i64);
-        engine.register_indexer_get(|spirits: &mut Vec<SpiritInfo>, index: i64| -> SpiritInfo {
-            spirits[index as usize].clone()
-        });
-        engine.register_indexer_get(
-            |skills: &mut Vec<SpiritSkillInfo>, index: i64| -> SpiritSkillInfo {
-                skills[index as usize].clone()
-            },
-        );
-        engine.register_indexer_get(|items: &mut Vec<BagItemInfo>, index: i64| -> BagItemInfo {
-            items[index as usize].clone()
-        });
+    }
+
+    fn to_array<T: Clone + Send + Sync + 'static>(items: &[T]) -> Array {
+        items.iter().cloned().map(Dynamic::from).collect()
     }
 
     fn register_static_info_types(engine: &mut Engine) {
@@ -507,9 +498,10 @@ impl RocoEngine {
         register_getters!(ActionResult, ok, code, message);
 
         engine.register_type_with_name::<SpiritInfo>("SpiritInfo");
-        register_getters!(
-            SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp, skills
-        );
+        register_getters!(SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp);
+        engine.register_get("skills", |value: &mut SpiritInfo| {
+            Self::to_array(&value.skills)
+        });
 
         engine.register_type_with_name::<SpiritSkillInfo>("SpiritSkillInfo");
         register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
@@ -517,8 +509,49 @@ impl RocoEngine {
         engine.register_type_with_name::<BagItemInfo>("BagItemInfo");
         register_getters!(BagItemInfo, item_id, count);
 
+        engine.register_type_with_name::<BattleSpiritResult>("BattleSpiritResult");
+        register_getters!(
+            BattleSpiritResult,
+            position,
+            exp,
+            level_delta,
+            level,
+            next_exp,
+            effort,
+            evolve_spirit_id,
+        );
+        engine.register_get("new_skill_ids", |value: &mut BattleSpiritResult| {
+            Self::to_array(&value.new_skill_ids)
+        });
+
+        engine.register_type_with_name::<BattleCapturedSpirit>("BattleCapturedSpirit");
+        register_getters!(BattleCapturedSpirit, spirit_id, level, disposition);
+
+        engine.register_type_with_name::<BattleResult>("BattleResult");
+        register_getters!(
+            BattleResult,
+            winner,
+            total_rounds,
+            finish_code,
+            trainer_exp,
+            next_level_trainer_exp,
+            honour_point,
+            exp_add_bits,
+        );
+        engine.register_get("obtained_items", |value: &mut BattleResult| {
+            Self::to_array(&value.obtained_items)
+        });
+        engine.register_get("spirit_results", |value: &mut BattleResult| {
+            Self::to_array(&value.spirit_results)
+        });
+        engine.register_get("captured_spirits", |value: &mut BattleResult| {
+            Self::to_array(&value.captured_spirits)
+        });
+
         engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");
-        register_getters!(SpiritBagInfo, spirits);
+        engine.register_get("spirits", |value: &mut SpiritBagInfo| {
+            Self::to_array(&value.spirits)
+        });
 
         engine.register_type_with_name::<StaticItemInfo>("StaticItemInfo");
         register_getters!(
@@ -558,8 +591,6 @@ impl RocoEngine {
             id,
             name,
             description,
-            features,
-            group,
             src,
             avatar,
             icon_src,
@@ -571,7 +602,6 @@ impl RocoEngine {
             color,
             interest,
             habitat,
-            evolution,
             catchrate,
             boss_phyle,
             boss_reward,
@@ -586,7 +616,6 @@ impl RocoEngine {
             fy,
             reward,
             evolution_form_id,
-            evolution_to_ids,
             get_form,
             state,
             start_time,
@@ -597,5 +626,17 @@ impl RocoEngine {
             skinnum,
             exp_type,
         );
+        engine.register_get("features", |value: &mut StaticSpiritInfo| {
+            Self::to_array(&value.features)
+        });
+        engine.register_get("group", |value: &mut StaticSpiritInfo| {
+            Self::to_array(&value.group)
+        });
+        engine.register_get("evolution", |value: &mut StaticSpiritInfo| {
+            Self::to_array(&value.evolution)
+        });
+        engine.register_get("evolution_to_ids", |value: &mut StaticSpiritInfo| {
+            Self::to_array(&value.evolution_to_ids)
+        });
     }
 }

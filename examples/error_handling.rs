@@ -140,6 +140,7 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(BattleResult {
             winner: None,
             total_rounds: 0,
+            ..BattleResult::default()
         })
     }
 

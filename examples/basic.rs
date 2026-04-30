@@ -257,6 +257,7 @@ impl RocoStdLib for MockStdLib {
                 None
             },
             total_rounds: self.round,
+            ..BattleResult::default()
         })
     }
 

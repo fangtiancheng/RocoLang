@@ -245,7 +245,7 @@ impl RocoStdLib for MockStdLib {
             round: self.round,
             my_hp: self.my_hp,
             rival_hp: self.rival_hp,
-            finished: self.is_finished().unwrap(),
+            finished: self.is_combat_finished().unwrap(),
         })
     }
 
@@ -344,7 +344,7 @@ impl RocoStdLib for MockStdLib {
         })
     }
 
-    fn is_finished(&mut self) -> Result<bool> {
+    fn is_combat_finished(&mut self) -> Result<bool> {
         Ok(self.rival_hp <= 0 || self.my_hp <= 0)
     }
 
@@ -383,7 +383,7 @@ fn main() -> Result<()> {
 
         // Battle loop.
         let round = 0;
-        while !is_finished() && round < 10 {
+        while !is_combat_finished() && round < 10 {
             log("Round " + round);
 
             let my_hp = get_my_hp();
@@ -404,7 +404,7 @@ fn main() -> Result<()> {
         }
 
         log("Battle finished");
-        is_finished()
+        is_combat_finished()
     "#;
 
     let result = engine.eval(script)?;

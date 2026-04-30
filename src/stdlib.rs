@@ -189,7 +189,12 @@ pub trait RocoStdLib: Send {
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo>;
 
     /// 战斗是否结束
-    fn is_finished(&mut self) -> Result<bool>;
+    fn is_combat_finished(&mut self) -> Result<bool>;
+
+    /// Deprecated: use is_combat_finished().
+    fn is_finished(&mut self) -> Result<bool> {
+        self.is_combat_finished()
+    }
 
     /// 获取当前回合数
     fn get_current_round(&mut self) -> Result<i64>;

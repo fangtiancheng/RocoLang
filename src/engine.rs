@@ -384,6 +384,13 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("is_combat_finished", move || {
+                call_stdlib!(stdlib, is_combat_finished)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("get_current_round", move || {
                 call_stdlib!(stdlib, get_current_round)
             });

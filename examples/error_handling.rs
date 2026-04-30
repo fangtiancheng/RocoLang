@@ -231,7 +231,7 @@ impl RocoStdLib for ErrorTestStdLib {
         })
     }
 
-    fn is_finished(&mut self) -> Result<bool> {
+    fn is_combat_finished(&mut self) -> Result<bool> {
         Ok(false)
     }
 

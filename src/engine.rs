@@ -8,7 +8,7 @@ use crate::stdlib::RocoStdLib;
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
     CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo, StaticSkillInfo,
-    StaticSpiritInfo,
+    StaticSpiritInfo, UserInfo,
 };
 
 /// Print callback 类型别名
@@ -103,6 +103,16 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn(
+                "try_move_to_scene",
+                move |scene_id: i64, timeout_ms: i64| {
+                    call_stdlib!(stdlib, try_move_to_scene, scene_id, timeout_ms)
+                },
+            );
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("get_current_scene", move || {
                 call_stdlib!(stdlib, get_current_scene)
             });
@@ -111,6 +121,11 @@ impl RocoEngine {
         {
             let stdlib = stdlib.clone();
             engine.register_fn("is_in_combat", move || call_stdlib!(stdlib, is_in_combat));
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_user_info", move || call_stdlib!(stdlib, get_user_info));
         }
 
         // ========== 宠物管理 ==========
@@ -159,6 +174,13 @@ impl RocoEngine {
             let stdlib = stdlib.clone();
             engine.register_fn("get_bag_items", move || {
                 call_stdlib!(stdlib, get_bag_items).map(|items| Self::to_array(&items))
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("recover_all_spirits", move || {
+                call_stdlib!(stdlib, recover_all_spirits)
             });
         }
 
@@ -496,6 +518,21 @@ impl RocoEngine {
 
         engine.register_type_with_name::<ActionResult>("ActionResult");
         register_getters!(ActionResult, ok, code, message);
+
+        engine.register_type_with_name::<UserInfo>("UserInfo");
+        register_getters!(
+            UserInfo,
+            uin,
+            id,
+            nick_name,
+            level,
+            is_vip,
+            vip_level,
+            vip_expiring_days,
+            vip_lulu,
+            trainer_level,
+            trainer_exp,
+        );
 
         engine.register_type_with_name::<SpiritInfo>("SpiritInfo");
         register_getters!(SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp);

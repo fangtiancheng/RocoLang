@@ -25,11 +25,34 @@ pub trait RocoStdLib: Send {
     /// Success returns the confirmed scene id. Failure returns `RocoError`.
     fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64>;
 
+    fn try_move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<ActionResult> {
+        match self.get_current_scene() {
+            Ok(current_scene) if current_scene == scene_id => return Ok(ActionResult::ok()),
+            Ok(_) => {}
+            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+        }
+
+        match self.move_to_scene(scene_id, timeout_ms) {
+            Ok(confirmed_scene) if confirmed_scene == scene_id => Ok(ActionResult::ok()),
+            Ok(confirmed_scene) => Ok(ActionResult::failed(format!(
+                "server confirmed scene {}, expected {}",
+                confirmed_scene, scene_id
+            ))),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
     /// 获取当前场景 ID
     fn get_current_scene(&mut self) -> Result<i64>;
 
     fn is_in_combat(&mut self) -> Result<bool> {
         Ok(false)
+    }
+
+    fn get_user_info(&mut self) -> Result<UserInfo> {
+        Err(crate::error::RocoError::StdLibError(
+            "get_user_info not implemented".to_string(),
+        ))
     }
 
     // ==================== 宠物管理 ====================
@@ -53,6 +76,12 @@ pub trait RocoStdLib: Send {
 
     fn get_bag_items(&mut self) -> Result<Vec<BagItemInfo>> {
         Ok(Vec::new())
+    }
+
+    fn recover_all_spirits(&mut self) -> Result<bool> {
+        Err(crate::error::RocoError::StdLibError(
+            "recover_all_spirits not implemented".to_string(),
+        ))
     }
 
     fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>>;

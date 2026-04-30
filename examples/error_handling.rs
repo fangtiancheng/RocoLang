@@ -56,10 +56,6 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(SpiritBagInfo { spirits: vec![] })
     }
 
-    fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
-        Ok(vec![])
-    }
-
     fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
         Ok(vec![])
     }

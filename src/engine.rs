@@ -160,11 +160,6 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("get_lineup", move || call_stdlib!(stdlib, get_lineup));
-        }
-
-        {
-            let stdlib = stdlib.clone();
             engine.register_fn("get_combat_lineup", move || {
                 call_stdlib!(stdlib, get_combat_lineup)
             });

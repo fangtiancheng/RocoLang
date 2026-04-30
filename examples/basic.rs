@@ -74,12 +74,8 @@ impl RocoStdLib for MockStdLib {
         })
     }
 
-    fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
-        Ok(vec![])
-    }
-
     fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
-        self.get_lineup()
+        Ok(vec![])
     }
 
     fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool> {

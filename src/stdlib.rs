@@ -55,9 +55,6 @@ pub trait RocoStdLib: Send {
         Ok(Vec::new())
     }
 
-    /// 获取当前阵容
-    fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
-
     fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
 
     // ==================== 技能/装备 ====================

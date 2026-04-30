@@ -315,10 +315,6 @@ impl RocoStdLib for MockStdLib {
         Ok(10)
     }
 
-    fn get_my_power_skill(&mut self) -> Result<i64> {
-        Ok(101)
-    }
-
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo> {
         println!("Getting spirit info at position {}", position);
         Ok(SpiritInfo {

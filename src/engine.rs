@@ -364,13 +364,6 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("get_my_power_skill", move || {
-                call_stdlib!(stdlib, get_my_power_skill)
-            });
-        }
-
-        {
-            let stdlib = stdlib.clone();
             engine.register_fn("get_my_spirit_info", move |position: i64| {
                 call_stdlib!(stdlib, get_my_spirit_info, position)
             });

@@ -185,9 +185,6 @@ pub trait RocoStdLib: Send {
     /// 获取我方技能 PP
     fn get_my_pp(&mut self, slot: i64) -> Result<i64>;
 
-    /// 获取我方宠物信息
-    fn get_my_power_skill(&mut self) -> Result<i64>;
-
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo>;
 
     /// 获取对手宠物信息（可见部分）

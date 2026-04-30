@@ -63,6 +63,14 @@ pub trait RocoStdLib: Send {
     /// 装备道具
     fn equip_item(&mut self, position: i64, item_name: &str) -> Result<bool>;
 
+    // ==================== 静态资料查询 ====================
+
+    fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo>;
+
+    fn lookup_skill_info(&mut self, skill_id: i64) -> Result<StaticSkillInfo>;
+
+    fn lookup_spirit_info(&mut self, spirit_id: i64) -> Result<StaticSpiritInfo>;
+
     // ==================== 战斗相关 ====================
 
     /// 邀请 PK

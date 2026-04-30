@@ -1,6 +1,6 @@
 use roco_lang::{
     BattleInfo, BattleResult, Result, RocoEngine, RocoStdLib, RoundResult, SkillInfo,
-    SpiritBagInfo, SpiritInfo,
+    SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -107,6 +107,84 @@ impl RocoStdLib for MockStdLib {
     fn equip_item(&mut self, position: i64, item_name: &str) -> Result<bool> {
         println!("Equipping {} at position {}", item_name, position);
         Ok(true)
+    }
+
+    fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo> {
+        Ok(StaticItemInfo {
+            id: item_id,
+            name: format!("Item {}", item_id),
+            description: String::new(),
+            unique: false,
+            item_type: 0,
+            subtype: 0,
+            price: 0,
+            expire_time: 0,
+        })
+    }
+
+    fn lookup_skill_info(&mut self, skill_id: i64) -> Result<StaticSkillInfo> {
+        Ok(StaticSkillInfo {
+            id: skill_id,
+            name: format!("Skill {}", skill_id),
+            description: String::new(),
+            description2: String::new(),
+            power: String::new(),
+            pp_max: 0,
+            property: 0,
+            src: String::new(),
+            attack_type: 0,
+            speed: 0,
+            damage_type: 0,
+            catch_rate: 0,
+            super_form_id: 0,
+            super_form_src: String::new(),
+        })
+    }
+
+    fn lookup_spirit_info(&mut self, spirit_id: i64) -> Result<StaticSpiritInfo> {
+        Ok(StaticSpiritInfo {
+            id: spirit_id,
+            name: format!("Spirit {}", spirit_id),
+            description: String::new(),
+            features: Vec::new(),
+            group: Vec::new(),
+            src: String::new(),
+            avatar: String::new(),
+            icon_src: String::new(),
+            preview_src: String::new(),
+            move_type: 0,
+            move_speed: 0,
+            height: String::new(),
+            weight: String::new(),
+            color: String::new(),
+            interest: String::new(),
+            habitat: String::new(),
+            evolution: Vec::new(),
+            catchrate: 0,
+            boss_phyle: String::new(),
+            boss_reward: String::new(),
+            scene_id: 0,
+            condition: String::new(),
+            require_level: String::new(),
+            wg: 0,
+            mg: 0,
+            mk: 0,
+            sm: 0,
+            sd: 0,
+            fy: 0,
+            reward: 0,
+            evolution_form_id: 0,
+            evolution_to_ids: Vec::new(),
+            get_form: String::new(),
+            state: 0,
+            start_time: String::new(),
+            end_time: String::new(),
+            first_id: 0,
+            propo_level: 0,
+            is_in_book: false,
+            skinnum: 0,
+            exp_type: 0,
+        })
     }
 
     fn invite_pk(&mut self, target_uin: i64) -> Result<BattleInfo> {

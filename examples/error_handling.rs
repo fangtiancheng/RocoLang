@@ -1,6 +1,6 @@
 use roco_lang::{
     BattleInfo, BattleResult, Result, RocoEngine, RocoError, RocoStdLib, RoundResult, SkillInfo,
-    SpiritBagInfo, SpiritInfo,
+    SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -73,6 +73,24 @@ impl RocoStdLib for ErrorTestStdLib {
 
     fn equip_item(&mut self, _position: i64, _item_name: &str) -> Result<bool> {
         Ok(true)
+    }
+
+    fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo> {
+        Err(RocoError::StdLibError(format!(
+            "item info not found: {item_id}"
+        )))
+    }
+
+    fn lookup_skill_info(&mut self, skill_id: i64) -> Result<StaticSkillInfo> {
+        Err(RocoError::StdLibError(format!(
+            "skill info not found: {skill_id}"
+        )))
+    }
+
+    fn lookup_spirit_info(&mut self, spirit_id: i64) -> Result<StaticSpiritInfo> {
+        Err(RocoError::StdLibError(format!(
+            "spirit info not found: {spirit_id}"
+        )))
     }
 
     fn invite_pk(&mut self, target_uin: i64) -> Result<BattleInfo> {

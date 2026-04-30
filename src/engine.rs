@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::error::{Result, RocoError};
 use crate::stdlib::RocoStdLib;
+use crate::types::{StaticItemInfo, StaticSkillInfo, StaticSpiritInfo};
 
 /// Print callback 类型别名
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -84,6 +85,8 @@ impl RocoEngine {
 
     /// 注册标准库函数到 Rhai 引擎
     fn register_stdlib<T: RocoStdLib + 'static>(engine: &mut Engine, stdlib: Arc<Mutex<T>>) {
+        Self::register_static_info_types(engine);
+
         // ========== 场景相关 ==========
         {
             let stdlib = stdlib.clone();
@@ -171,6 +174,28 @@ impl RocoEngine {
             let stdlib = stdlib.clone();
             engine.register_fn("equip_item", move |position: i64, item_name: &str| {
                 call_stdlib!(stdlib, equip_item, position, item_name)
+            });
+        }
+
+        // ========== 静态资料查询 ==========
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("lookup_item_info", move |item_id: i64| {
+                call_stdlib!(stdlib, lookup_item_info, item_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("lookup_skill_info", move |skill_id: i64| {
+                call_stdlib!(stdlib, lookup_skill_info, skill_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("lookup_spirit_info", move |spirit_id: i64| {
+                call_stdlib!(stdlib, lookup_spirit_info, spirit_id)
             });
         }
 
@@ -360,5 +385,95 @@ impl RocoEngine {
         self.engine
             .call_fn(&mut scope, ast, fn_name, args)
             .map_err(|e| RocoError::ScriptError(e.to_string()))
+    }
+
+    fn register_static_info_types(engine: &mut Engine) {
+        macro_rules! register_getters {
+            ($type:ty, $($field:ident),+ $(,)?) => {
+                $(
+                    engine.register_get(stringify!($field), |value: &mut $type| {
+                        value.$field.clone()
+                    });
+                )+
+            };
+        }
+
+        engine.register_type_with_name::<StaticItemInfo>("StaticItemInfo");
+        register_getters!(
+            StaticItemInfo,
+            id,
+            name,
+            description,
+            unique,
+            item_type,
+            subtype,
+            price,
+            expire_time,
+        );
+
+        engine.register_type_with_name::<StaticSkillInfo>("StaticSkillInfo");
+        register_getters!(
+            StaticSkillInfo,
+            id,
+            name,
+            description,
+            description2,
+            power,
+            pp_max,
+            property,
+            src,
+            attack_type,
+            speed,
+            damage_type,
+            catch_rate,
+            super_form_id,
+            super_form_src,
+        );
+
+        engine.register_type_with_name::<StaticSpiritInfo>("StaticSpiritInfo");
+        register_getters!(
+            StaticSpiritInfo,
+            id,
+            name,
+            description,
+            features,
+            group,
+            src,
+            avatar,
+            icon_src,
+            preview_src,
+            move_type,
+            move_speed,
+            height,
+            weight,
+            color,
+            interest,
+            habitat,
+            evolution,
+            catchrate,
+            boss_phyle,
+            boss_reward,
+            scene_id,
+            condition,
+            require_level,
+            wg,
+            mg,
+            mk,
+            sm,
+            sd,
+            fy,
+            reward,
+            evolution_form_id,
+            evolution_to_ids,
+            get_form,
+            state,
+            start_time,
+            end_time,
+            first_id,
+            propo_level,
+            is_in_book,
+            skinnum,
+            exp_type,
+        );
     }
 }

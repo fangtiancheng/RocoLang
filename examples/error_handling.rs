@@ -211,23 +211,27 @@ impl RocoStdLib for ErrorTestStdLib {
 
     fn get_my_spirit_info(&mut self, _position: i64) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            spirit_id: 1,
             position: _position,
             catch_time: 0,
             name: "Test".to_string(),
             level: 1,
             hp: 100,
             max_hp: 100,
+            skills: Vec::new(),
         })
     }
 
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            spirit_id: 2,
             position: 1,
             catch_time: 0,
             name: "Rival".to_string(),
             level: 1,
             hp: 100,
             max_hp: 100,
+            skills: Vec::new(),
         })
     }
 

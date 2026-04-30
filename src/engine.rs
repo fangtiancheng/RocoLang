@@ -6,7 +6,8 @@ use std::sync::{Arc, Mutex};
 use crate::error::{Result, RocoError};
 use crate::stdlib::RocoStdLib;
 use crate::types::{
-    ActionResult, CombatActions, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    ActionResult, BagItemInfo, CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 
 /// Print callback 类型别名
@@ -105,6 +106,11 @@ impl RocoEngine {
             });
         }
 
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("is_in_combat", move || call_stdlib!(stdlib, is_in_combat));
+        }
+
         // ========== 宠物管理 ==========
         {
             let stdlib = stdlib.clone();
@@ -145,6 +151,11 @@ impl RocoEngine {
             engine.register_fn("get_spirit_bag", move || {
                 call_stdlib!(stdlib, get_spirit_bag)
             });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_bag_items", move || call_stdlib!(stdlib, get_bag_items));
         }
 
         {
@@ -404,6 +415,13 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("format_time", move |timestamp: i64| {
+                call_stdlib!(stdlib, format_time, timestamp)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("log", move |message: &str| {
                 call_stdlib!(stdlib, log, message)
             });
@@ -454,8 +472,20 @@ impl RocoEngine {
     fn register_builtin_helpers(engine: &mut Engine) {
         engine.register_fn("len", |array: &mut Array| array.len() as i64);
         engine.register_fn("len", |spirits: &mut Vec<SpiritInfo>| spirits.len() as i64);
+        engine.register_fn("len", |skills: &mut Vec<SpiritSkillInfo>| {
+            skills.len() as i64
+        });
+        engine.register_fn("len", |items: &mut Vec<BagItemInfo>| items.len() as i64);
         engine.register_indexer_get(|spirits: &mut Vec<SpiritInfo>, index: i64| -> SpiritInfo {
             spirits[index as usize].clone()
+        });
+        engine.register_indexer_get(
+            |skills: &mut Vec<SpiritSkillInfo>, index: i64| -> SpiritSkillInfo {
+                skills[index as usize].clone()
+            },
+        );
+        engine.register_indexer_get(|items: &mut Vec<BagItemInfo>, index: i64| -> BagItemInfo {
+            items[index as usize].clone()
         });
     }
 
@@ -488,7 +518,18 @@ impl RocoEngine {
         register_getters!(ActionResult, ok, code, message);
 
         engine.register_type_with_name::<SpiritInfo>("SpiritInfo");
-        register_getters!(SpiritInfo, position, catch_time, name, level, hp, max_hp);
+        register_getters!(
+            SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp, skills
+        );
+
+        engine.register_type_with_name::<SpiritSkillInfo>("SpiritSkillInfo");
+        register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
+
+        engine.register_type_with_name::<BagItemInfo>("BagItemInfo");
+        register_getters!(BagItemInfo, item_id, count);
+
+        engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");
+        register_getters!(SpiritBagInfo, spirits);
 
         engine.register_type_with_name::<StaticItemInfo>("StaticItemInfo");
         register_getters!(

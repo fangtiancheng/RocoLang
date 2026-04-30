@@ -28,6 +28,10 @@ pub trait RocoStdLib: Send {
     /// 获取当前场景 ID
     fn get_current_scene(&mut self) -> Result<i64>;
 
+    fn is_in_combat(&mut self) -> Result<bool> {
+        Ok(false)
+    }
+
     // ==================== 宠物管理 ====================
 
     /// 从仓库取出宠物（通过 catch_time）
@@ -46,6 +50,10 @@ pub trait RocoStdLib: Send {
 
     /// 获取背包信息
     fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo>;
+
+    fn get_bag_items(&mut self) -> Result<Vec<BagItemInfo>> {
+        Ok(Vec::new())
+    }
 
     /// 获取当前阵容
     fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
@@ -203,6 +211,10 @@ pub trait RocoStdLib: Send {
 
     /// 休眠（毫秒）
     fn sleep(&mut self, ms: i64) -> Result<()>;
+
+    fn format_time(&mut self, timestamp: i64) -> Result<String> {
+        Ok(timestamp.to_string())
+    }
 
     /// 日志输出
     fn log(&mut self, message: &str) -> Result<()>;

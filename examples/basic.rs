@@ -62,12 +62,14 @@ impl RocoStdLib for MockStdLib {
     fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo> {
         Ok(SpiritBagInfo {
             spirits: vec![SpiritInfo {
+                spirit_id: 1,
                 position: 1,
                 catch_time: 123456,
                 name: "Fire Spirit".to_string(),
                 level: 50,
                 hp: 100,
                 max_hp: 100,
+                skills: Vec::new(),
             }],
         })
     }
@@ -324,23 +326,27 @@ impl RocoStdLib for MockStdLib {
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo> {
         println!("Getting spirit info at position {}", position);
         Ok(SpiritInfo {
+            spirit_id: 1,
             position,
             catch_time: 123456,
             name: "Fire Spirit".to_string(),
             level: 50,
             hp: self.my_hp,
             max_hp: 100,
+            skills: Vec::new(),
         })
     }
 
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            spirit_id: 2,
             position: 1,
             catch_time: 0,
             name: "Rival Spirit".to_string(),
             level: 50,
             hp: self.rival_hp,
             max_hp: 100,
+            skills: Vec::new(),
         })
     }
 

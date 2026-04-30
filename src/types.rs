@@ -5,12 +5,27 @@ use serde::{Deserialize, Serialize};
 /// 宠物信息
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritInfo {
+    pub spirit_id: i64,
     pub position: i64,
     pub catch_time: i64,
     pub name: String,
     pub level: i64,
     pub hp: i64,
     pub max_hp: i64,
+    pub skills: Vec<SpiritSkillInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpiritSkillInfo {
+    pub skill_id: i64,
+    pub pp: i64,
+    pub inherited: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BagItemInfo {
+    pub item_id: i64,
+    pub count: i64,
 }
 
 /// 宠物背包信息

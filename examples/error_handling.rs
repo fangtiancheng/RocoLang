@@ -1,6 +1,7 @@
 use roco_lang::{
-    BattleInfo, BattleResult, Result, RocoEngine, RocoError, RocoStdLib, RoundResult, SkillInfo,
-    SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    BattleInfo, BattleResult, CombatActions, Result, RocoEngine, RocoError, RocoStdLib,
+    RoundResult, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo,
+    StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -59,8 +60,8 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(vec![])
     }
 
-    fn get_lineup_count(&mut self) -> Result<i64> {
-        Ok(0)
+    fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
+        Ok(vec![])
     }
 
     fn learn_skill(&mut self, _position: i64, _skill_id: i64) -> Result<bool> {
@@ -114,7 +115,7 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
-    fn use_item(&mut self, _item_name: &str) -> Result<bool> {
+    fn use_item(&mut self, _item_id: i64) -> Result<bool> {
         Ok(true)
     }
 
@@ -144,6 +145,36 @@ impl RocoStdLib for ErrorTestStdLib {
             winner: None,
             total_rounds: 0,
         })
+    }
+
+    fn get_combat_actions(&mut self) -> Result<CombatActions> {
+        Ok(CombatActions {
+            can_submit_action: true,
+            can_use_skill: true,
+            can_capture: true,
+            can_use_item: true,
+            can_change_spirit: false,
+            can_escape: true,
+            can_use_any_skill: false,
+            can_change_to_any_spirit: false,
+            can_combat_mask: 31,
+        })
+    }
+
+    fn can_use_skill(&mut self, _skill_id: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn can_use_item(&mut self, _item_id: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn can_change_to_spirit(&mut self, _position: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn can_capture(&mut self) -> Result<bool> {
+        Ok(true)
     }
 
     fn get_battle_history(&mut self) -> Result<String> {
@@ -180,6 +211,7 @@ impl RocoStdLib for ErrorTestStdLib {
 
     fn get_my_spirit_info(&mut self, _position: i64) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            position: _position,
             catch_time: 0,
             name: "Test".to_string(),
             level: 1,
@@ -190,6 +222,7 @@ impl RocoStdLib for ErrorTestStdLib {
 
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            position: 1,
             catch_time: 0,
             name: "Rival".to_string(),
             level: 1,

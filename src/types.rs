@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 /// 宠物信息
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritInfo {
+    pub position: i64,
     pub catch_time: i64,
     pub name: String,
     pub level: i64,
@@ -41,6 +42,52 @@ pub struct RoundResult {
 pub struct BattleResult {
     pub winner: Option<i64>,
     pub total_rounds: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatActions {
+    pub can_submit_action: bool,
+    pub can_use_skill: bool,
+    pub can_capture: bool,
+    pub can_use_item: bool,
+    pub can_change_spirit: bool,
+    pub can_escape: bool,
+    pub can_use_any_skill: bool,
+    pub can_change_to_any_spirit: bool,
+    pub can_combat_mask: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActionResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+}
+
+impl ActionResult {
+    pub fn ok() -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+        }
+    }
+
+    pub fn unavailable(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 1,
+            message: message.into(),
+        }
+    }
+
+    pub fn failed(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 2,
+            message: message.into(),
+        }
+    }
 }
 
 /// 技能信息

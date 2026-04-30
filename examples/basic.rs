@@ -1,6 +1,6 @@
 use roco_lang::{
-    BattleInfo, BattleResult, Result, RocoEngine, RocoStdLib, RoundResult, SkillInfo,
-    SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    BattleInfo, BattleResult, CombatActions, Result, RocoEngine, RocoStdLib, RoundResult,
+    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -62,6 +62,7 @@ impl RocoStdLib for MockStdLib {
     fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo> {
         Ok(SpiritBagInfo {
             spirits: vec![SpiritInfo {
+                position: 1,
                 catch_time: 123456,
                 name: "Fire Spirit".to_string(),
                 level: 50,
@@ -75,8 +76,8 @@ impl RocoStdLib for MockStdLib {
         Ok(vec![])
     }
 
-    fn get_lineup_count(&mut self) -> Result<i64> {
-        Ok(1)
+    fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
+        self.get_lineup()
     }
 
     fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool> {
@@ -213,8 +214,8 @@ impl RocoStdLib for MockStdLib {
         Ok(true)
     }
 
-    fn use_item(&mut self, item_name: &str) -> Result<bool> {
-        println!("Using item {}", item_name);
+    fn use_item(&mut self, item_id: i64) -> Result<bool> {
+        println!("Using item {}", item_id);
         self.my_hp += 30;
         if self.my_hp > 100 {
             self.my_hp = 100;
@@ -261,6 +262,36 @@ impl RocoStdLib for MockStdLib {
         })
     }
 
+    fn get_combat_actions(&mut self) -> Result<CombatActions> {
+        Ok(CombatActions {
+            can_submit_action: true,
+            can_use_skill: true,
+            can_capture: true,
+            can_use_item: true,
+            can_change_spirit: false,
+            can_escape: true,
+            can_use_any_skill: true,
+            can_change_to_any_spirit: false,
+            can_combat_mask: 31,
+        })
+    }
+
+    fn can_use_skill(&mut self, _skill_id: i64) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn can_use_item(&mut self, _item_id: i64) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn can_change_to_spirit(&mut self, _position: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn can_capture(&mut self) -> Result<bool> {
+        Ok(true)
+    }
+
     fn get_battle_history(&mut self) -> Result<String> {
         Ok("{}".to_string())
     }
@@ -293,6 +324,7 @@ impl RocoStdLib for MockStdLib {
     fn get_my_spirit_info(&mut self, position: i64) -> Result<SpiritInfo> {
         println!("Getting spirit info at position {}", position);
         Ok(SpiritInfo {
+            position,
             catch_time: 123456,
             name: "Fire Spirit".to_string(),
             level: 50,
@@ -303,6 +335,7 @@ impl RocoStdLib for MockStdLib {
 
     fn get_rival_spirit_info(&mut self) -> Result<SpiritInfo> {
         Ok(SpiritInfo {
+            position: 1,
             catch_time: 0,
             name: "Rival Spirit".to_string(),
             level: 50,
@@ -360,7 +393,7 @@ fn main() -> Result<()> {
 
             if my_hp < 50 {
                 log("HP low, using item");
-                use_item("heal_potion");
+                use_item(16842759);
             } else {
                 log("Using attack skill");
                 use_skill(101);

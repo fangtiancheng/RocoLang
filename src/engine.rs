@@ -1,11 +1,13 @@
 //! RocoEngine - 封装 Rhai 引擎并注册标准库
 
-use rhai::{Dynamic, Engine, EvalAltResult, AST};
+use rhai::{Array, Dynamic, Engine, EvalAltResult, AST};
 use std::sync::{Arc, Mutex};
 
 use crate::error::{Result, RocoError};
 use crate::stdlib::RocoStdLib;
-use crate::types::{StaticItemInfo, StaticSkillInfo, StaticSpiritInfo};
+use crate::types::{
+    ActionResult, CombatActions, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+};
 
 /// Print callback 类型别名
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -44,6 +46,7 @@ impl RocoEngine {
 
         // 注册所有标准库函数
         Self::register_stdlib(&mut engine, stdlib);
+        Self::register_builtin_helpers(&mut engine);
 
         Self {
             engine,
@@ -151,8 +154,8 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("get_lineup_count", move || {
-                call_stdlib!(stdlib, get_lineup_count)
+            engine.register_fn("get_combat_lineup", move || {
+                call_stdlib!(stdlib, get_combat_lineup)
             });
         }
 
@@ -226,8 +229,22 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
-            engine.register_fn("use_item", move |item_name: &str| {
-                call_stdlib!(stdlib, use_item, item_name)
+            engine.register_fn("try_use_skill", move |skill_id: i64| {
+                call_stdlib!(stdlib, try_use_skill, skill_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("use_item", move |item_id: i64| {
+                call_stdlib!(stdlib, use_item, item_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("try_use_item", move |item_id: i64| {
+                call_stdlib!(stdlib, try_use_item, item_id)
             });
         }
 
@@ -235,6 +252,13 @@ impl RocoEngine {
             let stdlib = stdlib.clone();
             engine.register_fn("change_spirit", move |position: i64| {
                 call_stdlib!(stdlib, change_spirit, position)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("try_change_spirit", move |position: i64| {
+                call_stdlib!(stdlib, try_change_spirit, position)
             });
         }
 
@@ -260,6 +284,39 @@ impl RocoEngine {
             engine.register_fn("get_battle_result", move || {
                 call_stdlib!(stdlib, get_battle_result)
             });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("get_combat_actions", move || {
+                call_stdlib!(stdlib, get_combat_actions)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("can_use_skill", move |skill_id: i64| {
+                call_stdlib!(stdlib, can_use_skill, skill_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("can_use_item", move |item_id: i64| {
+                call_stdlib!(stdlib, can_use_item, item_id)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("can_change_to_spirit", move |position: i64| {
+                call_stdlib!(stdlib, can_change_to_spirit, position)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("can_capture", move || call_stdlib!(stdlib, can_capture));
         }
 
         {
@@ -387,6 +444,14 @@ impl RocoEngine {
             .map_err(|e| RocoError::ScriptError(e.to_string()))
     }
 
+    fn register_builtin_helpers(engine: &mut Engine) {
+        engine.register_fn("len", |array: &mut Array| array.len() as i64);
+        engine.register_fn("len", |spirits: &mut Vec<SpiritInfo>| spirits.len() as i64);
+        engine.register_indexer_get(|spirits: &mut Vec<SpiritInfo>, index: i64| -> SpiritInfo {
+            spirits[index as usize].clone()
+        });
+    }
+
     fn register_static_info_types(engine: &mut Engine) {
         macro_rules! register_getters {
             ($type:ty, $($field:ident),+ $(,)?) => {
@@ -397,6 +462,26 @@ impl RocoEngine {
                 )+
             };
         }
+
+        engine.register_type_with_name::<CombatActions>("CombatActions");
+        register_getters!(
+            CombatActions,
+            can_submit_action,
+            can_use_skill,
+            can_capture,
+            can_use_item,
+            can_change_spirit,
+            can_escape,
+            can_use_any_skill,
+            can_change_to_any_spirit,
+            can_combat_mask,
+        );
+
+        engine.register_type_with_name::<ActionResult>("ActionResult");
+        register_getters!(ActionResult, ok, code, message);
+
+        engine.register_type_with_name::<SpiritInfo>("SpiritInfo");
+        register_getters!(SpiritInfo, position, catch_time, name, level, hp, max_hp);
 
         engine.register_type_with_name::<StaticItemInfo>("StaticItemInfo");
         register_getters!(

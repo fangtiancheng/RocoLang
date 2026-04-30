@@ -50,7 +50,7 @@ pub trait RocoStdLib: Send {
     /// 获取当前阵容
     fn get_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
 
-    fn get_lineup_count(&mut self) -> Result<i64>;
+    fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>>;
 
     // ==================== 技能/装备 ====================
 
@@ -85,11 +85,53 @@ pub trait RocoStdLib: Send {
     /// 使用技能
     fn use_skill(&mut self, skill_id: i64) -> Result<bool>;
 
+    fn try_use_skill(&mut self, skill_id: i64) -> Result<ActionResult> {
+        match self.can_use_skill(skill_id) {
+            Ok(true) => {}
+            Ok(false) => return Ok(ActionResult::unavailable("skill unavailable")),
+            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+        }
+
+        match self.use_skill(skill_id) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("use_skill returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
     /// 使用道具
-    fn use_item(&mut self, item_name: &str) -> Result<bool>;
+    fn use_item(&mut self, item_id: i64) -> Result<bool>;
+
+    fn try_use_item(&mut self, item_id: i64) -> Result<ActionResult> {
+        match self.can_use_item(item_id) {
+            Ok(true) => {}
+            Ok(false) => return Ok(ActionResult::unavailable("item unavailable")),
+            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+        }
+
+        match self.use_item(item_id) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("use_item returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
 
     /// 更换宠物
     fn change_spirit(&mut self, position: i64) -> Result<bool>;
+
+    fn try_change_spirit(&mut self, position: i64) -> Result<ActionResult> {
+        match self.can_change_to_spirit(position) {
+            Ok(true) => {}
+            Ok(false) => return Ok(ActionResult::unavailable("target spirit unavailable")),
+            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+        }
+
+        match self.change_spirit(position) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("change_spirit returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
 
     /// 防御
     fn defend(&mut self) -> Result<bool>;
@@ -102,6 +144,21 @@ pub trait RocoStdLib: Send {
 
     /// 获取战斗结果
     fn get_battle_result(&mut self) -> Result<BattleResult>;
+
+    /// 获取当前回合可提交的战斗动作类别
+    fn get_combat_actions(&mut self) -> Result<CombatActions>;
+
+    /// 指定技能当前是否可用：同时检查当前回合动作类别、技能是否存在、PP 是否足够
+    fn can_use_skill(&mut self, skill_id: i64) -> Result<bool>;
+
+    /// 指定道具当前是否可用：同时检查当前回合动作类别和战斗背包数量
+    fn can_use_item(&mut self, item_id: i64) -> Result<bool>;
+
+    /// 指定位置是否可切换：同时检查当前回合动作类别、位置是否存在、是否未阵亡、是否非当前宠
+    fn can_change_to_spirit(&mut self, position: i64) -> Result<bool>;
+
+    /// 当前回合是否允许捕捉
+    fn can_capture(&mut self) -> Result<bool>;
 
     /// 获取战斗历史（JSON 字符串）
     fn get_battle_history(&mut self) -> Result<String>;

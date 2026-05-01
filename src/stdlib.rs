@@ -80,6 +80,10 @@ pub trait RocoStdLib: Send {
         Ok(Vec::new())
     }
 
+    fn take_pushed_items(&mut self) -> Result<Vec<BagItemInfo>> {
+        Ok(Vec::new())
+    }
+
     fn recover_all_spirits(&mut self) -> Result<bool> {
         Err(crate::error::RocoError::StdLibError(
             "recover_all_spirits not implemented".to_string(),

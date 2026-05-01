@@ -186,6 +186,13 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("take_pushed_items", move || {
+                call_stdlib!(stdlib, take_pushed_items).map(|items| Self::to_array(&items))
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("recover_all_spirits", move || {
                 call_stdlib!(stdlib, recover_all_spirits)
             });

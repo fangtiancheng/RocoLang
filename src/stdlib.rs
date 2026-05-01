@@ -62,6 +62,38 @@ pub trait RocoStdLib: Send {
         }
     }
 
+    fn session_get_int(&mut self, _key: &str, default_value: i64) -> Result<i64> {
+        Ok(default_value)
+    }
+
+    fn session_set_int(&mut self, _key: &str, _value: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn session_get_string(&mut self, _key: &str, default_value: &str) -> Result<String> {
+        Ok(default_value.to_string())
+    }
+
+    fn session_set_string(&mut self, _key: &str, _value: &str) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn session_get_bool(&mut self, _key: &str, default_value: bool) -> Result<bool> {
+        Ok(default_value)
+    }
+
+    fn session_set_bool(&mut self, _key: &str, _value: bool) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn session_delete(&mut self, _key: &str) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn session_clear(&mut self) -> Result<bool> {
+        Ok(false)
+    }
+
     fn is_in_combat(&mut self) -> Result<bool> {
         Ok(false)
     }

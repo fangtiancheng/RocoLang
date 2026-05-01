@@ -134,6 +134,63 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("session_get_int", move |key: &str, default_value: i64| {
+                call_stdlib!(stdlib, session_get_int, key, default_value)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_set_int", move |key: &str, value: i64| {
+                call_stdlib!(stdlib, session_set_int, key, value)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn(
+                "session_get_string",
+                move |key: &str, default_value: &str| {
+                    call_stdlib!(stdlib, session_get_string, key, default_value)
+                },
+            );
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_set_string", move |key: &str, value: &str| {
+                call_stdlib!(stdlib, session_set_string, key, value)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_get_bool", move |key: &str, default_value: bool| {
+                call_stdlib!(stdlib, session_get_bool, key, default_value)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_set_bool", move |key: &str, value: bool| {
+                call_stdlib!(stdlib, session_set_bool, key, value)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_delete", move |key: &str| {
+                call_stdlib!(stdlib, session_delete, key)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("session_clear", move || call_stdlib!(stdlib, session_clear));
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("is_in_combat", move || call_stdlib!(stdlib, is_in_combat));
         }
 

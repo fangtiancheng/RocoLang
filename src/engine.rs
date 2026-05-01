@@ -120,6 +120,20 @@ impl RocoEngine {
 
         {
             let stdlib = stdlib.clone();
+            engine.register_fn("query_server_time", move || {
+                call_stdlib!(stdlib, query_server_time)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("try_query_server_time", move || {
+                call_stdlib!(stdlib, try_query_server_time)
+            });
+        }
+
+        {
+            let stdlib = stdlib.clone();
             engine.register_fn("is_in_combat", move || call_stdlib!(stdlib, is_in_combat));
         }
 
@@ -446,6 +460,18 @@ impl RocoEngine {
         {
             let stdlib = stdlib.clone();
             engine.register_fn("sleep", move |ms: i64| call_stdlib!(stdlib, sleep, ms));
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("now_ms", move || call_stdlib!(stdlib, now_ms));
+        }
+
+        {
+            let stdlib = stdlib.clone();
+            engine.register_fn("sleep_until_ms", move |target_ms: i64| {
+                call_stdlib!(stdlib, sleep_until_ms, target_ms)
+            });
         }
 
         {

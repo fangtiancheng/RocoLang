@@ -45,6 +45,23 @@ pub trait RocoStdLib: Send {
     /// 获取当前场景 ID
     fn get_current_scene(&mut self) -> Result<i64>;
 
+    fn query_server_time(&mut self) -> Result<i64> {
+        Err(crate::error::RocoError::StdLibError(
+            "query_server_time not implemented".to_string(),
+        ))
+    }
+
+    fn try_query_server_time(&mut self) -> Result<ActionResult> {
+        match self.query_server_time() {
+            Ok(stamp) => Ok(ActionResult {
+                ok: true,
+                code: 0,
+                message: stamp.to_string(),
+            }),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
     fn is_in_combat(&mut self) -> Result<bool> {
         Ok(false)
     }
@@ -254,6 +271,23 @@ pub trait RocoStdLib: Send {
 
     /// 休眠（毫秒）
     fn sleep(&mut self, ms: i64) -> Result<()>;
+
+    fn now_ms(&mut self) -> Result<i64> {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|error| crate::error::RocoError::StdLibError(error.to_string()))?;
+        i64::try_from(now.as_millis()).map_err(|_| {
+            crate::error::RocoError::StdLibError("current timestamp exceeds i64 range".to_string())
+        })
+    }
+
+    fn sleep_until_ms(&mut self, target_ms: i64) -> Result<()> {
+        let now = self.now_ms()?;
+        if target_ms <= now {
+            return Ok(());
+        }
+        self.sleep(target_ms - now)
+    }
 
     fn format_time(&mut self, timestamp: i64) -> Result<String> {
         Ok(timestamp.to_string())

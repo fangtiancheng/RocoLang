@@ -4,7 +4,7 @@ use rhai::{Array, Dynamic, Engine, AST};
 use std::sync::{Arc, Mutex};
 
 use crate::error::{Result, RocoError};
-use crate::stdlib::{combat, lookup, profile, scene, session, spirit, system, RocoStdLib};
+use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
     CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo, StaticSkillInfo,
@@ -73,6 +73,10 @@ impl RocoEngine {
         let mut profile_module = rhai::Module::new();
         profile::register(&mut profile_module, stdlib.clone());
         engine.register_static_module("profile", profile_module.into());
+
+        let mut game_module = rhai::Module::new();
+        game::register(&mut game_module, stdlib.clone());
+        engine.register_static_module("game", game_module.into());
 
         let mut spirit_module = rhai::Module::new();
         spirit::register(&mut spirit_module, stdlib.clone());

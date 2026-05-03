@@ -4,6 +4,7 @@ use crate::error::{Result, RocoError};
 use crate::types::*;
 
 pub mod combat;
+pub mod game;
 pub mod lookup;
 pub mod profile;
 pub mod scene;
@@ -46,6 +47,22 @@ pub trait RocoStdLib: Send {
 
     fn query_server_time(&mut self) -> Result<i64> {
         unsupported("profile::query_server_time")
+    }
+
+    fn get_pause(&mut self) -> Result<bool> {
+        unsupported("game::get_pause")
+    }
+
+    fn set_pause(&mut self, _enabled: bool) -> Result<bool> {
+        unsupported("game::set_pause")
+    }
+
+    fn try_set_pause(&mut self, enabled: bool) -> Result<ActionResult> {
+        match self.set_pause(enabled) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("set_pause returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
     }
 
     fn try_query_server_time(&mut self) -> Result<ActionResult> {

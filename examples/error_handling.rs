@@ -32,19 +32,17 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(1)
     }
 
-    fn fetch_spirit(&mut self, _catch_time: i64) -> Result<bool> {
+    fn fetch_spirit(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<bool> {
         Ok(true)
     }
 
-    fn fetch_spirit_by_id(&mut self, _spirit_id: i64) -> Result<bool> {
-        Ok(true)
-    }
-
-    fn challenge_wild_spirit(&mut self, _spirit_id: i64) -> Result<bool> {
-        Ok(true)
-    }
-
-    fn challenge_boss(&mut self, _boss_code: i64) -> Result<bool> {
+    fn start_combat(
+        &mut self,
+        _server_type: i64,
+        _combat_type: i64,
+        _rival_id: i64,
+        _catch_time: i64,
+    ) -> Result<bool> {
         Ok(true)
     }
 
@@ -60,8 +58,8 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(SpiritBagInfo { spirits: vec![] })
     }
 
-    fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
-        Ok(vec![])
+    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
+        Ok(Default::default())
     }
 
     fn learn_skill(&mut self, _position: i64, _skill_id: i64) -> Result<bool> {
@@ -72,7 +70,14 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok([None, None, None, None])
     }
 
-    fn equip_item(&mut self, _position: i64, _item_name: &str) -> Result<bool> {
+    fn equip_item(
+        &mut self,
+        _position: i64,
+        _equipment_server_id: i64,
+        _equipment_catch_time: i64,
+        _spirit_id: i64,
+        _spirit_catch_time: i64,
+    ) -> Result<bool> {
         Ok(true)
     }
 
@@ -120,10 +125,6 @@ impl RocoStdLib for ErrorTestStdLib {
     }
 
     fn change_spirit(&mut self, _position: i64) -> Result<bool> {
-        Ok(true)
-    }
-
-    fn defend(&mut self) -> Result<bool> {
         Ok(true)
     }
 
@@ -264,10 +265,10 @@ fn main() -> Result<()> {
 
     println!("=== Test 1: Normal execution ===");
     let script1 = r#"
-        log("Test normal execution");
-        move_to_scene(42, 5000);
-        let hp = get_my_hp();
-        log("HP: " + hp);
+        system::log("Test normal execution");
+        scene::move_to_scene(42, 5000);
+        let hp = combat::get_my_hp();
+        system::log("HP: " + hp);
         true
     "#;
 
@@ -282,16 +283,16 @@ fn main() -> Result<()> {
     stdlib.lock().unwrap().should_fail = true;
 
     let script2 = r#"
-        log("Test error handling");
+        system::log("Test error handling");
 
         try {
-            move_to_scene(99, 5000);
-            log("This should not print");
+            scene::move_to_scene(99, 5000);
+            system::log("This should not print");
         } catch (err) {
-            log("Caught error: " + err);
+            system::log("Caught error: " + err);
         }
 
-        log("Script continues after error");
+        system::log("Script continues after error");
         true
     "#;
 
@@ -302,9 +303,9 @@ fn main() -> Result<()> {
 
     println!("=== Test 3: Unhandled error ===");
     let script3 = r#"
-        log("Test unhandled error");
-        get_my_hp();  // This will fail.
-        log("This should not print");
+        system::log("Test unhandled error");
+        combat::get_my_hp();  // This will fail.
+        system::log("This should not print");
     "#;
 
     match engine.eval(script3) {
@@ -316,14 +317,14 @@ fn main() -> Result<()> {
     stdlib.lock().unwrap().should_fail = false;
 
     let script4 = r#"
-        log("Test assert");
-        assert(1 + 1 == 2, "Math works");
-        log("First assert passed");
+        system::log("Test assert");
+        system::assert(1 + 1 == 2, "Math works");
+        system::log("First assert passed");
 
         try {
-            assert(1 + 1 == 3, "Math is broken!");
+            system::assert(1 + 1 == 3, "Math is broken!");
         } catch (err) {
-            log("Caught assertion error: " + err);
+            system::log("Caught assertion error: " + err);
         }
 
         true

@@ -34,23 +34,25 @@ impl RocoStdLib for MockStdLib {
         Ok(self.scene_id)
     }
 
-    fn fetch_spirit(&mut self, catch_time: i64) -> Result<bool> {
-        println!("Fetching spirit with catch_time {}", catch_time);
+    fn fetch_spirit(&mut self, spirit_id: i64, catch_time: i64) -> Result<bool> {
+        println!(
+            "Fetching spirit {} with catch_time {}",
+            spirit_id, catch_time
+        );
         Ok(true)
     }
 
-    fn fetch_spirit_by_id(&mut self, spirit_id: i64) -> Result<bool> {
-        println!("Fetching spirit with id {}", spirit_id);
-        Ok(true)
-    }
-
-    fn challenge_wild_spirit(&mut self, spirit_id: i64) -> Result<bool> {
-        println!("Challenging wild spirit {}", spirit_id);
-        Ok(true)
-    }
-
-    fn challenge_boss(&mut self, boss_code: i64) -> Result<bool> {
-        println!("Challenging boss {}", boss_code);
+    fn start_combat(
+        &mut self,
+        server_type: i64,
+        combat_type: i64,
+        rival_id: i64,
+        catch_time: i64,
+    ) -> Result<bool> {
+        println!(
+            "Starting combat server_type={} combat_type={} rival_id={} catch_time={}",
+            server_type, combat_type, rival_id, catch_time
+        );
         Ok(true)
     }
 
@@ -79,8 +81,8 @@ impl RocoStdLib for MockStdLib {
         })
     }
 
-    fn get_combat_lineup(&mut self) -> Result<Vec<SpiritInfo>> {
-        Ok(vec![])
+    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
+        Ok(Default::default())
     }
 
     fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool> {
@@ -108,8 +110,18 @@ impl RocoStdLib for MockStdLib {
         ])
     }
 
-    fn equip_item(&mut self, position: i64, item_name: &str) -> Result<bool> {
-        println!("Equipping {} at position {}", item_name, position);
+    fn equip_item(
+        &mut self,
+        position: i64,
+        equipment_server_id: i64,
+        equipment_catch_time: i64,
+        spirit_id: i64,
+        spirit_catch_time: i64,
+    ) -> Result<bool> {
+        println!(
+            "Equipping item {}:{} to spirit {}:{} at position {}",
+            equipment_server_id, equipment_catch_time, spirit_id, spirit_catch_time, position
+        );
         Ok(true)
     }
 
@@ -228,11 +240,6 @@ impl RocoStdLib for MockStdLib {
 
     fn change_spirit(&mut self, position: i64) -> Result<bool> {
         println!("Changing to spirit at position {}", position);
-        Ok(true)
-    }
-
-    fn defend(&mut self) -> Result<bool> {
-        println!("Defending");
         Ok(true)
     }
 
@@ -380,35 +387,35 @@ fn main() -> Result<()> {
 
     // Simple battle script.
     let script = r#"
-        log("Starting battle script");
+        system::log("Starting battle script");
 
         // Move to the battle scene.
-        move_to_scene(42, 5000);
+        scene::move_to_scene(42, 5000);
 
         // Battle loop.
         let round = 0;
-        while !is_combat_finished() && round < 10 {
-            log("Round " + round);
+        while !combat::is_combat_finished() && round < 10 {
+            system::log("Round " + round);
 
-            let my_hp = get_my_hp();
-            let rival_hp = get_rival_hp();
+            let my_hp = combat::get_my_hp();
+            let rival_hp = combat::get_rival_hp();
 
-            log("My HP: " + my_hp + ", Rival HP: " + rival_hp);
+            system::log("My HP: " + my_hp + ", Rival HP: " + rival_hp);
 
             if my_hp < 50 {
-                log("HP low, using item");
-                use_item(16842759);
+                system::log("HP low, using item");
+                combat::use_item(16842759);
             } else {
-                log("Using attack skill");
-                use_skill(101);
+                system::log("Using attack skill");
+                combat::use_skill(101);
             }
 
-            wait_round_end();
+            combat::wait_round_end();
             round += 1;
         }
 
-        log("Battle finished");
-        is_combat_finished()
+        system::log("Battle finished");
+        combat::is_combat_finished()
     "#;
 
     let result = engine.eval(script)?;

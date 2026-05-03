@@ -4,6 +4,7 @@
 
 pub mod engine;
 pub mod error;
+pub mod rocolib;
 pub mod stdlib;
 pub mod types;
 

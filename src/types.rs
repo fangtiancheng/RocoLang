@@ -146,7 +146,37 @@ impl ActionResult {
     }
 }
 
-/// 技能信息
+/// Result returned after refreshing a spirit's talent values.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct TalentRefreshResult {
+    pub position: i64,
+    pub pa_old: i64,
+    pub pd_old: i64,
+    pub ma_old: i64,
+    pub md_old: i64,
+    pub sp_old: i64,
+    pub hp_old: i64,
+    pub pa_new: i64,
+    pub pd_new: i64,
+    pub ma_new: i64,
+    pub md_new: i64,
+    pub sp_new: i64,
+    pub hp_new: i64,
+    pub pa_level_old: i64,
+    pub pd_level_old: i64,
+    pub ma_level_old: i64,
+    pub md_level_old: i64,
+    pub sp_level_old: i64,
+    pub hp_level_old: i64,
+    pub pa_level_new: i64,
+    pub pd_level_new: i64,
+    pub ma_level_new: i64,
+    pub md_level_new: i64,
+    pub sp_level_new: i64,
+    pub hp_level_new: i64,
+}
+
+/// Skill information.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SkillInfo {
     pub skill_id: i64,

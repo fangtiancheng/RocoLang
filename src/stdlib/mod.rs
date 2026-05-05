@@ -154,8 +154,16 @@ pub trait RocoStdLib: Send {
         Ok(Vec::new())
     }
 
-    fn recover_all_spirits_vip(&mut self) -> Result<bool> {
-        unsupported("spirit::recover_all_spirits_vip")
+    fn recover_all_spirits(&mut self) -> Result<bool> {
+        unsupported("spirit::recover_all_spirits")
+    }
+
+    fn try_recover_all_spirits(&mut self) -> Result<ActionResult> {
+        match self.recover_all_spirits() {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("recover_all_spirits returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
     }
 
     fn use_spirit_item(

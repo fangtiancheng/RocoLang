@@ -2,10 +2,12 @@ use rhai::module_resolvers::StaticModuleResolver;
 use rhai::{Engine, Module, Scope};
 
 const COMBAT: &str = include_str!("../rocolib/combat.rhai");
+const SPIRIT: &str = include_str!("../rocolib/spirit.rhai");
 
 pub fn register(engine: &mut Engine) {
     let mut resolver = StaticModuleResolver::new();
     register_script_module(engine, &mut resolver, "roco/combat", COMBAT);
+    register_script_module(engine, &mut resolver, "roco/spirit", SPIRIT);
     engine.set_module_resolver(resolver);
 }
 

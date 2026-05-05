@@ -17,12 +17,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         spirit_id: i64,
         catch_time: i64
     );
-    register_stdlib_fn_0!(
-        module,
-        stdlib,
-        "recover_all_spirits_vip",
-        recover_all_spirits_vip
-    );
+    register_stdlib_fn_0!(module, stdlib, "recover_all_spirits", recover_all_spirits);
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("try_recover_all_spirits", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.try_recover_all_spirits().map_err(to_rhai_error)
+        });
+    }
     register_stdlib_fn_4!(
         module,
         stdlib,

@@ -6,6 +6,10 @@ use crate::stdlib::util::{lock_stdlib, to_rhai_error};
 use crate::stdlib::RocoStdLib;
 
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
+    register_functions(module, stdlib);
+}
+
+pub fn register_functions<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("sleep", move |ms: i64| {

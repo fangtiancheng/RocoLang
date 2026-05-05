@@ -91,8 +91,12 @@ impl RocoEngine {
         engine.register_static_module("combat", combat_module.into());
 
         let mut system_module = rhai::Module::new();
-        system::register(&mut system_module, stdlib);
+        system::register(&mut system_module, stdlib.clone());
         engine.register_static_module("system", system_module.into());
+
+        let mut global_system_module = rhai::Module::new();
+        system::register_functions(&mut global_system_module, stdlib);
+        engine.register_global_module(global_system_module.into());
     }
 
     pub fn eval(&mut self, script: &str) -> Result<Dynamic> {

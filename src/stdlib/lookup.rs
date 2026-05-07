@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use rhai::Module;
 
-use crate::stdlib::util::{lock_stdlib, to_rhai_error};
+use crate::stdlib::util::{lock_stdlib, to_array, to_rhai_error};
 use crate::stdlib::RocoStdLib;
 
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
@@ -24,7 +24,9 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         let stdlib = stdlib.clone();
         module.set_native_fn("list_strive_item_infos", move || {
             let mut lib = lock_stdlib(&stdlib)?;
-            lib.list_strive_item_infos().map_err(to_rhai_error)
+            lib.list_strive_item_infos()
+                .map(|items| to_array(&items))
+                .map_err(to_rhai_error)
         });
     }
     {
@@ -60,7 +62,9 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         let stdlib = stdlib.clone();
         module.set_native_fn("list_plugin_infos", move || {
             let mut lib = lock_stdlib(&stdlib)?;
-            lib.list_plugin_infos().map_err(to_rhai_error)
+            lib.list_plugin_infos()
+                .map(|plugins| to_array(&plugins))
+                .map_err(to_rhai_error)
         });
     }
     {

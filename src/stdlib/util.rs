@@ -52,6 +52,17 @@ macro_rules! register_stdlib_fn_2 {
     }};
 }
 
+macro_rules! register_stdlib_fn_3 {
+    ($module:expr, $stdlib:expr, $name:literal, $method:ident, $a:ident : $ta:ty, $b:ident : $tb:ty, $c:ident : $tc:ty) => {{
+        let stdlib = $stdlib.clone();
+        $module.set_native_fn($name, move |$a: $ta, $b: $tb, $c: $tc| {
+            let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
+            lib.$method($a, $b, $c)
+                .map_err($crate::stdlib::util::to_rhai_error)
+        });
+    }};
+}
+
 macro_rules! register_stdlib_fn_4 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $a:ident : $ta:ty, $b:ident : $tb:ty, $c:ident : $tc:ty, $d:ident : $td:ty) => {{
         let stdlib = $stdlib.clone();
@@ -91,6 +102,7 @@ macro_rules! register_stdlib_fn_7 {
 pub(crate) use register_stdlib_fn_0;
 pub(crate) use register_stdlib_fn_1;
 pub(crate) use register_stdlib_fn_2;
+pub(crate) use register_stdlib_fn_3;
 pub(crate) use register_stdlib_fn_4;
 pub(crate) use register_stdlib_fn_5;
 pub(crate) use register_stdlib_fn_7;

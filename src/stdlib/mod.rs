@@ -128,6 +128,10 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::fetch_spirit")
     }
 
+    fn list_storage_spirits(&mut self) -> Result<Vec<StorageSpiritInfo>> {
+        unsupported("spirit::list_storage_spirits")
+    }
+
     fn start_combat(
         &mut self,
         _server_type: i64,
@@ -216,8 +220,43 @@ pub trait RocoStdLib: Send {
         unsupported("combat::get_combat_lineup")
     }
 
-    fn learn_skill(&mut self, _position: i64, _skill_id: i64) -> Result<bool> {
-        unsupported("spirit::learn_skill")
+    fn query_skill_pool(&mut self, _position: i64) -> Result<SkillPoolInfo> {
+        unsupported("spirit::query_skill_pool")
+    }
+
+    fn add_skill_from_pool(&mut self, _position: i64, _skill_id: i64) -> Result<SkillSwitchResult> {
+        unsupported("spirit::add_skill_from_pool")
+    }
+
+    fn switch_skill(
+        &mut self,
+        _position: i64,
+        _skill_slot: i64,
+        _skill_id: i64,
+    ) -> Result<SkillSwitchResult> {
+        unsupported("spirit::switch_skill")
+    }
+
+    fn use_skill_stone_preview(
+        &mut self,
+        _position: i64,
+        _item_id: i64,
+    ) -> Result<SkillStoneResult> {
+        unsupported("spirit::use_skill_stone_preview")
+    }
+
+    fn use_skill_stone_apply(&mut self, _position: i64, _item_id: i64) -> Result<SkillStoneResult> {
+        unsupported("spirit::use_skill_stone_apply")
+    }
+
+    fn use_skill_stone_replace(
+        &mut self,
+        _position: i64,
+        _item_id: i64,
+        _old_skill_id: i64,
+        _new_skill_id: i64,
+    ) -> Result<SkillStoneResult> {
+        unsupported("spirit::use_skill_stone_replace")
     }
 
     fn get_skills(&mut self, _position: i64) -> Result<[Option<SkillInfo>; 4]> {

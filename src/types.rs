@@ -33,6 +33,60 @@ pub struct SpiritSkillInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillPoolSkillInfo {
+    pub skill_id: i64,
+    pub pp: i64,
+    pub inherited: bool,
+    pub position: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillPoolInfo {
+    pub spirit_id: i64,
+    pub position: i64,
+    pub skills: Vec<SkillPoolSkillInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillSwitchResult {
+    pub spirit_id: i64,
+    pub position: i64,
+    pub skill_slot: i64,
+    pub skill_id: i64,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct SkillStoneSkillInfo {
+    pub skill_id: i64,
+    pub pp: i64,
+    pub inherited: bool,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct SkillStoneResult {
+    pub ok: bool,
+    pub result_code: i64,
+    pub message: String,
+    pub item_id: i64,
+    pub position: i64,
+    pub needs_replace: bool,
+    pub old_skills: Vec<SkillStoneSkillInfo>,
+    pub new_skills: Vec<SkillStoneSkillInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StorageSpiritInfo {
+    pub spirit_id: i64,
+    pub catch_time: i64,
+    pub storage_time: i64,
+    pub level: i64,
+    pub sex: i64,
+    pub skin_flag: i64,
+    pub talent_type: i64,
+    pub talent_level: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BagItemInfo {
     pub item_id: i64,
     pub count: i64,

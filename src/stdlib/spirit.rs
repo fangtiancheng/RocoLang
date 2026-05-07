@@ -4,7 +4,8 @@ use rhai::Module;
 
 use crate::stdlib::util::{
     lock_stdlib, register_stdlib_fn_0, register_stdlib_fn_1, register_stdlib_fn_2,
-    register_stdlib_fn_4, register_stdlib_fn_5, register_stdlib_fn_7, to_array, to_rhai_error,
+    register_stdlib_fn_3, register_stdlib_fn_4, register_stdlib_fn_5, register_stdlib_fn_7,
+    to_array, to_rhai_error,
 };
 use crate::stdlib::RocoStdLib;
 
@@ -17,6 +18,15 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         spirit_id: i64,
         catch_time: i64
     );
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_storage_spirits", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_storage_spirits()
+                .map(|spirits| to_array(&spirits))
+                .map_err(to_rhai_error)
+        });
+    }
     register_stdlib_fn_0!(module, stdlib, "recover_all_spirits", recover_all_spirits);
     {
         let stdlib = stdlib.clone();
@@ -113,13 +123,55 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
+    register_stdlib_fn_1!(
+        module,
+        stdlib,
+        "query_skill_pool",
+        query_skill_pool,
+        position: i64
+    );
     register_stdlib_fn_2!(
         module,
         stdlib,
-        "learn_skill",
-        learn_skill,
+        "add_skill_from_pool",
+        add_skill_from_pool,
         position: i64,
         skill_id: i64
+    );
+    register_stdlib_fn_3!(
+        module,
+        stdlib,
+        "switch_skill",
+        switch_skill,
+        position: i64,
+        skill_slot: i64,
+        skill_id: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "use_skill_stone_preview",
+        use_skill_stone_preview,
+        position: i64,
+        item_id: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "use_skill_stone_apply",
+        use_skill_stone_apply,
+        position: i64,
+        item_id: i64
+    );
+    register_stdlib_fn_4!(
+        module,
+        stdlib,
+        "use_skill_stone_replace",
+        use_skill_stone_replace,
+        position: i64,
+        item_id: i64,
+        old_skill_id: i64,
+        new_skill_id: i64
     );
     register_stdlib_fn_1!(module, stdlib, "get_skills", get_skills, position: i64);
     register_stdlib_fn_5!(

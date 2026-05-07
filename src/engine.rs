@@ -7,10 +7,11 @@ use crate::error::{Result, RocoError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
-    CombatActions, SceneSpiritInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    CombatActions, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, TalentRefreshResult,
-    UserInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -220,6 +221,51 @@ impl RocoEngine {
 
         engine.register_type_with_name::<SpiritSkillInfo>("SpiritSkillInfo");
         register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
+
+        engine.register_type_with_name::<SkillPoolSkillInfo>("SkillPoolSkillInfo");
+        register_getters!(SkillPoolSkillInfo, skill_id, pp, inherited, position);
+
+        engine.register_type_with_name::<SkillPoolInfo>("SkillPoolInfo");
+        register_getters!(SkillPoolInfo, spirit_id, position);
+        engine.register_get("skills", |value: &mut SkillPoolInfo| {
+            Self::to_array(&value.skills)
+        });
+
+        engine.register_type_with_name::<SkillSwitchResult>("SkillSwitchResult");
+        register_getters!(SkillSwitchResult, spirit_id, position, skill_slot, skill_id);
+
+        engine.register_type_with_name::<SkillStoneSkillInfo>("SkillStoneSkillInfo");
+        register_getters!(SkillStoneSkillInfo, skill_id, pp, inherited);
+
+        engine.register_type_with_name::<SkillStoneResult>("SkillStoneResult");
+        register_getters!(
+            SkillStoneResult,
+            ok,
+            result_code,
+            message,
+            item_id,
+            position,
+            needs_replace,
+        );
+        engine.register_get("old_skills", |value: &mut SkillStoneResult| {
+            Self::to_array(&value.old_skills)
+        });
+        engine.register_get("new_skills", |value: &mut SkillStoneResult| {
+            Self::to_array(&value.new_skills)
+        });
+
+        engine.register_type_with_name::<StorageSpiritInfo>("StorageSpiritInfo");
+        register_getters!(
+            StorageSpiritInfo,
+            spirit_id,
+            catch_time,
+            storage_time,
+            level,
+            sex,
+            skin_flag,
+            talent_type,
+            talent_level,
+        );
 
         engine.register_type_with_name::<SceneSpiritInfo>("SceneSpiritInfo");
         register_getters!(

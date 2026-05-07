@@ -85,11 +85,6 @@ impl RocoStdLib for MockStdLib {
         Ok(Default::default())
     }
 
-    fn learn_skill(&mut self, position: i64, skill_id: i64) -> Result<bool> {
-        println!("Learning skill {} at position {}", skill_id, position);
-        Ok(true)
-    }
-
     fn get_skills(&mut self, position: i64) -> Result<[Option<SkillInfo>; 4]> {
         println!("Getting skills at position {}", position);
         Ok([

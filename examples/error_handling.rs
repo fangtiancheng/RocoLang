@@ -62,10 +62,6 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(Default::default())
     }
 
-    fn learn_skill(&mut self, _position: i64, _skill_id: i64) -> Result<bool> {
-        Ok(true)
-    }
-
     fn get_skills(&mut self, _position: i64) -> Result<[Option<SkillInfo>; 4]> {
         Ok([None, None, None, None])
     }

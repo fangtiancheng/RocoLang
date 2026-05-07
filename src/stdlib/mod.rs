@@ -45,6 +45,10 @@ pub trait RocoStdLib: Send {
         unsupported("scene::get_current_scene")
     }
 
+    fn get_scene_spirits(&mut self) -> Result<Vec<SceneSpiritInfo>> {
+        unsupported("scene::get_scene_spirits")
+    }
+
     fn query_server_time(&mut self) -> Result<i64> {
         unsupported("profile::query_server_time")
     }

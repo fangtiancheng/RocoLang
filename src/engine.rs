@@ -7,8 +7,8 @@ use crate::error::{Result, RocoError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
-    CombatActions, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo, StaticSkillInfo,
-    StaticSpiritInfo, TalentRefreshResult, UserInfo,
+    CombatActions, SceneSpiritInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo,
+    StaticSkillInfo, StaticSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -218,6 +218,17 @@ impl RocoEngine {
 
         engine.register_type_with_name::<SpiritSkillInfo>("SpiritSkillInfo");
         register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
+
+        engine.register_type_with_name::<SceneSpiritInfo>("SceneSpiritInfo");
+        register_getters!(
+            SceneSpiritInfo,
+            spirit_id,
+            count,
+            area_index,
+            is_rare,
+            is_boss,
+            is_npc_boss,
+        );
 
         engine.register_type_with_name::<BagItemInfo>("BagItemInfo");
         register_getters!(BagItemInfo, item_id, count);

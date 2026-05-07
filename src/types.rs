@@ -16,6 +16,16 @@ pub struct SpiritInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SceneSpiritInfo {
+    pub spirit_id: i64,
+    pub count: i64,
+    pub area_index: i64,
+    pub is_rare: bool,
+    pub is_boss: bool,
+    pub is_npc_boss: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritSkillInfo {
     pub skill_id: i64,
     pub pp: i64,

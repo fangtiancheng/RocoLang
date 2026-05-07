@@ -8,8 +8,9 @@ use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, syste
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
     CombatActions, SceneSpiritInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticSkillInfo,
-    StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, TalentRefreshResult, UserInfo,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, TalentRefreshResult,
+    UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -336,6 +337,19 @@ impl RocoEngine {
             action_type,
             app,
             description,
+        );
+
+        engine.register_type_with_name::<StaticPluginInfo>("StaticPluginInfo");
+        register_getters!(
+            StaticPluginInfo,
+            name,
+            label,
+            domain,
+            version,
+            command_type,
+            plugin_class,
+            plugin_src,
+            plugin_url,
         );
 
         engine.register_type_with_name::<StaticSkillInfo>("StaticSkillInfo");

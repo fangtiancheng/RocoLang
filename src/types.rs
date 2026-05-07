@@ -253,6 +253,18 @@ pub struct StaticMagicInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticPluginInfo {
+    pub name: String,
+    pub label: String,
+    pub domain: String,
+    pub version: String,
+    pub command_type: String,
+    pub plugin_class: String,
+    pub plugin_src: String,
+    pub plugin_url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaticSkillInfo {
     pub id: i64,
     pub name: String,

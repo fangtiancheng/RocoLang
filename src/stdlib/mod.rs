@@ -262,6 +262,14 @@ pub trait RocoStdLib: Send {
         unsupported("lookup::lookup_magic_info")
     }
 
+    fn lookup_plugin_info(&mut self, _plugin_name: &str) -> Result<StaticPluginInfo> {
+        unsupported("lookup::lookup_plugin_info")
+    }
+
+    fn list_plugin_infos(&mut self) -> Result<Vec<StaticPluginInfo>> {
+        unsupported("lookup::list_plugin_infos")
+    }
+
     fn lookup_skill_info(&mut self, _skill_id: i64) -> Result<StaticSkillInfo> {
         unsupported("lookup::lookup_skill_info")
     }

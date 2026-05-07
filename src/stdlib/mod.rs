@@ -239,6 +239,29 @@ pub trait RocoStdLib: Send {
         unsupported("lookup::lookup_item_info")
     }
 
+    fn lookup_strive_item_info(&mut self, _item_id: i64) -> Result<StaticStriveItemInfo> {
+        unsupported("lookup::lookup_strive_item_info")
+    }
+
+    fn list_strive_item_infos(&mut self) -> Result<Vec<StaticStriveItemInfo>> {
+        unsupported("lookup::list_strive_item_infos")
+    }
+
+    fn lookup_guardian_pet_property_info(
+        &mut self,
+        _level: i64,
+    ) -> Result<StaticGuardianPetPropertyInfo> {
+        unsupported("lookup::lookup_guardian_pet_property_info")
+    }
+
+    fn lookup_title_info(&mut self, _title_id: i64) -> Result<StaticTitleInfo> {
+        unsupported("lookup::lookup_title_info")
+    }
+
+    fn lookup_magic_info(&mut self, _magic_id: i64) -> Result<StaticMagicInfo> {
+        unsupported("lookup::lookup_magic_info")
+    }
+
     fn lookup_skill_info(&mut self, _skill_id: i64) -> Result<StaticSkillInfo> {
         unsupported("lookup::lookup_skill_info")
     }

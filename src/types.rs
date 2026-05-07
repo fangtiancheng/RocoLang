@@ -208,6 +208,51 @@ pub struct StaticItemInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticStriveItemInfo {
+    pub id: i64,
+    pub name: String,
+    pub item_type: i64,
+    pub ghp: i64,
+    pub gpa: i64,
+    pub gpd: i64,
+    pub gma: i64,
+    pub gmd: i64,
+    pub gsp: i64,
+    pub src: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticGuardianPetPropertyInfo {
+    pub level: i64,
+    pub phase: i64,
+    pub energy: i64,
+    pub attack: i64,
+    pub defend: i64,
+    pub magic_attack: i64,
+    pub magic_defend: i64,
+    pub need_level_to_next_phase: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticTitleInfo {
+    pub id: i64,
+    pub title_name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticMagicInfo {
+    pub id: i64,
+    pub name: String,
+    pub item_id: String,
+    pub target: i64,
+    pub magic_type: i64,
+    pub duration: i64,
+    pub action_type: i64,
+    pub app: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaticSkillInfo {
     pub id: i64,
     pub name: String,

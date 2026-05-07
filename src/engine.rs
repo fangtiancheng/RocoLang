@@ -7,8 +7,9 @@ use crate::error::{Result, RocoError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
-    CombatActions, SceneSpiritInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticItemInfo,
-    StaticSkillInfo, StaticSpiritInfo, TalentRefreshResult, UserInfo,
+    CombatActions, SceneSpiritInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticSkillInfo,
+    StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -288,6 +289,53 @@ impl RocoEngine {
             subtype,
             price,
             expire_time,
+        );
+
+        engine.register_type_with_name::<StaticStriveItemInfo>("StaticStriveItemInfo");
+        register_getters!(
+            StaticStriveItemInfo,
+            id,
+            name,
+            item_type,
+            ghp,
+            gpa,
+            gpd,
+            gma,
+            gmd,
+            gsp,
+            src,
+        );
+
+        engine.register_type_with_name::<StaticGuardianPetPropertyInfo>(
+            "StaticGuardianPetPropertyInfo",
+        );
+        register_getters!(
+            StaticGuardianPetPropertyInfo,
+            level,
+            phase,
+            energy,
+            attack,
+            defend,
+            magic_attack,
+            magic_defend,
+            need_level_to_next_phase,
+        );
+
+        engine.register_type_with_name::<StaticTitleInfo>("StaticTitleInfo");
+        register_getters!(StaticTitleInfo, id, title_name);
+
+        engine.register_type_with_name::<StaticMagicInfo>("StaticMagicInfo");
+        register_getters!(
+            StaticMagicInfo,
+            id,
+            name,
+            item_id,
+            target,
+            magic_type,
+            duration,
+            action_type,
+            app,
+            description,
         );
 
         engine.register_type_with_name::<StaticSkillInfo>("StaticSkillInfo");

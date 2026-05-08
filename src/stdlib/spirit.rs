@@ -27,6 +27,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "get_storage_spirit_detail",
+        get_storage_spirit_detail,
+        spirit_id: i64,
+        catch_time: i64
+    );
     register_stdlib_fn_0!(module, stdlib, "recover_all_spirits", recover_all_spirits);
     {
         let stdlib = stdlib.clone();
@@ -50,6 +58,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         stdlib,
         "restore_spirit",
         restore_spirit,
+        spirit_id: i64,
+        position: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "try_restore_spirit",
+        try_restore_spirit,
         spirit_id: i64,
         position: i64
     );
@@ -98,6 +114,13 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         store_spirit,
         position: i64
     );
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("try_store_spirit", move |position: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.try_store_spirit(position).map_err(to_rhai_error)
+        });
+    }
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("get_spirit_bag", move || {

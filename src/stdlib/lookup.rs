@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 
+use rhai::Array;
 use rhai::Module;
 
 use crate::stdlib::util::{lock_stdlib, to_array, to_rhai_error};
@@ -76,9 +77,43 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("lookup_skills_info", move |skill_ids: Array| {
+            let skill_ids = skill_ids
+                .into_iter()
+                .map(|value| {
+                    value.as_int().map_err(|err| {
+                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.lookup_skills_info(skill_ids)
+                .map(|infos| to_array(&infos))
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_spirit_info", move |spirit_id: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_spirit_info(spirit_id).map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("lookup_spirits_info", move |spirit_ids: Array| {
+            let spirit_ids = spirit_ids
+                .into_iter()
+                .map(|value| {
+                    value.as_int().map_err(|err| {
+                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.lookup_spirits_info(spirit_ids)
+                .map(|infos| to_array(&infos))
+                .map_err(to_rhai_error)
         });
     }
 }

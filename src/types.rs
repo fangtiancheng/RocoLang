@@ -177,6 +177,12 @@ pub struct CombatActions {
     pub can_combat_mask: i64,
 }
 
+/// Standard result shape for operation-style `try_*` APIs.
+///
+/// `try_*` functions should not raise expected business failures such as
+/// unavailable actions or server rejections. They should return `ok = false`
+/// with a non-zero `code` and a readable `message`. Programming errors such as
+/// invalid argument types may still be raised by the script engine.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActionResult {
     pub ok: bool,

@@ -19,6 +19,12 @@ fn unsupported<T>(name: &str) -> Result<T> {
     )))
 }
 
+/// Native APIs exposed to Rhai scripts.
+///
+/// Convention: operation-style `try_*` APIs return `ActionResult`
+/// (`ok/code/message`) instead of raising expected business failures. Plain
+/// APIs may raise or return their domain result directly. Query APIs should not
+/// use `try_*` unless they also follow the `ActionResult` convention.
 pub trait RocoStdLib: Send {
     fn move_to_scene(&mut self, _scene_id: i64, _timeout_ms: i64) -> Result<i64> {
         unsupported("scene::move_to_scene")
@@ -132,6 +138,14 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::list_storage_spirits")
     }
 
+    fn get_storage_spirit_detail(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<SpiritInfo> {
+        unsupported("spirit::get_storage_spirit_detail")
+    }
+
     fn start_combat(
         &mut self,
         _server_type: i64,
@@ -148,6 +162,14 @@ pub trait RocoStdLib: Send {
 
     fn store_spirit(&mut self, _position: i64) -> Result<bool> {
         unsupported("spirit::store_spirit")
+    }
+
+    fn try_store_spirit(&mut self, position: i64) -> Result<ActionResult> {
+        match self.store_spirit(position) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("store_spirit returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
     }
 
     fn get_spirit_bag(&mut self) -> Result<SpiritBagInfo> {
@@ -186,6 +208,14 @@ pub trait RocoStdLib: Send {
 
     fn restore_spirit(&mut self, _spirit_id: i64, _position: i64) -> Result<bool> {
         unsupported("spirit::restore_spirit")
+    }
+
+    fn try_restore_spirit(&mut self, spirit_id: i64, position: i64) -> Result<ActionResult> {
+        match self.restore_spirit(spirit_id, position) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("restore_spirit returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
     }
 
     fn use_talent_refresh_item(
@@ -313,8 +343,24 @@ pub trait RocoStdLib: Send {
         unsupported("lookup::lookup_skill_info")
     }
 
+    fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
+        let mut infos = Vec::with_capacity(skill_ids.len());
+        for skill_id in skill_ids {
+            infos.push(self.lookup_skill_info(skill_id)?);
+        }
+        Ok(infos)
+    }
+
     fn lookup_spirit_info(&mut self, _spirit_id: i64) -> Result<StaticSpiritInfo> {
         unsupported("lookup::lookup_spirit_info")
+    }
+
+    fn lookup_spirits_info(&mut self, spirit_ids: Vec<i64>) -> Result<Vec<StaticSpiritInfo>> {
+        let mut infos = Vec::with_capacity(spirit_ids.len());
+        for spirit_id in spirit_ids {
+            infos.push(self.lookup_spirit_info(spirit_id)?);
+        }
+        Ok(infos)
     }
 
     fn invite_pk(&mut self, _target_uin: i64) -> Result<BattleInfo> {

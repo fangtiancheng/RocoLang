@@ -2,6 +2,7 @@
 //!
 //! 提供统一的脚本执行引擎和标准库接口定义
 
+pub mod builtin_sources;
 pub mod debugger;
 pub mod engine;
 pub mod error;
@@ -12,9 +13,9 @@ pub mod types;
 // 重导出核心类型
 pub use debugger::{
     RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent, RocoDebugHooks,
-    RocoDebugStackFrame,
+    RocoDebugLocalVariable, RocoDebugStackFrame,
 };
 pub use engine::RocoEngine;
-pub use error::{Result, RocoError};
+pub use error::{Result, RocoError, RocoScriptError};
 pub use stdlib::RocoStdLib;
 pub use types::*;

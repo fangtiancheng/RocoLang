@@ -339,7 +339,7 @@ fn debug_runner_pauses_on_line_breakpoint_and_reports_call_stack() {
                 source: Some("debug_test.rhai".to_string()),
                 breakpoints: vec![RocoDebugBreakpoint {
                     source: Some("debug_test.rhai".to_string()),
-                    line: 3,
+                    line: 4,
                     column: None,
                     enabled: true,
                 }],
@@ -372,18 +372,26 @@ fn debug_runner_pauses_on_line_breakpoint_and_reports_call_stack() {
                 source,
                 line,
                 stack,
+                locals,
                 ..
-            } => Some((reason, source, line, stack)),
+            } => Some((reason, source, line, stack, locals)),
             _ => None,
         })
         .expect("line breakpoint should pause");
 
     assert_eq!(paused.0, "breakpoint:0");
     assert_eq!(paused.1.as_deref(), Some("debug_test.rhai"));
-    assert_eq!(*paused.2, Some(3));
+    assert_eq!(*paused.2, Some(4));
     assert!(
         paused.3.iter().any(|frame| frame.function_name == "value"),
         "pause event should include function call stack"
+    );
+    assert!(
+        paused
+            .4
+            .iter()
+            .any(|local| local.name == "x" && local.value_preview == "1"),
+        "pause event should include local variables"
     );
 }
 
@@ -452,5 +460,56 @@ fn debug_runner_can_update_breakpoints_while_paused() {
     assert!(
         paused_lines.contains(&4),
         "updated breakpoint should pause on line 4, got {paused_lines:?}"
+    );
+}
+
+#[test]
+fn imported_rocolib_frames_expose_stable_source_id() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib {
+        bag_count: 1,
+        ..Default::default()
+    }));
+    let mut engine = RocoEngine::new(stdlib);
+    let events = Arc::new(Mutex::new(Vec::<RocoDebugEvent>::new()));
+    let events_for_hook = events.clone();
+
+    let _ = engine
+        .eval_debug(
+            r#"
+                import "roco/spirit" as roco_spirit;
+
+                roco_spirit::try_store_all_spirits();
+            "#,
+            RocoDebugConfig {
+                source: Some("main.rhai".to_string()),
+                breakpoints: vec![RocoDebugBreakpoint {
+                    source: Some("roco/spirit".to_string()),
+                    line: 206,
+                    column: None,
+                    enabled: true,
+                }],
+            },
+            RocoDebugHooks::new(
+                move |event| {
+                    events_for_hook.lock().expect("events lock").push(event);
+                },
+                || RocoDebugCommand::Continue,
+            ),
+        )
+        .expect("debug runner should pause inside imported module");
+
+    let paused_sources = events
+        .lock()
+        .expect("events lock")
+        .iter()
+        .filter_map(|event| match event {
+            RocoDebugEvent::Paused { source, .. } => source.clone(),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+
+    assert!(
+        paused_sources.iter().any(|source| source == "roco/spirit"),
+        "expected imported module source id, got {paused_sources:?}"
     );
 }

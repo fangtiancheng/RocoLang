@@ -1,13 +1,14 @@
 //! RocoEngine - Rhai engine wrapper and stdlib registration
 
 use rhai::{Array, Dynamic, Engine, AST};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use crate::debugger::{
     dynamic_preview, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoDebugStackFrame,
+    RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
-use crate::error::{Result, RocoError};
+use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
@@ -19,6 +20,11 @@ use crate::types::{
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
+
+#[derive(Default)]
+struct DebugControlState {
+    stop_requested: AtomicBool,
+}
 
 pub struct RocoEngine {
     engine: Engine,
@@ -135,21 +141,43 @@ impl RocoEngine {
     }
 
     pub fn eval(&mut self, script: &str) -> Result<Dynamic> {
-        self.engine
-            .eval(script)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))
+        self.engine.eval(script).map_err(Self::map_eval_error)
     }
 
     pub fn compile(&self, script: &str) -> Result<AST> {
         self.engine
             .compile(script)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))
+            .map_err(|error| Self::map_parse_error(error, None))
     }
 
     pub fn eval_ast(&mut self, ast: &AST) -> Result<Dynamic> {
-        self.engine
-            .eval_ast(ast)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))
+        self.engine.eval_ast(ast).map_err(Self::map_eval_error)
+    }
+
+    fn map_eval_error(error: Box<rhai::EvalAltResult>) -> RocoError {
+        let position = error.position();
+        let kind = match error.as_ref() {
+            rhai::EvalAltResult::ErrorParsing(..) => "parse",
+            rhai::EvalAltResult::ErrorTerminated(..) => "terminated",
+            rhai::EvalAltResult::ErrorRuntime(..) => "runtime",
+            rhai::EvalAltResult::ErrorInFunctionCall(..) => "function_call",
+            rhai::EvalAltResult::ErrorInModule(..) => "module",
+            _ => "script",
+        }
+        .to_string();
+        let source = match error.as_ref() {
+            rhai::EvalAltResult::ErrorInFunctionCall(_, source, ..) if !source.is_empty() => {
+                Some(source.clone())
+            }
+            _ => None,
+        };
+        RocoError::ScriptError(RocoScriptError {
+            kind,
+            message: error.to_string(),
+            source,
+            line: position.line(),
+            column: position.position(),
+        })
     }
 
     #[allow(deprecated)]
@@ -159,9 +187,20 @@ impl RocoEngine {
         config: RocoDebugConfig,
         hooks: RocoDebugHooks,
     ) -> Result<Dynamic> {
+        let control_state = Arc::new(DebugControlState::default());
         let hooks = Arc::new(Mutex::new(hooks));
         let init_config = config.clone();
         let event_hooks = hooks.clone();
+        let progress_control = control_state.clone();
+        let debugger_control = control_state.clone();
+
+        self.engine.on_progress(move |_| {
+            if progress_control.stop_requested.load(Ordering::Relaxed) {
+                Some("debug session stopped".into())
+            } else {
+                None
+            }
+        });
 
         self.engine.register_debugger(
             move |_, mut debugger| {
@@ -218,6 +257,16 @@ impl RocoEngine {
                                 args_preview: frame.args.iter().map(dynamic_preview).collect(),
                             })
                             .collect();
+                        let visible_scope = context.scope().clone_visible();
+                        let locals = visible_scope
+                            .iter_raw()
+                            .map(|(name, is_constant, value)| RocoDebugLocalVariable {
+                                name: name.to_string(),
+                                type_name: context.engine().map_type_name(value.type_name()).into(),
+                                value_preview: dynamic_preview(value),
+                                is_constant,
+                            })
+                            .collect();
 
                         (hooks.on_event)(RocoDebugEvent::Paused {
                             reason,
@@ -225,6 +274,7 @@ impl RocoEngine {
                             line: pos.line(),
                             column: pos.position(),
                             stack,
+                            locals,
                         });
 
                         loop {
@@ -258,6 +308,9 @@ impl RocoEngine {
                                     return Ok(rhai::debugger::DebuggerCommand::FunctionExit);
                                 }
                                 RocoDebugCommand::Stop => {
+                                    debugger_control
+                                        .stop_requested
+                                        .store(true, Ordering::Relaxed);
                                     return Err(Box::<rhai::EvalAltResult>::from(
                                         rhai::EvalAltResult::ErrorTerminated(
                                             "debug session stopped".into(),
@@ -275,14 +328,12 @@ impl RocoEngine {
         let mut ast = self
             .engine
             .compile(script)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))?;
+            .map_err(|error| Self::map_parse_error(error, config.source.clone()))?;
         if let Some(source) = config.source {
             ast.set_source(source);
         }
 
-        self.engine
-            .eval_ast(&ast)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))
+        self.engine.eval_ast(&ast).map_err(Self::map_eval_error)
     }
 
     pub fn call_fn<T: Clone + 'static>(
@@ -294,7 +345,18 @@ impl RocoEngine {
         let mut scope = rhai::Scope::new();
         self.engine
             .call_fn(&mut scope, ast, fn_name, args)
-            .map_err(|e| RocoError::ScriptError(e.to_string()))
+            .map_err(Self::map_eval_error)
+    }
+
+    fn map_parse_error(error: rhai::ParseError, source: Option<String>) -> RocoError {
+        let position = error.position();
+        RocoError::ScriptError(RocoScriptError {
+            kind: "parse".to_string(),
+            message: error.to_string(),
+            source,
+            line: position.line(),
+            column: position.position(),
+        })
     }
 
     fn register_builtin_helpers(engine: &mut Engine) {

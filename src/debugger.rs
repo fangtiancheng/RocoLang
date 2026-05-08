@@ -36,6 +36,14 @@ pub struct RocoDebugStackFrame {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RocoDebugLocalVariable {
+    pub name: String,
+    pub type_name: String,
+    pub value_preview: String,
+    pub is_constant: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoDebugEvent {
     Started,
     Paused {
@@ -44,6 +52,7 @@ pub enum RocoDebugEvent {
         line: Option<usize>,
         column: Option<usize>,
         stack: Vec<RocoDebugStackFrame>,
+        locals: Vec<RocoDebugLocalVariable>,
     },
     Continued,
     Ended,

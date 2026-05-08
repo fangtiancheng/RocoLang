@@ -1,5 +1,6 @@
 use roco_lang::{
     ActionResult, Result, RocoEngine, RocoStdLib, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -9,6 +10,7 @@ struct MockStdLib {
     bag_count: i64,
     stored_positions: Vec<i64>,
     restored_positions: Vec<i64>,
+    swapped_positions: Vec<(i64, i64)>,
 }
 
 impl MockStdLib {
@@ -59,6 +61,116 @@ impl RocoStdLib for MockStdLib {
         self.restored_positions.push(position);
         Ok(ActionResult::ok())
     }
+
+    fn swap_spirits(&mut self, first_position: i64, second_position: i64) -> Result<bool> {
+        self.swapped_positions
+            .push((first_position, second_position));
+        Ok(true)
+    }
+
+    fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
+        Ok(skill_ids
+            .into_iter()
+            .map(|id| StaticSkillInfo {
+                id,
+                name: format!("Skill {id}"),
+                description: String::new(),
+                description2: String::new(),
+                power: "0".to_string(),
+                pp_max: 0,
+                property: 0,
+                src: String::new(),
+                attack_type: 0,
+                speed: 0,
+                damage_type: 0,
+                catch_rate: 0,
+                super_form_id: 0,
+                super_form_src: String::new(),
+            })
+            .collect())
+    }
+
+    fn list_storage_spirits(&mut self) -> Result<Vec<StorageSpiritInfo>> {
+        Ok(vec![
+            StorageSpiritInfo {
+                spirit_id: 49,
+                catch_time: 10,
+                storage_time: 100,
+                level: 99,
+                sex: 0,
+                skin_flag: 0,
+                talent_type: 0,
+                talent_level: 0,
+            },
+            StorageSpiritInfo {
+                spirit_id: 49,
+                catch_time: 20,
+                storage_time: 200,
+                level: 100,
+                sex: 0,
+                skin_flag: 0,
+                talent_type: 0,
+                talent_level: 0,
+            },
+            StorageSpiritInfo {
+                spirit_id: 49,
+                catch_time: 30,
+                storage_time: 150,
+                level: 100,
+                sex: 0,
+                skin_flag: 0,
+                talent_type: 0,
+                talent_level: 0,
+            },
+            StorageSpiritInfo {
+                spirit_id: 2928,
+                catch_time: 40,
+                storage_time: 300,
+                level: 100,
+                sex: 0,
+                skin_flag: 0,
+                talent_type: 0,
+                talent_level: 0,
+            },
+        ])
+    }
+
+    fn get_storage_spirit_detail(&mut self, spirit_id: i64, catch_time: i64) -> Result<SpiritInfo> {
+        let skill_id = if catch_time == 30 { 203 } else { 105 };
+        Ok(SpiritInfo {
+            spirit_id,
+            position: 0,
+            catch_time,
+            name: format!("Storage Spirit {spirit_id}"),
+            level: 100,
+            hp: 100,
+            max_hp: 100,
+            skills: vec![SpiritSkillInfo {
+                skill_id,
+                pp: 10,
+                inherited: false,
+            }],
+        })
+    }
+}
+
+#[test]
+fn imports_built_in_spirit_swap_helpers() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib.clone());
+
+    let _ = engine
+        .eval(
+            r#"
+                spirit::swap_spirits(1, 2);
+                let result = spirit::try_swap_spirits(2, 3);
+                system::assert(result.ok, result.message);
+            "#,
+        )
+        .expect("built-in spirit swap helpers should import and run");
+
+    let stdlib = stdlib.lock().expect("stdlib lock");
+    assert_eq!(stdlib.swapped_positions, &[(1, 2), (2, 3)]);
 }
 
 #[test]
@@ -136,4 +248,71 @@ fn built_in_spirit_recovery_helpers_are_try_style() {
 
     let stdlib = stdlib.lock().expect("stdlib lock");
     assert_eq!(stdlib.restored_positions, &[1, 2]);
+}
+
+#[test]
+fn built_in_spirit_ready_helper_returns_try_style_result() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                import "roco/spirit" as roco_spirit;
+
+                let spirit_info = #{
+                    spirit_id: 49,
+                    position: 1,
+                    catch_time: 1,
+                    name: "Black Rock",
+                    level: 100,
+                    hp: 100,
+                    max_hp: 100,
+                    skills: [
+                        #{ skill_id: 203, pp: 10, inherited: false },
+                        #{ skill_id: 105, pp: 10, inherited: false }
+                    ]
+                };
+
+                let ready = roco_spirit::is_spirit_ready(spirit_info, 49, [203, 105]);
+                system::assert(ready.ok, ready.message);
+                system::assert(ready.code == 0, "ready code mismatch");
+
+                let wrong_id = roco_spirit::is_spirit_ready(spirit_info, 2928, [203]);
+                system::assert(!wrong_id.ok, "wrong id must fail");
+                system::assert(wrong_id.code == 1, "wrong id code mismatch");
+
+                let missing_skill = roco_spirit::is_spirit_ready(spirit_info, 49, [203, 2647]);
+                system::assert(!missing_skill.ok, "missing skill must fail");
+                system::assert(missing_skill.code == 2, "missing skill code mismatch");
+
+                let skill_requirements = roco_spirit::format_skill_requirements([203, 2647]);
+                system::assert(skill_requirements == "[Skill 203(203),Skill 2647(2647)]", skill_requirements);
+            "#,
+        )
+        .expect("built-in spirit ready helper should import and run");
+}
+
+#[test]
+fn built_in_select_best_storage_spirit_prefers_ready_level_100_spirit() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                import "roco/spirit" as roco_spirit;
+
+                let best = roco_spirit::select_best_storage_spirit(49, [203]);
+                system::assert(best.found, "best storage spirit must be found");
+                system::assert(best.spirit_id == 49, "best spirit id mismatch");
+                system::assert(best.catch_time == 30, "best catch_time mismatch: " + best.catch_time);
+                system::assert(best.level == 100, "best level mismatch");
+                system::assert(best.has_required_skills, "best must have required skills");
+
+                let missing = roco_spirit::select_best_storage_spirit(9999, [203]);
+                system::assert(!missing.found, "missing spirit must not be found");
+            "#,
+        )
+        .expect("built-in select_best_storage_spirit should import and run");
 }

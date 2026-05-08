@@ -114,6 +114,22 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         store_spirit,
         position: i64
     );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "swap_spirits",
+        swap_spirits,
+        first_position: i64,
+        second_position: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "try_swap_spirits",
+        try_swap_spirits,
+        first_position: i64,
+        second_position: i64
+    );
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("try_store_spirit", move |position: i64| {

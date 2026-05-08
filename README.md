@@ -55,9 +55,9 @@ match engine.eval(script) {
 Operation-style `try_*` APIs return `ActionResult` and should not raise expected business failures:
 
 ```rhai
-let result = spirit::try_store_spirit(position);
+let result = spirit::try_swap_spirits(first_position, second_position);
 if !result.ok {
-    print("store failed: " + result.message);
+    print("swap failed: " + result.message);
 }
 ```
 

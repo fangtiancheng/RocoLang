@@ -1,3 +1,119 @@
+fn format_skill_requirements(required_skill_ids) {
+    const skill_infos = lookup::lookup_skills_info(required_skill_ids);
+    let text = "";
+    let index = 0;
+    while index < len(skill_infos) {
+        if index > 0 {
+            text = text + ",";
+        }
+        text = text + skill_infos[index].name + "(" + skill_infos[index].id + ")";
+        index = index + 1;
+    }
+
+    return "[" + text + "]";
+}
+
+fn is_spirit_ready(spirit_info, spirit_id, required_skill_ids) {
+    if spirit_info.spirit_id != spirit_id {
+        return #{
+            ok: false,
+            code: 1,
+            message: "spirit id mismatch: expected " + spirit_id + ", got " + spirit_info.spirit_id
+        };
+    }
+
+    let missing_skill_ids = [];
+    for required_skill_id in required_skill_ids {
+        let found = false;
+        for skill in spirit_info.skills {
+            if skill.skill_id == required_skill_id {
+                found = true;
+            }
+        }
+
+        if !found {
+            missing_skill_ids.push(required_skill_id);
+        }
+    }
+
+    if len(missing_skill_ids) != 0 {
+        return #{
+            ok: false,
+            code: 2,
+            message: "spirit " + spirit_id + " missing required skills " + format_skill_requirements(missing_skill_ids)
+        };
+    }
+
+    return #{
+        ok: true,
+        code: 0,
+        message: "spirit " + spirit_id + " is ready"
+    };
+}
+
+fn select_best_storage_spirit(spirit_id, required_skill_ids) {
+    const storage_spirits = spirit::list_storage_spirits();
+    let best = ();
+    let found = false;
+    for spirit_info in storage_spirits {
+        if spirit_info.spirit_id == spirit_id {
+            let has_required_skills = len(required_skill_ids) == 0;
+            if spirit_info.level == 100 {
+                const detail = spirit::get_storage_spirit_detail(spirit_info.spirit_id, spirit_info.catch_time);
+                has_required_skills = is_spirit_ready(detail, spirit_id, required_skill_ids).ok;
+            }
+
+            if !found {
+                best = #{
+                    spirit_id: spirit_info.spirit_id,
+                    catch_time: spirit_info.catch_time,
+                    level: spirit_info.level,
+                    storage_time: spirit_info.storage_time,
+                    has_required_skills: has_required_skills
+                };
+                found = true;
+            } else if spirit_info.level > best.level {
+                best = #{
+                    spirit_id: spirit_info.spirit_id,
+                    catch_time: spirit_info.catch_time,
+                    level: spirit_info.level,
+                    storage_time: spirit_info.storage_time,
+                    has_required_skills: has_required_skills
+                };
+            } else if spirit_info.level == best.level && spirit_info.level == 100 && has_required_skills && !best.has_required_skills {
+                best = #{
+                    spirit_id: spirit_info.spirit_id,
+                    catch_time: spirit_info.catch_time,
+                    level: spirit_info.level,
+                    storage_time: spirit_info.storage_time,
+                    has_required_skills: has_required_skills
+                };
+            } else if spirit_info.level == best.level && has_required_skills == best.has_required_skills && spirit_info.storage_time > best.storage_time {
+                best = #{
+                    spirit_id: spirit_info.spirit_id,
+                    catch_time: spirit_info.catch_time,
+                    level: spirit_info.level,
+                    storage_time: spirit_info.storage_time,
+                    has_required_skills: has_required_skills
+                };
+            }
+        }
+    }
+
+    if !found {
+        return #{ found: false };
+    }
+
+    return #{
+        found: true,
+        spirit_id: best.spirit_id,
+        catch_time: best.catch_time,
+        level: best.level,
+        storage_time: best.storage_time,
+        has_required_skills: best.has_required_skills
+    };
+}
+
 fn try_recover_all_spirits_by_mode(recovery_mode, is_vip) {
     if recovery_mode == "vip" {
         return spirit::try_recover_all_spirits();

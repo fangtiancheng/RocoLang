@@ -164,6 +164,22 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::store_spirit")
     }
 
+    fn swap_spirits(&mut self, _first_position: i64, _second_position: i64) -> Result<bool> {
+        unsupported("spirit::swap_spirits")
+    }
+
+    fn try_swap_spirits(
+        &mut self,
+        first_position: i64,
+        second_position: i64,
+    ) -> Result<ActionResult> {
+        match self.swap_spirits(first_position, second_position) {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("swap_spirits returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
     fn try_store_spirit(&mut self, position: i64) -> Result<ActionResult> {
         match self.store_spirit(position) {
             Ok(true) => Ok(ActionResult::ok()),

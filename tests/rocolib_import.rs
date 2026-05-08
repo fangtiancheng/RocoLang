@@ -1,5 +1,6 @@
 use roco_lang::{
-    ActionResult, Result, RocoEngine, RocoStdLib, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    ActionResult, Result, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
+    RocoDebugHooks, RocoEngine, RocoStdLib, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
     StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -315,4 +316,141 @@ fn built_in_select_best_storage_spirit_prefers_ready_level_100_spirit() {
             "#,
         )
         .expect("built-in select_best_storage_spirit should import and run");
+}
+
+#[test]
+fn debug_runner_pauses_on_line_breakpoint_and_reports_call_stack() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+    let events = Arc::new(Mutex::new(Vec::<RocoDebugEvent>::new()));
+    let events_for_hook = events.clone();
+
+    let result = engine
+        .eval_debug(
+            r#"
+                fn value() {
+                    let x = 1;
+                    x + 1
+                }
+
+                value()
+            "#,
+            RocoDebugConfig {
+                source: Some("debug_test.rhai".to_string()),
+                breakpoints: vec![RocoDebugBreakpoint {
+                    source: Some("debug_test.rhai".to_string()),
+                    line: 3,
+                    column: None,
+                    enabled: true,
+                }],
+            },
+            RocoDebugHooks::new(
+                move |event| {
+                    events_for_hook.lock().expect("events lock").push(event);
+                },
+                || RocoDebugCommand::Continue,
+            ),
+        )
+        .expect("debug runner should complete");
+
+    assert_eq!(result.as_int().expect("int result"), 2);
+
+    let events = events.lock().expect("events lock");
+    assert!(matches!(events.first(), Some(RocoDebugEvent::Started)));
+    assert!(
+        events
+            .iter()
+            .any(|event| matches!(event, RocoDebugEvent::Ended)),
+        "debug session should report end"
+    );
+
+    let paused = events
+        .iter()
+        .find_map(|event| match event {
+            RocoDebugEvent::Paused {
+                reason,
+                source,
+                line,
+                stack,
+                ..
+            } => Some((reason, source, line, stack)),
+            _ => None,
+        })
+        .expect("line breakpoint should pause");
+
+    assert_eq!(paused.0, "breakpoint:0");
+    assert_eq!(paused.1.as_deref(), Some("debug_test.rhai"));
+    assert_eq!(*paused.2, Some(3));
+    assert!(
+        paused.3.iter().any(|frame| frame.function_name == "value"),
+        "pause event should include function call stack"
+    );
+}
+
+#[test]
+fn debug_runner_can_update_breakpoints_while_paused() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+    let events = Arc::new(Mutex::new(Vec::<RocoDebugEvent>::new()));
+    let events_for_hook = events.clone();
+    let commands = Arc::new(Mutex::new(vec![
+        RocoDebugCommand::SetBreakpoints(vec![RocoDebugBreakpoint {
+            source: Some("debug_update.rhai".to_string()),
+            line: 4,
+            column: None,
+            enabled: true,
+        }]),
+        RocoDebugCommand::Continue,
+        RocoDebugCommand::Continue,
+    ]));
+    let commands_for_hook = commands.clone();
+
+    let result = engine
+        .eval_debug(
+            r#"
+                let a = 1;
+                let b = 2;
+                a + b
+            "#,
+            RocoDebugConfig {
+                source: Some("debug_update.rhai".to_string()),
+                breakpoints: vec![RocoDebugBreakpoint {
+                    source: Some("debug_update.rhai".to_string()),
+                    line: 2,
+                    column: None,
+                    enabled: true,
+                }],
+            },
+            RocoDebugHooks::new(
+                move |event| {
+                    events_for_hook.lock().expect("events lock").push(event);
+                },
+                move || {
+                    let mut commands = commands_for_hook.lock().expect("commands lock");
+                    if commands.is_empty() {
+                        RocoDebugCommand::Continue
+                    } else {
+                        commands.remove(0)
+                    }
+                },
+            ),
+        )
+        .expect("debug runner should complete after breakpoint update");
+
+    assert_eq!(result.as_int().expect("int result"), 3);
+
+    let paused_lines = events
+        .lock()
+        .expect("events lock")
+        .iter()
+        .filter_map(|event| match event {
+            RocoDebugEvent::Paused { line, .. } => *line,
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(paused_lines.first(), Some(&2));
+    assert!(
+        paused_lines.contains(&4),
+        "updated breakpoint should pause on line 4, got {paused_lines:?}"
+    );
 }

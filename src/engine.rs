@@ -3,6 +3,10 @@
 use rhai::{Array, Dynamic, Engine, AST};
 use std::sync::{Arc, Mutex};
 
+use crate::debugger::{
+    dynamic_preview, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
+    RocoDebugHooks, RocoDebugStackFrame,
+};
 use crate::error::{Result, RocoError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
@@ -22,6 +26,34 @@ pub struct RocoEngine {
 }
 
 impl RocoEngine {
+    fn apply_debug_breakpoints(
+        debugger: &mut rhai::debugger::Debugger,
+        default_source: Option<&str>,
+        breakpoints: &[RocoDebugBreakpoint],
+    ) {
+        debugger.break_points_mut().clear();
+        for breakpoint in breakpoints {
+            if !breakpoint.enabled || breakpoint.line == 0 {
+                continue;
+            }
+
+            let line = breakpoint.line.min(u16::MAX as usize) as u16;
+            let column = breakpoint.column.unwrap_or(0).min(u16::MAX as usize) as u16;
+            let source = breakpoint
+                .source
+                .clone()
+                .or_else(|| default_source.map(ToString::to_string))
+                .map(Into::into);
+            debugger
+                .break_points_mut()
+                .push(rhai::debugger::BreakPoint::AtPosition {
+                    source,
+                    pos: rhai::Position::new(line, column),
+                    enabled: true,
+                });
+        }
+    }
+
     pub fn new<T: RocoStdLib + 'static>(stdlib: Arc<Mutex<T>>) -> Self {
         let mut engine = Engine::new();
         engine.set_max_expr_depths(0, 0);
@@ -117,6 +149,139 @@ impl RocoEngine {
     pub fn eval_ast(&mut self, ast: &AST) -> Result<Dynamic> {
         self.engine
             .eval_ast(ast)
+            .map_err(|e| RocoError::ScriptError(e.to_string()))
+    }
+
+    #[allow(deprecated)]
+    pub fn eval_debug(
+        &mut self,
+        script: &str,
+        config: RocoDebugConfig,
+        hooks: RocoDebugHooks,
+    ) -> Result<Dynamic> {
+        let hooks = Arc::new(Mutex::new(hooks));
+        let init_config = config.clone();
+        let event_hooks = hooks.clone();
+
+        self.engine.register_debugger(
+            move |_, mut debugger| {
+                Self::apply_debug_breakpoints(
+                    &mut debugger,
+                    init_config.source.as_deref(),
+                    &init_config.breakpoints,
+                );
+                debugger
+            },
+            move |mut context, event, _node, source, pos| {
+                let mut hooks = event_hooks.lock().map_err(|err| {
+                    Box::<rhai::EvalAltResult>::from(rhai::EvalAltResult::ErrorRuntime(
+                        format!("Debugger hook lock error: {err}").into(),
+                        pos,
+                    ))
+                })?;
+
+                match event {
+                    rhai::debugger::DebuggerEvent::Start => {
+                        (hooks.on_event)(RocoDebugEvent::Started);
+                        Ok(rhai::debugger::DebuggerCommand::Continue)
+                    }
+                    rhai::debugger::DebuggerEvent::End => {
+                        (hooks.on_event)(RocoDebugEvent::Ended);
+                        Ok(rhai::debugger::DebuggerCommand::Continue)
+                    }
+                    event => {
+                        let reason = match event {
+                            rhai::debugger::DebuggerEvent::Step => "step".to_string(),
+                            rhai::debugger::DebuggerEvent::BreakPoint(index) => {
+                                format!("breakpoint:{index}")
+                            }
+                            rhai::debugger::DebuggerEvent::FunctionExitWithValue(_) => {
+                                "function_exit".to_string()
+                            }
+                            rhai::debugger::DebuggerEvent::FunctionExitWithError(_) => {
+                                "function_exit_error".to_string()
+                            }
+                            rhai::debugger::DebuggerEvent::Start
+                            | rhai::debugger::DebuggerEvent::End => unreachable!(),
+                            _ => "debugger_event".to_string(),
+                        };
+                        let stack = context
+                            .global_runtime_state()
+                            .debugger()
+                            .call_stack()
+                            .iter()
+                            .map(|frame| RocoDebugStackFrame {
+                                function_name: frame.fn_name.to_string(),
+                                source: frame.source.as_ref().map(ToString::to_string),
+                                line: frame.pos.line(),
+                                column: frame.pos.position(),
+                                args_preview: frame.args.iter().map(dynamic_preview).collect(),
+                            })
+                            .collect();
+
+                        (hooks.on_event)(RocoDebugEvent::Paused {
+                            reason,
+                            source: source.map(ToString::to_string),
+                            line: pos.line(),
+                            column: pos.position(),
+                            stack,
+                        });
+
+                        loop {
+                            let command = (hooks.wait_command)();
+                            match command {
+                                RocoDebugCommand::SetBreakpoints(breakpoints) => {
+                                    Self::apply_debug_breakpoints(
+                                        context.global_runtime_state_mut().debugger_mut(),
+                                        source,
+                                        &breakpoints,
+                                    );
+                                }
+                                RocoDebugCommand::Continue => {
+                                    (hooks.on_event)(RocoDebugEvent::Continued);
+                                    return Ok(rhai::debugger::DebuggerCommand::Continue);
+                                }
+                                RocoDebugCommand::StepInto => {
+                                    (hooks.on_event)(RocoDebugEvent::Continued);
+                                    return Ok(rhai::debugger::DebuggerCommand::StepInto);
+                                }
+                                RocoDebugCommand::StepOver => {
+                                    (hooks.on_event)(RocoDebugEvent::Continued);
+                                    return Ok(rhai::debugger::DebuggerCommand::StepOver);
+                                }
+                                RocoDebugCommand::Next => {
+                                    (hooks.on_event)(RocoDebugEvent::Continued);
+                                    return Ok(rhai::debugger::DebuggerCommand::Next);
+                                }
+                                RocoDebugCommand::StepOut => {
+                                    (hooks.on_event)(RocoDebugEvent::Continued);
+                                    return Ok(rhai::debugger::DebuggerCommand::FunctionExit);
+                                }
+                                RocoDebugCommand::Stop => {
+                                    return Err(Box::<rhai::EvalAltResult>::from(
+                                        rhai::EvalAltResult::ErrorTerminated(
+                                            "debug session stopped".into(),
+                                            pos,
+                                        ),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        );
+
+        let mut ast = self
+            .engine
+            .compile(script)
+            .map_err(|e| RocoError::ScriptError(e.to_string()))?;
+        if let Some(source) = config.source {
+            ast.set_source(source);
+        }
+
+        self.engine
+            .eval_ast(&ast)
             .map_err(|e| RocoError::ScriptError(e.to_string()))
     }
 

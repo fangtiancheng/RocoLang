@@ -146,6 +146,34 @@ pub struct BattleResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BattleResultQueryResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub result: Option<BattleResult>,
+}
+
+impl BattleResultQueryResult {
+    pub fn ok(result: BattleResult) -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+            result: Some(result),
+        }
+    }
+
+    pub fn unavailable(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 1,
+            message: message.into(),
+            result: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BattleSpiritResult {
     pub position: i64,
     pub exp: i64,

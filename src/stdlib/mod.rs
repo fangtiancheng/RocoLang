@@ -479,6 +479,13 @@ pub trait RocoStdLib: Send {
         unsupported("combat::get_battle_result")
     }
 
+    fn try_get_battle_result(&mut self) -> Result<BattleResultQueryResult> {
+        match self.get_battle_result() {
+            Ok(result) => Ok(BattleResultQueryResult::ok(result)),
+            Err(error) => Ok(BattleResultQueryResult::unavailable(error.to_string())),
+        }
+    }
+
     fn get_combat_actions(&mut self) -> Result<CombatActions> {
         unsupported("combat::get_combat_actions")
     }

@@ -11,12 +11,12 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
-    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
-    CombatActions, CombatSideState, CombatSpiritState, CombatState, SceneSpiritInfo, SkillPoolInfo,
-    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, TalentRefreshResult, UserInfo,
+    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
+    BattleSpiritResult, CombatActions, CombatSideState, CombatSpiritState, CombatState,
+    SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
+    SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo,
+    StaticItemInfo, StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo,
+    StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -599,6 +599,13 @@ impl RocoEngine {
         });
         engine.register_get("captured_spirits", |value: &mut BattleResult| {
             Self::to_array(&value.captured_spirits)
+        });
+
+        engine.register_type_with_name::<BattleResultQueryResult>("BattleResultQueryResult");
+        register_to_string!(BattleResultQueryResult);
+        register_getters!(BattleResultQueryResult, ok, code, message);
+        engine.register_get("result", |value: &mut BattleResultQueryResult| {
+            value.result.clone()
         });
 
         engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");

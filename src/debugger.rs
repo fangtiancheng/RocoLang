@@ -2,12 +2,13 @@ use rhai::{Array, Dynamic, Map};
 use serde::{Deserialize, Serialize};
 
 use crate::types::{
-    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleInfo, BattleResult, BattleSpiritResult,
-    CombatActions, CombatSideState, CombatSpiritState, CombatState, RoundResult, SceneSpiritInfo,
-    SkillInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
-    SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo,
-    StaticItemInfo, StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo,
-    StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, TalentRefreshResult, UserInfo,
+    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleInfo, BattleResult,
+    BattleResultQueryResult, BattleSpiritResult, CombatActions, CombatSideState, CombatSpiritState,
+    CombatState, RoundResult, SceneSpiritInfo, SkillInfo, SkillPoolInfo, SkillPoolSkillInfo,
+    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo,
+    SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 const MAX_PREVIEW_CHARS: usize = 4_000;
@@ -139,6 +140,7 @@ fn preview_roco_type(value: &Dynamic) -> Option<String> {
         BattleCapturedSpirit,
         BattleInfo,
         BattleResult,
+        BattleResultQueryResult,
         BattleSpiritResult,
         CombatActions,
         CombatSideState,

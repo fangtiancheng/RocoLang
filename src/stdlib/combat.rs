@@ -43,6 +43,12 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     register_stdlib_fn_0!(module, stdlib, "try_combat_escape", try_combat_escape);
     register_stdlib_fn_0!(module, stdlib, "wait_round_end", wait_round_end);
     register_stdlib_fn_0!(module, stdlib, "get_battle_result", get_battle_result);
+    register_stdlib_fn_0!(
+        module,
+        stdlib,
+        "try_get_battle_result",
+        try_get_battle_result
+    );
     register_stdlib_fn_0!(module, stdlib, "get_combat_actions", get_combat_actions);
     {
         let stdlib = stdlib.clone();

@@ -177,6 +177,31 @@ pub struct CombatActions {
     pub can_combat_mask: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatSpiritState {
+    pub position: i64,
+    pub spirit_id: i64,
+    pub level: i64,
+    pub hp: i64,
+    pub max_hp: i64,
+    pub skills: Vec<SpiritSkillInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatSideState {
+    pub active_position: i64,
+    pub alive_count: i64,
+    pub spirits: Vec<CombatSpiritState>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatState {
+    pub round: i64,
+    pub my_side: CombatSideState,
+    pub rival_side: CombatSideState,
+    pub rival_active_is_last: bool,
+}
+
 /// Standard result shape for operation-style `try_*` APIs.
 ///
 /// `try_*` functions should not raise expected business failures such as

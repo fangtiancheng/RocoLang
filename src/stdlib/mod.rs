@@ -266,6 +266,10 @@ pub trait RocoStdLib: Send {
         unsupported("combat::get_combat_lineup")
     }
 
+    fn get_combat_state(&mut self) -> Result<CombatState> {
+        unsupported("combat::get_combat_state")
+    }
+
     fn query_skill_pool(&mut self, _position: i64) -> Result<SkillPoolInfo> {
         unsupported("spirit::query_skill_pool")
     }

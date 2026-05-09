@@ -62,6 +62,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
+    register_stdlib_fn_0!(module, stdlib, "get_combat_state", get_combat_state);
     register_stdlib_fn_1!(module, stdlib, "can_use_skill", can_use_skill, skill_id: i64);
     register_stdlib_fn_1!(module, stdlib, "can_use_item", can_use_item, item_id: i64);
     register_stdlib_fn_1!(

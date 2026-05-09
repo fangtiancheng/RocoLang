@@ -12,11 +12,11 @@ use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleSpiritResult,
-    CombatActions, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    TalentRefreshResult, UserInfo,
+    CombatActions, CombatSideState, CombatSpiritState, CombatState, SceneSpiritInfo, SkillPoolInfo,
+    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -407,6 +407,28 @@ impl RocoEngine {
             can_change_to_any_spirit,
             can_combat_mask,
         );
+
+        engine.register_type_with_name::<CombatSpiritState>("CombatSpiritState");
+        register_to_string!(CombatSpiritState);
+        register_getters!(CombatSpiritState, position, spirit_id, level, hp, max_hp);
+        engine.register_get("skills", |value: &mut CombatSpiritState| {
+            Self::to_array(&value.skills)
+        });
+
+        engine.register_type_with_name::<CombatSideState>("CombatSideState");
+        register_to_string!(CombatSideState);
+        register_getters!(CombatSideState, active_position, alive_count);
+        engine.register_get("spirits", |value: &mut CombatSideState| {
+            Self::to_array(&value.spirits)
+        });
+
+        engine.register_type_with_name::<CombatState>("CombatState");
+        register_to_string!(CombatState);
+        register_getters!(CombatState, round, rival_active_is_last);
+        engine.register_get("my_side", |value: &mut CombatState| value.my_side.clone());
+        engine.register_get("rival_side", |value: &mut CombatState| {
+            value.rival_side.clone()
+        });
 
         engine.register_type_with_name::<ActionResult>("ActionResult");
         register_to_string!(ActionResult);

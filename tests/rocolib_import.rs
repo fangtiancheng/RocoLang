@@ -396,6 +396,64 @@ fn debug_runner_pauses_on_line_breakpoint_and_reports_call_stack() {
 }
 
 #[test]
+fn debug_runner_previews_custom_type_locals_as_json() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib {
+        bag_count: 1,
+        ..Default::default()
+    }));
+    let mut engine = RocoEngine::new(stdlib);
+    let events = Arc::new(Mutex::new(Vec::<RocoDebugEvent>::new()));
+    let events_for_hook = events.clone();
+
+    let _ = engine
+        .eval_debug(
+            r#"
+                let bag = spirit::get_spirit_bag();
+                let count = len(bag.spirits);
+                count
+            "#,
+            RocoDebugConfig {
+                source: Some("debug_custom_type.rhai".to_string()),
+                breakpoints: vec![RocoDebugBreakpoint {
+                    source: Some("debug_custom_type.rhai".to_string()),
+                    line: 3,
+                    column: None,
+                    enabled: true,
+                }],
+            },
+            RocoDebugHooks::new(
+                move |event| {
+                    events_for_hook.lock().expect("events lock").push(event);
+                },
+                || RocoDebugCommand::Continue,
+            ),
+        )
+        .expect("debug runner should complete");
+
+    let bag_preview = events
+        .lock()
+        .expect("events lock")
+        .iter()
+        .find_map(|event| match event {
+            RocoDebugEvent::Paused { locals, .. } => locals
+                .iter()
+                .find(|local| local.name == "bag")
+                .map(|local| local.value_preview.clone()),
+            _ => None,
+        })
+        .expect("pause event should include bag local");
+
+    assert!(
+        bag_preview.contains("\"spirits\""),
+        "custom type preview should include serialized fields, got {bag_preview}"
+    );
+    assert!(
+        bag_preview.contains("Spirit 1"),
+        "custom type preview should include nested values, got {bag_preview}"
+    );
+}
+
+#[test]
 fn debug_runner_can_update_breakpoints_while_paused() {
     let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
     let mut engine = RocoEngine::new(stdlib);

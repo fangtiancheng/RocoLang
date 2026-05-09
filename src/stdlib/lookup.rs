@@ -32,6 +32,20 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("list_features_name", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_features_name()
+                .map(|names| {
+                    names
+                        .into_iter()
+                        .map(rhai::Dynamic::from)
+                        .collect::<Array>()
+                })
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_guardian_pet_property_info", move |level: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_guardian_pet_property_info(level)

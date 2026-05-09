@@ -377,8 +377,24 @@ impl RocoEngine {
                 )+
             };
         }
+        macro_rules! register_to_string {
+            ($type:ty) => {
+                engine.register_fn(
+                    "to_string",
+                    |value: &mut $type| -> std::result::Result<String, Box<rhai::EvalAltResult>> {
+                        serde_json::to_string_pretty(value).map_err(|error| {
+                            Box::<rhai::EvalAltResult>::from(rhai::EvalAltResult::ErrorRuntime(
+                                error.to_string().into(),
+                                rhai::Position::NONE,
+                            ))
+                        })
+                    },
+                );
+            };
+        }
 
         engine.register_type_with_name::<CombatActions>("CombatActions");
+        register_to_string!(CombatActions);
         register_getters!(
             CombatActions,
             can_submit_action,
@@ -393,9 +409,11 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<ActionResult>("ActionResult");
+        register_to_string!(ActionResult);
         register_getters!(ActionResult, ok, code, message);
 
         engine.register_type_with_name::<TalentRefreshResult>("TalentRefreshResult");
+        register_to_string!(TalentRefreshResult);
         register_getters!(
             TalentRefreshResult,
             position,
@@ -426,6 +444,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<UserInfo>("UserInfo");
+        register_to_string!(UserInfo);
         register_getters!(
             UserInfo,
             uin,
@@ -441,30 +460,37 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<SpiritInfo>("SpiritInfo");
+        register_to_string!(SpiritInfo);
         register_getters!(SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp);
         engine.register_get("skills", |value: &mut SpiritInfo| {
             Self::to_array(&value.skills)
         });
 
         engine.register_type_with_name::<SpiritSkillInfo>("SpiritSkillInfo");
+        register_to_string!(SpiritSkillInfo);
         register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
 
         engine.register_type_with_name::<SkillPoolSkillInfo>("SkillPoolSkillInfo");
+        register_to_string!(SkillPoolSkillInfo);
         register_getters!(SkillPoolSkillInfo, skill_id, pp, inherited, position);
 
         engine.register_type_with_name::<SkillPoolInfo>("SkillPoolInfo");
+        register_to_string!(SkillPoolInfo);
         register_getters!(SkillPoolInfo, spirit_id, position);
         engine.register_get("skills", |value: &mut SkillPoolInfo| {
             Self::to_array(&value.skills)
         });
 
         engine.register_type_with_name::<SkillSwitchResult>("SkillSwitchResult");
+        register_to_string!(SkillSwitchResult);
         register_getters!(SkillSwitchResult, spirit_id, position, skill_slot, skill_id);
 
         engine.register_type_with_name::<SkillStoneSkillInfo>("SkillStoneSkillInfo");
+        register_to_string!(SkillStoneSkillInfo);
         register_getters!(SkillStoneSkillInfo, skill_id, pp, inherited);
 
         engine.register_type_with_name::<SkillStoneResult>("SkillStoneResult");
+        register_to_string!(SkillStoneResult);
         register_getters!(
             SkillStoneResult,
             ok,
@@ -482,6 +508,7 @@ impl RocoEngine {
         });
 
         engine.register_type_with_name::<StorageSpiritInfo>("StorageSpiritInfo");
+        register_to_string!(StorageSpiritInfo);
         register_getters!(
             StorageSpiritInfo,
             spirit_id,
@@ -495,6 +522,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<SceneSpiritInfo>("SceneSpiritInfo");
+        register_to_string!(SceneSpiritInfo);
         register_getters!(
             SceneSpiritInfo,
             spirit_id,
@@ -506,9 +534,11 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<BagItemInfo>("BagItemInfo");
+        register_to_string!(BagItemInfo);
         register_getters!(BagItemInfo, item_id, count);
 
         engine.register_type_with_name::<BattleSpiritResult>("BattleSpiritResult");
+        register_to_string!(BattleSpiritResult);
         register_getters!(
             BattleSpiritResult,
             position,
@@ -524,9 +554,11 @@ impl RocoEngine {
         });
 
         engine.register_type_with_name::<BattleCapturedSpirit>("BattleCapturedSpirit");
+        register_to_string!(BattleCapturedSpirit);
         register_getters!(BattleCapturedSpirit, spirit_id, level, disposition);
 
         engine.register_type_with_name::<BattleResult>("BattleResult");
+        register_to_string!(BattleResult);
         register_getters!(
             BattleResult,
             winner,
@@ -548,11 +580,13 @@ impl RocoEngine {
         });
 
         engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");
+        register_to_string!(SpiritBagInfo);
         engine.register_get("spirits", |value: &mut SpiritBagInfo| {
             Self::to_array(&value.spirits)
         });
 
         engine.register_type_with_name::<StaticItemInfo>("StaticItemInfo");
+        register_to_string!(StaticItemInfo);
         register_getters!(
             StaticItemInfo,
             id,
@@ -566,6 +600,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<StaticStriveItemInfo>("StaticStriveItemInfo");
+        register_to_string!(StaticStriveItemInfo);
         register_getters!(
             StaticStriveItemInfo,
             id,
@@ -583,6 +618,7 @@ impl RocoEngine {
         engine.register_type_with_name::<StaticGuardianPetPropertyInfo>(
             "StaticGuardianPetPropertyInfo",
         );
+        register_to_string!(StaticGuardianPetPropertyInfo);
         register_getters!(
             StaticGuardianPetPropertyInfo,
             level,
@@ -596,9 +632,11 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<StaticTitleInfo>("StaticTitleInfo");
+        register_to_string!(StaticTitleInfo);
         register_getters!(StaticTitleInfo, id, title_name);
 
         engine.register_type_with_name::<StaticMagicInfo>("StaticMagicInfo");
+        register_to_string!(StaticMagicInfo);
         register_getters!(
             StaticMagicInfo,
             id,
@@ -613,6 +651,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<StaticPluginInfo>("StaticPluginInfo");
+        register_to_string!(StaticPluginInfo);
         register_getters!(
             StaticPluginInfo,
             name,
@@ -626,6 +665,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<StaticSkillInfo>("StaticSkillInfo");
+        register_to_string!(StaticSkillInfo);
         register_getters!(
             StaticSkillInfo,
             id,
@@ -645,6 +685,7 @@ impl RocoEngine {
         );
 
         engine.register_type_with_name::<StaticSpiritInfo>("StaticSpiritInfo");
+        register_to_string!(StaticSpiritInfo);
         register_getters!(
             StaticSpiritInfo,
             id,
@@ -654,7 +695,6 @@ impl RocoEngine {
             avatar,
             icon_src,
             preview_src,
-            move_type,
             move_speed,
             height,
             weight,

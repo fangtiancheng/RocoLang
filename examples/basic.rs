@@ -163,7 +163,6 @@ impl RocoStdLib for MockStdLib {
             avatar: String::new(),
             icon_src: String::new(),
             preview_src: String::new(),
-            move_type: 0,
             move_speed: 0,
             height: String::new(),
             weight: String::new(),

@@ -353,7 +353,6 @@ pub struct StaticSpiritInfo {
     pub avatar: String,
     pub icon_src: String,
     pub preview_src: String,
-    pub move_type: i64,
     pub move_speed: i64,
     pub height: String,
     pub weight: String,

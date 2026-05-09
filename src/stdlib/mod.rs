@@ -332,6 +332,10 @@ pub trait RocoStdLib: Send {
         unsupported("lookup::list_strive_item_infos")
     }
 
+    fn list_features_name(&mut self) -> Result<Vec<String>> {
+        unsupported("lookup::list_features_name")
+    }
+
     fn lookup_guardian_pet_property_info(
         &mut self,
         _level: i64,

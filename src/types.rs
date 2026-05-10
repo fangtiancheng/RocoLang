@@ -218,16 +218,16 @@ pub struct CombatSpiritState {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatSideState {
     pub active_position: i64,
-    pub alive_count: i64,
     pub spirits: Vec<CombatSpiritState>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatState {
     pub round: i64,
+    pub weather: i64,
+    pub weather_round: i64,
     pub my_side: CombatSideState,
     pub rival_side: CombatSideState,
-    pub rival_active_is_last: bool,
 }
 
 /// Standard result shape for operation-style `try_*` APIs.

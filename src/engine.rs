@@ -417,14 +417,14 @@ impl RocoEngine {
 
         engine.register_type_with_name::<CombatSideState>("CombatSideState");
         register_to_string!(CombatSideState);
-        register_getters!(CombatSideState, active_position, alive_count);
+        register_getters!(CombatSideState, active_position);
         engine.register_get("spirits", |value: &mut CombatSideState| {
             Self::to_array(&value.spirits)
         });
 
         engine.register_type_with_name::<CombatState>("CombatState");
         register_to_string!(CombatState);
-        register_getters!(CombatState, round, rival_active_is_last);
+        register_getters!(CombatState, round, weather, weather_round);
         engine.register_get("my_side", |value: &mut CombatState| value.my_side.clone());
         engine.register_get("rival_side", |value: &mut CombatState| {
             value.rival_side.clone()

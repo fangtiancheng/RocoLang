@@ -13,3 +13,17 @@ fn challenge_boss(boss_id) {
 fn challenge_boss_with_catch_time(boss_id, catch_time) {
     combat::start_combat(0, 2, boss_id, catch_time)
 }
+
+fn remaining_spirit_count(side) {
+    let count = 0;
+    for spirit in side.spirits {
+        if spirit.hp > 0 {
+            count = count + 1;
+        }
+    }
+    count
+}
+
+fn rival_remaining_spirit_count(state) {
+    remaining_spirit_count(state.rival_side)
+}

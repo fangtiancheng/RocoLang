@@ -1,13 +1,14 @@
 fn format_skill_requirements(required_skill_ids) {
     const skill_infos = lookup::lookup_skills_info(required_skill_ids);
     let text = "";
-    let index = 0;
-    while index < len(skill_infos) {
-        if index > 0 {
+    let is_first = true;
+    for skill_info in skill_infos {
+        if is_first {
+            is_first = false;
+        } else {
             text = text + ",";
         }
-        text = text + skill_infos[index].name + "(" + skill_infos[index].id + ")";
-        index = index + 1;
+        text = text + skill_info.name + "(" + skill_info.id + ")";
     }
 
     return "[" + text + "]";
@@ -178,9 +179,7 @@ fn try_recover_all_spirits_hospital() {
 fn try_recover_all_spirits_money() {
     let bag = spirit::get_spirit_bag();
     let restored_count = 0;
-    let index = 0;
-    while index < len(bag.spirits) {
-        let spirit_info = bag.spirits[index];
+    for spirit_info in bag.spirits {
         if spirit_info.hp < spirit_info.max_hp {
             let restore_result = spirit::try_restore_spirit(spirit_info.spirit_id, spirit_info.position);
             if !restore_result.ok {
@@ -192,7 +191,6 @@ fn try_recover_all_spirits_money() {
             }
             restored_count = restored_count + 1;
         }
-        index = index + 1;
     }
 
     return #{

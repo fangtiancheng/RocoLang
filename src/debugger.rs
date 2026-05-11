@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleInfo, BattleResult,
     BattleResultQueryResult, BattleSpiritResult, CombatActions, CombatSideState, CombatSpiritState,
-    CombatState, RoundResult, SceneSpiritInfo, SkillInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo,
-    SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    CombatState, RoundResult, SceneRoleInfo, SceneSpiritInfo, SkillInfo, SkillPoolInfo,
+    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
     StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
     StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
@@ -147,6 +147,7 @@ fn preview_roco_type(value: &Dynamic) -> Option<String> {
         CombatSpiritState,
         CombatState,
         RoundResult,
+        SceneRoleInfo,
         SceneSpiritInfo,
         SkillInfo,
         SkillPoolInfo,

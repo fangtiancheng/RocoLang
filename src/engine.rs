@@ -9,14 +9,17 @@ use crate::debugger::{
     RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
 use crate::error::{Result, RocoError, RocoScriptError};
-use crate::stdlib::{combat, game, lookup, profile, scene, session, spirit, system, RocoStdLib};
+use crate::stdlib::{
+    combat, game, lookup, profile, role, scene, session, spirit, system, RocoStdLib,
+};
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
     BattleSpiritResult, CombatActions, CombatSideState, CombatSpiritState, CombatState,
-    SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
-    SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo,
-    StaticItemInfo, StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo,
-    StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, TalentRefreshResult, UserInfo,
+    SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -114,6 +117,10 @@ impl RocoEngine {
         let mut profile_module = rhai::Module::new();
         profile::register(&mut profile_module, stdlib.clone());
         engine.register_static_module("profile", profile_module.into());
+
+        let mut role_module = rhai::Module::new();
+        role::register(&mut role_module, stdlib.clone());
+        engine.register_static_module("role", role_module.into());
 
         let mut game_module = rhai::Module::new();
         game::register(&mut game_module, stdlib.clone());
@@ -553,6 +560,24 @@ impl RocoEngine {
             is_rare,
             is_boss,
             is_npc_boss,
+        );
+
+        engine.register_type_with_name::<SceneRoleInfo>("SceneRoleInfo");
+        register_to_string!(SceneRoleInfo);
+        register_getters!(
+            SceneRoleInfo,
+            uin,
+            id,
+            nick_name,
+            level,
+            loc_x,
+            loc_y,
+            pk_state,
+            is_in_combat,
+            is_vip,
+            vip_level,
+            trainer_level,
+            trainer_exp,
         );
 
         engine.register_type_with_name::<BagItemInfo>("BagItemInfo");

@@ -1,7 +1,7 @@
 use roco_lang::{
     ActionResult, Result, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoEngine, RocoStdLib, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
-    StaticSkillInfo, StorageSpiritInfo,
+    RocoDebugHooks, RocoEngine, RocoStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
+    SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -67,6 +67,23 @@ impl RocoStdLib for MockStdLib {
         self.swapped_positions
             .push((first_position, second_position));
         Ok(true)
+    }
+
+    fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
+        Ok(vec![SceneRoleInfo {
+            uin: 470926678,
+            id: 470926678,
+            nick_name: "Target".to_string(),
+            level: 100,
+            loc_x: 10,
+            loc_y: 20,
+            pk_state: 0,
+            is_in_combat: false,
+            is_vip: true,
+            vip_level: 5,
+            trainer_level: 20,
+            trainer_exp: 1234,
+        }])
     }
 
     fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
@@ -202,6 +219,32 @@ fn imports_built_in_combat_helpers() {
             (0, 2, 9002, 34),
         ]
     );
+}
+
+#[test]
+fn imports_built_in_role_cache_helpers() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                import "roco/role" as roco_role;
+
+                let roles = role::get_cached_scene_roles();
+                system::assert(len(roles) == 1, "cached role count mismatch");
+                system::assert(roles[0].uin == 470926678, "cached role uin mismatch");
+                system::assert(!roles[0].is_in_combat, "cached role combat state mismatch");
+
+                let found = roco_role::find_cached_scene_role(470926678);
+                system::assert(found.found, "target role must be found in cache");
+                system::assert(found.role.nick_name == "Target", found.role.nick_name);
+
+                let missing = roco_role::find_cached_scene_role(1);
+                system::assert(!missing.found, "missing role must not be found");
+            "#,
+        )
+        .expect("built-in role cache helpers should import and run");
 }
 
 #[test]

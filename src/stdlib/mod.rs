@@ -7,6 +7,7 @@ pub mod combat;
 pub mod game;
 pub mod lookup;
 pub mod profile;
+pub mod role;
 pub mod scene;
 pub mod session;
 pub mod spirit;
@@ -53,6 +54,10 @@ pub trait RocoStdLib: Send {
 
     fn get_scene_spirits(&mut self) -> Result<Vec<SceneSpiritInfo>> {
         unsupported("scene::get_scene_spirits")
+    }
+
+    fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
+        unsupported("role::get_cached_scene_roles")
     }
 
     fn query_server_time(&mut self) -> Result<i64> {

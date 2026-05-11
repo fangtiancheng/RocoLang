@@ -26,6 +26,22 @@ pub struct SceneSpiritInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SceneRoleInfo {
+    pub uin: i64,
+    pub id: i64,
+    pub nick_name: String,
+    pub level: i64,
+    pub loc_x: i64,
+    pub loc_y: i64,
+    pub pk_state: i64,
+    pub is_in_combat: bool,
+    pub is_vip: bool,
+    pub vip_level: i64,
+    pub trainer_level: i64,
+    pub trainer_exp: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritSkillInfo {
     pub skill_id: i64,
     pub pp: i64,

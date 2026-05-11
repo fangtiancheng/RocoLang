@@ -79,6 +79,29 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         item_id: i64,
         count: i64
     );
+    register_stdlib_fn_1!(
+        module,
+        stdlib,
+        "get_blood_gift_info",
+        get_blood_gift_info,
+        position: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "awaken_blood_gift",
+        awaken_blood_gift,
+        position: i64,
+        blood_index: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "equip_blood_gift",
+        equip_blood_gift,
+        position: i64,
+        blood_index: i64
+    );
     register_stdlib_fn_2!(
         module,
         stdlib,
@@ -221,6 +244,31 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         position: i64,
         equipment_server_id: i64,
         equipment_catch_time: i64,
+        spirit_id: i64,
+        spirit_catch_time: i64
+    );
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_equipment_bag", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_equipment_bag().map_err(to_rhai_error)
+        });
+    }
+    register_stdlib_fn_4!(
+        module,
+        stdlib,
+        "unequip_item",
+        unequip_item,
+        equipment_server_id: i64,
+        equipment_catch_time: i64,
+        spirit_id: i64,
+        spirit_catch_time: i64
+    );
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "unequip_all_items",
+        unequip_all_items,
         spirit_id: i64,
         spirit_catch_time: i64
     );

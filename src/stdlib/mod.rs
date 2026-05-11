@@ -249,6 +249,18 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::use_talent_refresh_item")
     }
 
+    fn get_blood_gift_info(&mut self, _position: i64) -> Result<BloodGiftInfo> {
+        unsupported("spirit::get_blood_gift_info")
+    }
+
+    fn awaken_blood_gift(&mut self, _position: i64, _blood_index: i64) -> Result<BloodGiftInfo> {
+        unsupported("spirit::awaken_blood_gift")
+    }
+
+    fn equip_blood_gift(&mut self, _position: i64, _blood_index: i64) -> Result<BloodGiftInfo> {
+        unsupported("spirit::equip_blood_gift")
+    }
+
     fn allocate_exp(&mut self, _position: i64, _exp: i64) -> Result<bool> {
         unsupported("spirit::allocate_exp")
     }
@@ -329,6 +341,24 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::equip_item")
     }
 
+    fn list_equipment_bag(&mut self) -> Result<SpiritEquipmentBagInfo> {
+        unsupported("spirit::list_equipment_bag")
+    }
+
+    fn unequip_item(
+        &mut self,
+        _equipment_server_id: i64,
+        _equipment_catch_time: i64,
+        _spirit_id: i64,
+        _spirit_catch_time: i64,
+    ) -> Result<bool> {
+        unsupported("spirit::unequip_item")
+    }
+
+    fn unequip_all_items(&mut self, _spirit_id: i64, _spirit_catch_time: i64) -> Result<bool> {
+        unsupported("spirit::unequip_all_items")
+    }
+
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {
         unsupported("lookup::lookup_item_info")
     }
@@ -366,6 +396,14 @@ pub trait RocoStdLib: Send {
 
     fn list_plugin_infos(&mut self) -> Result<Vec<StaticPluginInfo>> {
         unsupported("lookup::list_plugin_infos")
+    }
+
+    fn lookup_talent_info(&mut self, _talent_type: i64) -> Result<StaticTalentInfo> {
+        unsupported("lookup::lookup_talent_info")
+    }
+
+    fn list_talent_infos(&mut self) -> Result<Vec<StaticTalentInfo>> {
+        unsupported("lookup::list_talent_infos")
     }
 
     fn lookup_skill_info(&mut self, _skill_id: i64) -> Result<StaticSkillInfo> {

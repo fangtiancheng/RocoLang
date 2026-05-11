@@ -84,6 +84,22 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("lookup_talent_info", move |talent_type: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.lookup_talent_info(talent_type).map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_talent_infos", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_talent_infos()
+                .map(|talents| to_array(&talents))
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_skill_info", move |skill_id: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_skill_info(skill_id).map_err(to_rhai_error)

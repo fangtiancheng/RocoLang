@@ -315,6 +315,52 @@ pub struct TalentRefreshResult {
     pub hp_level_new: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BloodGiftItemRequirement {
+    pub item_id: i64,
+    pub count: i64,
+    pub need: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BloodGiftOption {
+    pub blood_index: i64,
+    pub talent_type: i64,
+    pub talent_name: String,
+    pub talent_description: String,
+    pub awakened: bool,
+    pub required_items: Vec<BloodGiftItemRequirement>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BloodGiftInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub position: i64,
+    pub equipped_index: i64,
+    pub options: Vec<BloodGiftOption>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpiritEquipmentInfo {
+    pub server_id: i64,
+    pub catch_time: i64,
+    pub base_attr: i64,
+    pub base_value: i64,
+    pub special_attr: i64,
+    pub special_value: i64,
+    pub spirit_id: i64,
+    pub spirit_catch_time: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpiritEquipmentBagInfo {
+    pub equipment_count: i64,
+    pub all_num: i64,
+    pub need: i64,
+    pub equipments: Vec<SpiritEquipmentInfo>,
+}
+
 /// Skill information.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SkillInfo {
@@ -391,6 +437,13 @@ pub struct StaticPluginInfo {
     pub plugin_class: String,
     pub plugin_src: String,
     pub plugin_url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticTalentInfo {
+    pub id: i64,
+    pub name: String,
+    pub description: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -14,9 +14,10 @@ use crate::stdlib::{
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
-    BattleSpiritResult, CombatActions, CombatSideState, CombatSpiritState, CombatState,
-    SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritInfo, SpiritSkillInfo,
+    BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CombatActions,
+    CombatSideState, CombatSpiritState, CombatState, SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo,
+    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     TalentRefreshResult, UserInfo,
@@ -631,6 +632,58 @@ impl RocoEngine {
         register_getters!(BattleResultQueryResult, ok, code, message);
         engine.register_get("result", |value: &mut BattleResultQueryResult| {
             value.result.clone()
+        });
+
+        engine.register_type_with_name::<BloodGiftItemRequirement>("BloodGiftItemRequirement");
+        register_to_string!(BloodGiftItemRequirement);
+        register_getters!(BloodGiftItemRequirement, item_id, count, need);
+
+        engine.register_type_with_name::<BloodGiftOption>("BloodGiftOption");
+        register_to_string!(BloodGiftOption);
+        register_getters!(
+            BloodGiftOption,
+            blood_index,
+            talent_type,
+            talent_name,
+            talent_description,
+            awakened,
+        );
+        engine.register_get("required_items", |value: &mut BloodGiftOption| {
+            Self::to_array(&value.required_items)
+        });
+
+        engine.register_type_with_name::<BloodGiftInfo>("BloodGiftInfo");
+        register_to_string!(BloodGiftInfo);
+        register_getters!(
+            BloodGiftInfo,
+            result_code,
+            message,
+            position,
+            equipped_index
+        );
+        engine.register_get("options", |value: &mut BloodGiftInfo| {
+            Self::to_array(&value.options)
+        });
+
+        engine.register_type_with_name::<SpiritEquipmentInfo>("SpiritEquipmentInfo");
+        register_to_string!(SpiritEquipmentInfo);
+        register_getters!(
+            SpiritEquipmentInfo,
+            server_id,
+            catch_time,
+            base_attr,
+            base_value,
+            special_attr,
+            special_value,
+            spirit_id,
+            spirit_catch_time,
+        );
+
+        engine.register_type_with_name::<SpiritEquipmentBagInfo>("SpiritEquipmentBagInfo");
+        register_to_string!(SpiritEquipmentBagInfo);
+        register_getters!(SpiritEquipmentBagInfo, equipment_count, all_num, need);
+        engine.register_get("equipments", |value: &mut SpiritEquipmentBagInfo| {
+            Self::to_array(&value.equipments)
         });
 
         engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");

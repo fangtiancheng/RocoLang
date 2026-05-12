@@ -16,6 +16,23 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("lookup_items_info", move |item_ids: Array| {
+            let item_ids = item_ids
+                .into_iter()
+                .map(|value| {
+                    value.as_int().map_err(|err| {
+                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.lookup_items_info(item_ids)
+                .map(|infos| to_array(&infos))
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_strive_item_info", move |item_id: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_strive_item_info(item_id).map_err(to_rhai_error)

@@ -10,13 +10,15 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, game, lookup, profile, role, scene, session, spirit, system, RocoStdLib,
+    combat, game, lookup, manor, profile, role, scene, session, spirit, system, RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
     BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CombatActions,
-    CombatSideState, CombatSpiritState, CombatState, SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo,
-    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    CombatSideState, CombatSpiritState, CombatState, ManorFertilizerResult, ManorGroundInfo,
+    ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
+    ManorWeedResult, SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo,
+    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
     SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
@@ -130,6 +132,10 @@ impl RocoEngine {
         let mut spirit_module = rhai::Module::new();
         spirit::register(&mut spirit_module, stdlib.clone());
         engine.register_static_module("spirit", spirit_module.into());
+
+        let mut manor_module = rhai::Module::new();
+        manor::register(&mut manor_module, stdlib.clone());
+        engine.register_static_module("manor", manor_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -683,6 +689,126 @@ impl RocoEngine {
         register_getters!(SpiritEquipmentBagInfo, equipment_count, all_num, need);
         engine.register_get("equipments", |value: &mut SpiritEquipmentBagInfo| {
             Self::to_array(&value.equipments)
+        });
+
+        engine.register_type_with_name::<ManorGroundInfo>("ManorGroundInfo");
+        register_to_string!(ManorGroundInfo);
+        register_getters!(
+            ManorGroundInfo,
+            ground_id,
+            ground_status,
+            seed,
+            plant_status,
+            current_time,
+            total_time,
+            total_produce,
+            left_produce,
+            has_grass,
+            has_insect,
+            has_fruit,
+            season,
+            left_row_times,
+        );
+
+        engine.register_type_with_name::<ManorInfo>("ManorInfo");
+        register_to_string!(ManorInfo);
+        register_getters!(
+            ManorInfo,
+            qq_uin,
+            manor_level,
+            manor_exp,
+            gold_mass_num,
+            gold_money_num,
+            guide_type,
+            pet_status,
+            scarecrow_exp,
+            scarecrow_level,
+            scarecrow_id,
+            home_id,
+            parasol_id,
+            beautify_id,
+            billboard_id,
+            scarecrow_ever_play,
+            scarecrow_next_exp,
+            scarecrow_gift_gotten,
+            proficiency_a,
+            proficiency_a_exp,
+            proficiency_a_exp_pre,
+            proficiency_a_exp_next,
+            proficiency_b,
+            proficiency_b_exp,
+            proficiency_b_exp_pre,
+            proficiency_b_exp_next,
+            proficiency_c,
+            proficiency_c_exp,
+            proficiency_c_exp_pre,
+            proficiency_c_exp_next,
+            steal_state,
+        );
+        engine.register_get("gift_status_a", |value: &mut ManorInfo| {
+            Self::to_array(&value.gift_status_a)
+        });
+        engine.register_get("gift_status_b", |value: &mut ManorInfo| {
+            Self::to_array(&value.gift_status_b)
+        });
+        engine.register_get("gift_status_c", |value: &mut ManorInfo| {
+            Self::to_array(&value.gift_status_c)
+        });
+        engine.register_get("grounds", |value: &mut ManorInfo| {
+            Self::to_array(&value.grounds)
+        });
+
+        engine.register_type_with_name::<ManorItemCount>("ManorItemCount");
+        register_to_string!(ManorItemCount);
+        register_getters!(ManorItemCount, item_id, item_count);
+
+        engine.register_type_with_name::<ManorRewardInfo>("ManorRewardInfo");
+        register_to_string!(ManorRewardInfo);
+        register_getters!(ManorRewardInfo, item_id, count);
+
+        engine.register_type_with_name::<ManorSowResult>("ManorSowResult");
+        register_to_string!(ManorSowResult);
+        register_getters!(ManorSowResult, exp);
+        engine.register_get("ground", |value: &mut ManorSowResult| value.ground.clone());
+
+        engine.register_type_with_name::<ManorReapResult>("ManorReapResult");
+        register_to_string!(ManorReapResult);
+        register_getters!(
+            ManorReapResult,
+            qq_uin,
+            seed_id,
+            result,
+            exp,
+            fruit_num,
+            event_id,
+        );
+        engine.register_get("ground", |value: &mut ManorReapResult| value.ground.clone());
+        engine.register_get("rewards", |value: &mut ManorReapResult| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<ManorUprootResult>("ManorUprootResult");
+        register_to_string!(ManorUprootResult);
+        engine.register_get("ground", |value: &mut ManorUprootResult| {
+            value.ground.clone()
+        });
+
+        engine.register_type_with_name::<ManorWeedResult>("ManorWeedResult");
+        register_to_string!(ManorWeedResult);
+        register_getters!(ManorWeedResult, qq_uin, exp);
+        engine.register_get("ground", |value: &mut ManorWeedResult| value.ground.clone());
+
+        engine.register_type_with_name::<ManorFertilizerResult>("ManorFertilizerResult");
+        register_to_string!(ManorFertilizerResult);
+        register_getters!(
+            ManorFertilizerResult,
+            can_fertilizer,
+            deduce_time_in_second,
+            fertilizer,
+            uin,
+        );
+        engine.register_get("ground", |value: &mut ManorFertilizerResult| {
+            value.ground.clone()
         });
 
         engine.register_type_with_name::<SpiritBagInfo>("SpiritBagInfo");

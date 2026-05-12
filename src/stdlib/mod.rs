@@ -6,6 +6,7 @@ use crate::types::*;
 pub mod combat;
 pub mod game;
 pub mod lookup;
+pub mod manor;
 pub mod profile;
 pub mod role;
 pub mod scene;
@@ -359,8 +360,44 @@ pub trait RocoStdLib: Send {
         unsupported("spirit::unequip_all_items")
     }
 
+    fn manor_get_ground_info(&mut self) -> Result<ManorInfo> {
+        unsupported("manor::get_ground_info")
+    }
+
+    fn manor_get_seed_bag(&mut self) -> Result<Vec<ManorItemCount>> {
+        unsupported("manor::get_seed_bag")
+    }
+
+    fn manor_sow(&mut self, _seed_id: i64, _ground_id: i64) -> Result<ManorSowResult> {
+        unsupported("manor::sow")
+    }
+
+    fn manor_reap(&mut self, _ground_id: i64) -> Result<ManorReapResult> {
+        unsupported("manor::reap")
+    }
+
+    fn manor_uproot(&mut self, _ground_id: i64) -> Result<ManorUprootResult> {
+        unsupported("manor::uproot")
+    }
+
+    fn manor_weed(&mut self, _ground_id: i64, _weed_type: i64) -> Result<ManorWeedResult> {
+        unsupported("manor::weed")
+    }
+
+    fn manor_use_fertilizer(
+        &mut self,
+        _ground_id: i64,
+        _fertilizer_item_id: i64,
+    ) -> Result<ManorFertilizerResult> {
+        unsupported("manor::use_fertilizer")
+    }
+
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {
         unsupported("lookup::lookup_item_info")
+    }
+
+    fn lookup_items_info(&mut self, _item_ids: Vec<i64>) -> Result<Vec<StaticItemInfo>> {
+        unsupported("lookup::lookup_items_info")
     }
 
     fn lookup_strive_item_info(&mut self, _item_id: i64) -> Result<StaticStriveItemInfo> {
@@ -410,24 +447,16 @@ pub trait RocoStdLib: Send {
         unsupported("lookup::lookup_skill_info")
     }
 
-    fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
-        let mut infos = Vec::with_capacity(skill_ids.len());
-        for skill_id in skill_ids {
-            infos.push(self.lookup_skill_info(skill_id)?);
-        }
-        Ok(infos)
+    fn lookup_skills_info(&mut self, _skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
+        unsupported("lookup::lookup_skills_info")
     }
 
     fn lookup_spirit_info(&mut self, _spirit_id: i64) -> Result<StaticSpiritInfo> {
         unsupported("lookup::lookup_spirit_info")
     }
 
-    fn lookup_spirits_info(&mut self, spirit_ids: Vec<i64>) -> Result<Vec<StaticSpiritInfo>> {
-        let mut infos = Vec::with_capacity(spirit_ids.len());
-        for spirit_id in spirit_ids {
-            infos.push(self.lookup_spirit_info(spirit_id)?);
-        }
-        Ok(infos)
+    fn lookup_spirits_info(&mut self, _spirit_ids: Vec<i64>) -> Result<Vec<StaticSpiritInfo>> {
+        unsupported("lookup::lookup_spirits_info")
     }
 
     fn invite_pk(&mut self, _target_uin: i64) -> Result<BattleInfo> {

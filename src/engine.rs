@@ -413,7 +413,6 @@ impl RocoEngine {
             can_escape,
             can_use_any_skill,
             can_change_to_any_spirit,
-            can_combat_mask,
         );
 
         engine.register_type_with_name::<CombatSpiritState>("CombatSpiritState");

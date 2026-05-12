@@ -155,7 +155,6 @@ impl RocoStdLib for ErrorTestStdLib {
             can_escape: true,
             can_use_any_skill: false,
             can_change_to_any_spirit: false,
-            can_combat_mask: 31,
         })
     }
 

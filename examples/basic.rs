@@ -277,7 +277,6 @@ impl RocoStdLib for MockStdLib {
             can_escape: true,
             can_use_any_skill: true,
             can_change_to_any_spirit: false,
-            can_combat_mask: 31,
         })
     }
 

@@ -218,7 +218,6 @@ pub struct CombatActions {
     pub can_escape: bool,
     pub can_use_any_skill: bool,
     pub can_change_to_any_spirit: bool,
-    pub can_combat_mask: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -7,6 +7,8 @@ pub mod combat;
 pub mod game;
 pub mod lookup;
 pub mod manor;
+pub mod news;
+pub mod news_times;
 pub mod profile;
 pub mod role;
 pub mod scene;
@@ -390,6 +392,26 @@ pub trait RocoStdLib: Send {
         _fertilizer_item_id: i64,
     ) -> Result<ManorFertilizerResult> {
         unsupported("manor::use_fertilizer")
+    }
+
+    fn news_times_query_reports(&mut self) -> Result<NewsTimesReportsResult> {
+        unsupported("news_times::query_reports")
+    }
+
+    fn news_query_reports(&mut self) -> Result<NewsTimesReportsResult> {
+        self.news_times_query_reports()
+    }
+
+    fn news_query_active_ids(&mut self) -> Result<Vec<i64>> {
+        unsupported("news::query_active_ids")
+    }
+
+    fn news_query_active_items(&mut self) -> Result<Vec<NewsActiveItem>> {
+        unsupported("news::query_active_items")
+    }
+
+    fn news_list_active_config_items(&mut self) -> Result<Vec<NewsActiveItem>> {
+        unsupported("news::list_active_config_items")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

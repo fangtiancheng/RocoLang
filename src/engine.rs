@@ -10,19 +10,20 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, game, lookup, manor, profile, role, scene, session, spirit, system, RocoStdLib,
+    combat, game, lookup, manor, news, news_times, profile, role, scene, session, spirit, system,
+    RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
     BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CombatActions,
     CombatSideState, CombatSpiritState, CombatState, ManorFertilizerResult, ManorGroundInfo,
     ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
-    ManorWeedResult, SceneRoleInfo, SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    TalentRefreshResult, UserInfo,
+    ManorWeedResult, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo,
+    SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
+    SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo,
+    SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -136,6 +137,14 @@ impl RocoEngine {
         let mut manor_module = rhai::Module::new();
         manor::register(&mut manor_module, stdlib.clone());
         engine.register_static_module("manor", manor_module.into());
+
+        let mut news_module = rhai::Module::new();
+        news::register(&mut news_module, stdlib.clone());
+        engine.register_static_module("news", news_module.into());
+
+        let mut news_times_module = rhai::Module::new();
+        news_times::register(&mut news_times_module, stdlib.clone());
+        engine.register_static_module("news_times", news_times_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -609,6 +618,53 @@ impl RocoEngine {
         engine.register_type_with_name::<BattleCapturedSpirit>("BattleCapturedSpirit");
         register_to_string!(BattleCapturedSpirit);
         register_getters!(BattleCapturedSpirit, spirit_id, level, disposition);
+
+        engine.register_type_with_name::<NewsTimesReport>("NewsTimesReport");
+        register_to_string!(NewsTimesReport);
+        register_getters!(
+            NewsTimesReport,
+            id,
+            report_type,
+            begin_time,
+            end_time,
+            name_image_url,
+            app_url,
+        );
+        engine.register_get("act_begin_time", |value: &mut NewsTimesReport| {
+            Self::to_array(&value.act_begin_time)
+        });
+        engine.register_get("act_end_time", |value: &mut NewsTimesReport| {
+            Self::to_array(&value.act_end_time)
+        });
+        engine.register_type_with_name::<NewsTimesReportsResult>("NewsTimesReportsResult");
+        register_to_string!(NewsTimesReportsResult);
+        register_getters!(NewsTimesReportsResult, gift_gotten);
+        engine.register_get("reports", |value: &mut NewsTimesReportsResult| {
+            Self::to_array(&value.reports)
+        });
+        engine.register_get(
+            "player_status_today",
+            |value: &mut NewsTimesReportsResult| Self::to_array(&value.player_status_today),
+        );
+        engine.register_get(
+            "player_status_forever",
+            |value: &mut NewsTimesReportsResult| Self::to_array(&value.player_status_forever),
+        );
+
+        engine.register_type_with_name::<NewsActiveItem>("NewsActiveItem");
+        register_to_string!(NewsActiveItem);
+        register_getters!(
+            NewsActiveItem,
+            id,
+            scene_id,
+            npc_x,
+            npc_y,
+            time,
+            content,
+            auto_start,
+            script_url,
+            app_url,
+        );
 
         engine.register_type_with_name::<BattleResult>("BattleResult");
         register_to_string!(BattleResult);

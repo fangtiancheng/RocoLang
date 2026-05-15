@@ -10,8 +10,8 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, game, lookup, manor, news, news_times, profile, role, scene, session, spirit, system,
-    RocoStdLib,
+    combat, game, lookup, manor, news, news_times, profile, role, scene, session, spirit,
+    star_tower, system, RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
@@ -21,9 +21,10 @@ use crate::types::{
     ManorWeedResult, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo,
     SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
     SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo,
-    SpiritSkillInfo, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, TalentRefreshResult, UserInfo,
+    SpiritSkillInfo, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -145,6 +146,10 @@ impl RocoEngine {
         let mut news_times_module = rhai::Module::new();
         news_times::register(&mut news_times_module, stdlib.clone());
         engine.register_static_module("news_times", news_times_module.into());
+
+        let mut star_tower_module = rhai::Module::new();
+        star_tower::register(&mut star_tower_module, stdlib.clone());
+        engine.register_static_module("star_tower", star_tower_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -665,6 +670,57 @@ impl RocoEngine {
             script_url,
             app_url,
         );
+
+        engine.register_type_with_name::<StarTowerNode>("StarTowerNode");
+        register_to_string!(StarTowerNode);
+        register_getters!(
+            StarTowerNode,
+            node_index,
+            star,
+            spirit_id,
+            fight_id,
+            item_id,
+            reward,
+            equip_id,
+        );
+
+        engine.register_type_with_name::<StarTowerStorey>("StarTowerStorey");
+        register_to_string!(StarTowerStorey);
+        register_getters!(StarTowerStorey, storey_index, first, can_quick_fight);
+        engine.register_get("nodes", |value: &mut StarTowerStorey| {
+            Self::to_array(&value.nodes)
+        });
+
+        engine.register_type_with_name::<StarTowerTop>("StarTowerTop");
+        register_to_string!(StarTowerTop);
+        register_getters!(StarTowerTop, star, refresh, fight_desc, task_desc, fight_id,);
+        engine.register_get("tokens", |value: &mut StarTowerTop| {
+            Self::to_array(&value.tokens)
+        });
+        engine.register_get("exchanges", |value: &mut StarTowerTop| {
+            Self::to_array(&value.exchanges)
+        });
+
+        engine.register_type_with_name::<StarTowerInfo>("StarTowerInfo");
+        register_to_string!(StarTowerInfo);
+        register_getters!(
+            StarTowerInfo,
+            result_code,
+            message,
+            mop,
+            boss_id,
+            countdown,
+            auto_sell,
+            money,
+            has_top,
+        );
+        engine.register_get("clips", |value: &mut StarTowerInfo| {
+            Self::to_array(&value.clips)
+        });
+        engine.register_get("storeys", |value: &mut StarTowerInfo| {
+            Self::to_array(&value.storeys)
+        });
+        engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
 
         engine.register_type_with_name::<BattleResult>("BattleResult");
         register_to_string!(BattleResult);

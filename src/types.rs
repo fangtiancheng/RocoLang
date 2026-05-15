@@ -242,6 +242,51 @@ pub struct NewsActiveItem {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub mop: i64,
+    pub boss_id: i64,
+    pub countdown: i64,
+    pub auto_sell: bool,
+    pub money: i64,
+    pub clips: Vec<i64>,
+    pub storeys: Vec<StarTowerStorey>,
+    pub has_top: bool,
+    pub top: StarTowerTop,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerStorey {
+    pub storey_index: i64,
+    pub first: i64,
+    pub can_quick_fight: bool,
+    pub nodes: Vec<StarTowerNode>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerNode {
+    pub node_index: i64,
+    pub star: i64,
+    pub spirit_id: i64,
+    pub fight_id: i64,
+    pub item_id: i64,
+    pub reward: i64,
+    pub equip_id: i64,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct StarTowerTop {
+    pub star: i64,
+    pub refresh: i64,
+    pub fight_desc: String,
+    pub task_desc: String,
+    pub fight_id: i64,
+    pub tokens: Vec<i64>,
+    pub exchanges: Vec<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatActions {
     pub can_submit_action: bool,
     pub can_use_skill: bool,

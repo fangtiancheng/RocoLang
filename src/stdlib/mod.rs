@@ -14,6 +14,7 @@ pub mod role;
 pub mod scene;
 pub mod session;
 pub mod spirit;
+pub mod star_tower;
 pub mod system;
 pub mod util;
 
@@ -412,6 +413,55 @@ pub trait RocoStdLib: Send {
 
     fn news_list_active_config_items(&mut self) -> Result<Vec<NewsActiveItem>> {
         unsupported("news::list_active_config_items")
+    }
+
+    fn star_tower_query(&mut self) -> Result<StarTowerInfo> {
+        unsupported("star_tower::query")
+    }
+
+    fn star_tower_settle_floor_fight(
+        &mut self,
+        _storey_index: i64,
+        _node_index: i64,
+    ) -> Result<StarTowerInfo> {
+        unsupported("star_tower::settle_floor_fight")
+    }
+
+    fn star_tower_get_floor_award(&mut self, _storey_index: i64) -> Result<StarTowerInfo> {
+        unsupported("star_tower::get_floor_award")
+    }
+
+    fn star_tower_quick_fight(
+        &mut self,
+        _storey: i64,
+        _storey1: i64,
+        _sell: bool,
+    ) -> Result<StarTowerInfo> {
+        unsupported("star_tower::quick_fight")
+    }
+
+    fn star_tower_toggle_auto_sell(&mut self) -> Result<StarTowerInfo> {
+        unsupported("star_tower::toggle_auto_sell")
+    }
+
+    fn star_tower_settle_top_boss_fight(&mut self) -> Result<StarTowerInfo> {
+        unsupported("star_tower::settle_top_boss_fight")
+    }
+
+    fn star_tower_get_top_reward(&mut self, _reward_index: i64) -> Result<StarTowerInfo> {
+        unsupported("star_tower::get_top_reward")
+    }
+
+    fn star_tower_query_bag(&mut self) -> Result<StarTowerInfo> {
+        unsupported("star_tower::query_bag")
+    }
+
+    fn star_tower_full_level(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<StarTowerInfo> {
+        unsupported("star_tower::full_level")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

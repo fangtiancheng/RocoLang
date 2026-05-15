@@ -7,6 +7,10 @@ use crate::stdlib::util::{
 };
 use crate::stdlib::RocoStdLib;
 
+// Index convention:
+// - Star tower storey_index/node_index/reward_index are 0-based, matching the
+//   CGI and the StarTowerInfo fields returned by query().
+// - Spirit IDs and catch_time are raw server values, not positional indexes.
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
     register_stdlib_fn_0!(module, stdlib, "query", star_tower_query);
     register_stdlib_fn_2!(

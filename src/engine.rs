@@ -10,8 +10,8 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, game, lookup, manor, news, news_times, profile, role, scene, session, spirit,
-    star_tower, system, RocoStdLib,
+    combat, game, lookup, manor, news, news_times, profile, role, scene, sentinel_intelligence,
+    session, spirit, star_tower, system, RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
@@ -19,12 +19,13 @@ use crate::types::{
     CombatSideState, CombatSpiritState, CombatState, ManorFertilizerResult, ManorGroundInfo,
     ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
     ManorWeedResult, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo,
-    SceneSpiritInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
-    SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo,
-    SpiritSkillInfo, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    TalentRefreshResult, UserInfo,
+    SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
+    SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
+    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
+    StarTowerStorey, StarTowerTop, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -150,6 +151,10 @@ impl RocoEngine {
         let mut star_tower_module = rhai::Module::new();
         star_tower::register(&mut star_tower_module, stdlib.clone());
         engine.register_static_module("star_tower", star_tower_module.into());
+
+        let mut sentinel_intelligence_module = rhai::Module::new();
+        sentinel_intelligence::register(&mut sentinel_intelligence_module, stdlib.clone());
+        engine.register_static_module("sentinel_intelligence", sentinel_intelligence_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -721,6 +726,61 @@ impl RocoEngine {
             Self::to_array(&value.storeys)
         });
         engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
+
+        engine.register_type_with_name::<SentinelBossInfo>("SentinelBossInfo");
+        register_to_string!(SentinelBossInfo);
+        register_getters!(
+            SentinelBossInfo,
+            index,
+            spirit_id,
+            difficulty,
+            status,
+            max_intelligence,
+            intelligence,
+        );
+
+        engine.register_type_with_name::<SentinelExchangeInfo>("SentinelExchangeInfo");
+        register_to_string!(SentinelExchangeInfo);
+        register_getters!(SentinelExchangeInfo, index, item_id, need_bounty, status);
+
+        engine.register_type_with_name::<SentinelSpiritExchangeInfo>("SentinelSpiritExchangeInfo");
+        register_to_string!(SentinelSpiritExchangeInfo);
+        register_getters!(
+            SentinelSpiritExchangeInfo,
+            index,
+            spirit_id,
+            need_intelligence,
+            evolve_spirit_id,
+            status,
+        );
+
+        engine.register_type_with_name::<SentinelIntelligenceInfo>("SentinelIntelligenceInfo");
+        register_to_string!(SentinelIntelligenceInfo);
+        register_getters!(
+            SentinelIntelligenceInfo,
+            result_code,
+            message,
+            fight_id,
+            added_bounty,
+            refresh_count,
+            exchange_refresh_count,
+            mission_type,
+            fight_times,
+            bounty,
+            intelligence_count,
+        );
+        engine.register_get("mission_values", |value: &mut SentinelIntelligenceInfo| {
+            Self::to_array(&value.mission_values)
+        });
+        engine.register_get("bosses", |value: &mut SentinelIntelligenceInfo| {
+            Self::to_array(&value.bosses)
+        });
+        engine.register_get("exchanges", |value: &mut SentinelIntelligenceInfo| {
+            Self::to_array(&value.exchanges)
+        });
+        engine.register_get("spirits", |value: &mut SentinelIntelligenceInfo| {
+            Self::to_array(&value.spirits)
+        });
 
         engine.register_type_with_name::<BattleResult>("BattleResult");
         register_to_string!(BattleResult);

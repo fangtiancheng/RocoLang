@@ -12,6 +12,7 @@ pub mod news_times;
 pub mod profile;
 pub mod role;
 pub mod scene;
+pub mod sentinel_intelligence;
 pub mod session;
 pub mod spirit;
 pub mod star_tower;
@@ -462,6 +463,73 @@ pub trait RocoStdLib: Send {
         _catch_time: i64,
     ) -> Result<StarTowerInfo> {
         unsupported("star_tower::full_level")
+    }
+
+    fn sentinel_intelligence_query(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::query")
+    }
+
+    fn sentinel_intelligence_start_fight(
+        &mut self,
+        _boss_index: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::start_fight")
+    }
+
+    fn sentinel_intelligence_settle_fight(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::settle_fight")
+    }
+
+    fn sentinel_intelligence_refresh_mission(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::refresh_mission")
+    }
+
+    fn sentinel_intelligence_refresh_boss(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::refresh_boss")
+    }
+
+    fn sentinel_intelligence_refresh_exchange(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::refresh_exchange")
+    }
+
+    fn sentinel_intelligence_exchange_item(
+        &mut self,
+        _index: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::exchange_item")
+    }
+
+    fn sentinel_intelligence_exchange_spirit(
+        &mut self,
+        _index: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::exchange_spirit")
+    }
+
+    fn sentinel_intelligence_evolve_spirit(
+        &mut self,
+        _index: i64,
+        _catch_time: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::evolve_spirit")
+    }
+
+    fn sentinel_intelligence_query_all(&mut self) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::query_all")
+    }
+
+    fn sentinel_intelligence_get_prize(
+        &mut self,
+        _boss_index: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::get_prize")
+    }
+
+    fn sentinel_intelligence_query_bag(
+        &mut self,
+        _evolve_spirit_id: i64,
+    ) -> Result<SentinelIntelligenceInfo> {
+        unsupported("sentinel_intelligence::query_bag")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

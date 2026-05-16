@@ -9,6 +9,7 @@ pub mod game;
 pub mod lookup;
 pub mod manor;
 pub mod mountain_sea;
+pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
 pub mod profile;
@@ -19,6 +20,7 @@ pub mod session;
 pub mod spirit;
 pub mod star_tower;
 pub mod system;
+pub mod treasure_realm;
 pub mod util;
 
 fn unsupported<T>(name: &str) -> Result<T> {
@@ -591,6 +593,66 @@ pub trait RocoStdLib: Send {
         _count: i64,
     ) -> Result<DarkCityReputationInfo> {
         unsupported("dark_city::reputation_exchange")
+    }
+
+    fn mystery_fusion_query(&mut self) -> Result<MysteryFusionInfo> {
+        unsupported("mystery_fusion::query")
+    }
+
+    fn mystery_fusion_prepare_battle(&mut self, _battle_index: i64) -> Result<MysteryFusionInfo> {
+        unsupported("mystery_fusion::prepare_battle")
+    }
+
+    fn mystery_fusion_submit_battle(&mut self) -> Result<MysteryFusionInfo> {
+        unsupported("mystery_fusion::submit_battle")
+    }
+
+    fn mystery_fusion_query_material_bag(
+        &mut self,
+        _spirit_id: i64,
+    ) -> Result<MysteryFusionMaterialBag> {
+        unsupported("mystery_fusion::query_material_bag")
+    }
+
+    fn mystery_fusion_claim_reward(&mut self) -> Result<MysteryFusionInfo> {
+        unsupported("mystery_fusion::claim_reward")
+    }
+
+    fn mystery_fusion_fuse(
+        &mut self,
+        _recipe_index: i64,
+        _material_bag_indexes: Vec<i64>,
+        _personality: i64,
+    ) -> Result<MysteryFusionInfo> {
+        unsupported("mystery_fusion::fuse")
+    }
+
+    fn treasure_realm_query(&mut self) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::query")
+    }
+
+    fn treasure_realm_buy(&mut self, _index: i64) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::buy")
+    }
+
+    fn treasure_realm_boost_by_item(&mut self, _index: i64) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::boost_by_item")
+    }
+
+    fn treasure_realm_boost_by_vip(&mut self) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::boost_by_vip")
+    }
+
+    fn treasure_realm_start_battle(&mut self) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::start_battle")
+    }
+
+    fn treasure_realm_submit_battle(&mut self) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::submit_battle")
+    }
+
+    fn treasure_realm_get_gift(&mut self, _index: i64) -> Result<TreasureRealmInfo> {
+        unsupported("treasure_realm::get_gift")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

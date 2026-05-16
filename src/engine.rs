@@ -10,8 +10,9 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, dark_city, game, lookup, manor, mountain_sea, news, news_times, profile, role, scene,
-    sentinel_intelligence, session, spirit, star_tower, system, RocoStdLib,
+    combat, dark_city, game, lookup, manor, mountain_sea, mystery_fusion, news, news_times,
+    profile, role, scene, sentinel_intelligence, session, spirit, star_tower, system,
+    treasure_realm, RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
@@ -19,15 +20,17 @@ use crate::types::{
     CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
     DarkCityReputationInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount,
     ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult,
-    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
+    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo,
+    MysteryFusionInfo, MysteryFusionMaterialBag, MysteryFusionMaterialCandidate,
+    MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult,
+    SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
     SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
     SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
     SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
     StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    TalentRefreshResult, UserInfo,
+    TalentRefreshResult, TreasureRealmInfo, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -165,6 +168,14 @@ impl RocoEngine {
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
         engine.register_static_module("dark_city", dark_city_module.into());
+
+        let mut mystery_fusion_module = rhai::Module::new();
+        mystery_fusion::register(&mut mystery_fusion_module, stdlib.clone());
+        engine.register_static_module("mystery_fusion", mystery_fusion_module.into());
+
+        let mut treasure_realm_module = rhai::Module::new();
+        treasure_realm::register(&mut treasure_realm_module, stdlib.clone());
+        engine.register_static_module("treasure_realm", treasure_realm_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -874,6 +885,78 @@ impl RocoEngine {
         register_getters!(DarkCityReputationInfo, result_code, message, reputation);
         engine.register_get("exchanges", |value: &mut DarkCityReputationInfo| {
             Self::to_array(&value.exchanges)
+        });
+
+        engine.register_type_with_name::<MysteryFusionBattleInfo>("MysteryFusionBattleInfo");
+        register_to_string!(MysteryFusionBattleInfo);
+        register_getters!(MysteryFusionBattleInfo, index, battle_id);
+        engine.register_get("attr_types", |value: &mut MysteryFusionBattleInfo| {
+            Self::to_array(&value.attr_types)
+        });
+
+        engine.register_type_with_name::<MysteryFusionRecipeInfo>("MysteryFusionRecipeInfo");
+        register_to_string!(MysteryFusionRecipeInfo);
+        register_getters!(MysteryFusionRecipeInfo, index, spirit_id, energy_cost);
+        engine.register_get(
+            "required_spirit_ids",
+            |value: &mut MysteryFusionRecipeInfo| Self::to_array(&value.required_spirit_ids),
+        );
+
+        engine.register_type_with_name::<MysteryFusionInfo>("MysteryFusionInfo");
+        register_to_string!(MysteryFusionInfo);
+        register_getters!(
+            MysteryFusionInfo,
+            result_code,
+            message,
+            times,
+            energy,
+            added_energy,
+        );
+        engine.register_get("battles", |value: &mut MysteryFusionInfo| {
+            Self::to_array(&value.battles)
+        });
+        engine.register_get("recipes", |value: &mut MysteryFusionInfo| {
+            Self::to_array(&value.recipes)
+        });
+
+        engine.register_type_with_name::<MysteryFusionMaterialCandidate>(
+            "MysteryFusionMaterialCandidate",
+        );
+        register_to_string!(MysteryFusionMaterialCandidate);
+        register_getters!(
+            MysteryFusionMaterialCandidate,
+            candidate_index,
+            spirit_id,
+            bag_index,
+            level,
+            personality,
+        );
+
+        engine.register_type_with_name::<MysteryFusionMaterialBag>("MysteryFusionMaterialBag");
+        register_to_string!(MysteryFusionMaterialBag);
+        register_getters!(MysteryFusionMaterialBag, result_code, message);
+        engine.register_get("candidates", |value: &mut MysteryFusionMaterialBag| {
+            Self::to_array(&value.candidates)
+        });
+
+        engine.register_type_with_name::<TreasureRealmInfo>("TreasureRealmInfo");
+        register_to_string!(TreasureRealmInfo);
+        register_getters!(
+            TreasureRealmInfo,
+            result_code,
+            message,
+            battle,
+            battle_id,
+            schedule,
+            possible,
+            time,
+            got_box,
+        );
+        engine.register_get("item_counts", |value: &mut TreasureRealmInfo| {
+            Self::to_array(&value.item_counts)
+        });
+        engine.register_get("commits", |value: &mut TreasureRealmInfo| {
+            Self::to_array(&value.commits)
         });
 
         engine.register_type_with_name::<BattleResult>("BattleResult");

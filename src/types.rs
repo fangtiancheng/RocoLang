@@ -597,6 +597,26 @@ pub struct BloodGiftInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AmendNatureCandidate {
+    pub spirit_id: i64,
+    pub catch_time: i64,
+    pub level: i64,
+    pub personality: i64,
+    pub personality_name: String,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AmendNatureInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub eligible_spirit_ids: Vec<i64>,
+    pub candidates: Vec<AmendNatureCandidate>,
+    pub new_personality: i64,
+    pub new_personality_name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritEquipmentInfo {
     pub server_id: i64,
     pub catch_time: i64,

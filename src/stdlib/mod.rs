@@ -4,6 +4,8 @@ use crate::error::{Result, RocoError};
 use crate::types::*;
 
 pub mod combat;
+pub mod combat_result;
+pub mod combat_status;
 pub mod dark_city;
 pub mod game;
 pub mod lookup;
@@ -12,6 +14,7 @@ pub mod mountain_sea;
 pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
+pub mod personality;
 pub mod profile;
 pub mod role;
 pub mod scene;
@@ -22,6 +25,7 @@ pub mod star_tower;
 pub mod system;
 pub mod treasure_realm;
 pub mod util;
+pub mod weather;
 
 fn unsupported<T>(name: &str) -> Result<T> {
     Err(RocoError::StdLibError(format!(
@@ -268,6 +272,31 @@ pub trait RocoStdLib: Send {
 
     fn equip_blood_gift(&mut self, _position: i64, _blood_index: i64) -> Result<BloodGiftInfo> {
         unsupported("spirit::equip_blood_gift")
+    }
+
+    fn amend_nature_query_eligible_spirit_ids(&mut self) -> Result<Vec<i64>> {
+        unsupported("spirit::amend_nature_query_eligible_spirit_ids")
+    }
+
+    fn amend_nature_query_candidates(&mut self) -> Result<AmendNatureInfo> {
+        unsupported("spirit::amend_nature_query_candidates")
+    }
+
+    fn random_amend_nature(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<AmendNatureInfo> {
+        unsupported("spirit::random_amend_nature")
+    }
+
+    fn choose_amend_nature(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+        _personality: i64,
+    ) -> Result<AmendNatureInfo> {
+        unsupported("spirit::choose_amend_nature")
     }
 
     fn allocate_exp(&mut self, _position: i64, _exp: i64) -> Result<bool> {

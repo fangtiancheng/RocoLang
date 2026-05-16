@@ -10,27 +10,27 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, dark_city, game, lookup, manor, mountain_sea, mystery_fusion, news, news_times,
-    profile, role, scene, sentinel_intelligence, session, spirit, star_tower, system,
-    treasure_realm, RocoStdLib,
+    combat, combat_result, combat_status, dark_city, game, lookup, manor, mountain_sea,
+    mystery_fusion, news, news_times, personality, profile, role, scene, sentinel_intelligence,
+    session, spirit, star_tower, system, treasure_realm, weather, RocoStdLib,
 };
 use crate::types::{
-    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
-    BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CombatActions,
-    CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
-    DarkCityReputationInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount,
-    ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult,
-    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo,
-    MysteryFusionInfo, MysteryFusionMaterialBag, MysteryFusionMaterialCandidate,
-    MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult,
-    SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
-    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    TalentRefreshResult, TreasureRealmInfo, UserInfo,
+    ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
+    BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
+    BloodGiftItemRequirement, BloodGiftOption, CombatActions, CombatSideState, CombatSpiritState,
+    CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
+    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
+    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
+    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
+    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo,
+    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
+    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
+    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
+    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
+    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, TalentRefreshResult, TreasureRealmInfo, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -140,6 +140,22 @@ impl RocoEngine {
         let mut spirit_module = rhai::Module::new();
         spirit::register(&mut spirit_module, stdlib.clone());
         engine.register_static_module("spirit", spirit_module.into());
+
+        let mut personality_module = rhai::Module::new();
+        personality::register(&mut personality_module);
+        engine.register_static_module("personality", personality_module.into());
+
+        let mut weather_module = rhai::Module::new();
+        weather::register(&mut weather_module);
+        engine.register_static_module("weather", weather_module.into());
+
+        let mut combat_status_module = rhai::Module::new();
+        combat_status::register(&mut combat_status_module);
+        engine.register_static_module("combat_status", combat_status_module.into());
+
+        let mut combat_result_module = rhai::Module::new();
+        combat_result::register(&mut combat_result_module);
+        engine.register_static_module("combat_result", combat_result_module.into());
 
         let mut manor_module = rhai::Module::new();
         manor::register(&mut manor_module, stdlib.clone());
@@ -1017,6 +1033,34 @@ impl RocoEngine {
         );
         engine.register_get("options", |value: &mut BloodGiftInfo| {
             Self::to_array(&value.options)
+        });
+
+        engine.register_type_with_name::<AmendNatureCandidate>("AmendNatureCandidate");
+        register_to_string!(AmendNatureCandidate);
+        register_getters!(
+            AmendNatureCandidate,
+            spirit_id,
+            catch_time,
+            level,
+            personality,
+            personality_name,
+            need_money,
+        );
+
+        engine.register_type_with_name::<AmendNatureInfo>("AmendNatureInfo");
+        register_to_string!(AmendNatureInfo);
+        register_getters!(
+            AmendNatureInfo,
+            result_code,
+            message,
+            new_personality,
+            new_personality_name,
+        );
+        engine.register_get("eligible_spirit_ids", |value: &mut AmendNatureInfo| {
+            Self::to_array(&value.eligible_spirit_ids)
+        });
+        engine.register_get("candidates", |value: &mut AmendNatureInfo| {
+            Self::to_array(&value.candidates)
         });
 
         engine.register_type_with_name::<SpiritEquipmentInfo>("SpiritEquipmentInfo");

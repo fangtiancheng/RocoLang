@@ -614,3 +614,24 @@ fn imported_rocolib_frames_expose_stable_source_id() {
         "expected imported module source id, got {paused_sources:?}"
     );
 }
+
+#[test]
+fn enum_like_modules_expose_combat_constants() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let result = engine
+        .eval(
+            r#"
+                weather::MIASMA
+                    + combat_status::SLEEP
+                    + combat_result::WIN
+                    + len(weather::name(weather::MIASMA))
+                    + len(combat_status::name(combat_status::SLEEP))
+                    + len(combat_result::name(combat_result::WIN))
+            "#,
+        )
+        .expect("enum-like constants should be available");
+
+    assert!(result.as_int().expect("int result") > 11);
+}

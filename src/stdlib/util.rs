@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use rhai::{Dynamic, EvalAltResult};
+use rhai::{Array, Dynamic, EvalAltResult};
 
 use crate::error::RocoError;
 
@@ -18,6 +18,18 @@ pub fn lock_stdlib<T>(
 
 pub fn to_array<T: Clone + Send + Sync + 'static>(items: &[T]) -> rhai::Array {
     items.iter().cloned().map(Dynamic::from).collect()
+}
+
+pub fn named_id_array(items: &[(i64, &str)]) -> Array {
+    items
+        .iter()
+        .map(|(id, name)| {
+            let mut item = rhai::Map::new();
+            item.insert("id".into(), Dynamic::from(*id));
+            item.insert("name".into(), Dynamic::from((*name).to_string()));
+            Dynamic::from_map(item)
+        })
+        .collect()
 }
 
 macro_rules! register_stdlib_fn_0 {

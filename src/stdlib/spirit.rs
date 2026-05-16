@@ -102,6 +102,43 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         position: i64,
         blood_index: i64
     );
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("amend_nature_query_eligible_spirit_ids", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.amend_nature_query_eligible_spirit_ids()
+                .map(|ids| {
+                    ids.into_iter()
+                        .map(rhai::Dynamic::from)
+                        .collect::<rhai::Array>()
+                })
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("amend_nature_query_candidates", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.amend_nature_query_candidates().map_err(to_rhai_error)
+        });
+    }
+    register_stdlib_fn_2!(
+        module,
+        stdlib,
+        "random_amend_nature",
+        random_amend_nature,
+        spirit_id: i64,
+        catch_time: i64
+    );
+    register_stdlib_fn_3!(
+        module,
+        stdlib,
+        "choose_amend_nature",
+        choose_amend_nature,
+        spirit_id: i64,
+        catch_time: i64,
+        personality: i64
+    );
     register_stdlib_fn_2!(
         module,
         stdlib,

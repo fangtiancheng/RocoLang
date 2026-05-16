@@ -4,9 +4,11 @@ use crate::error::{Result, RocoError};
 use crate::types::*;
 
 pub mod combat;
+pub mod dark_city;
 pub mod game;
 pub mod lookup;
 pub mod manor;
+pub mod mountain_sea;
 pub mod news;
 pub mod news_times;
 pub mod profile;
@@ -530,6 +532,65 @@ pub trait RocoStdLib: Send {
         _evolve_spirit_id: i64,
     ) -> Result<SentinelIntelligenceInfo> {
         unsupported("sentinel_intelligence::query_bag")
+    }
+
+    fn mountain_sea_query(&mut self) -> Result<MountainSeaInfo> {
+        unsupported("mountain_sea::query")
+    }
+
+    fn mountain_sea_open(&mut self) -> Result<MountainSeaInfo> {
+        unsupported("mountain_sea::open")
+    }
+
+    fn mountain_sea_enter_boss(&mut self, _boss_index: i64) -> Result<MountainSeaInfo> {
+        unsupported("mountain_sea::enter_boss")
+    }
+
+    fn mountain_sea_settle_fight(&mut self) -> Result<MountainSeaInfo> {
+        unsupported("mountain_sea::settle_fight")
+    }
+
+    fn mountain_sea_summon(
+        &mut self,
+        _page_index: i64,
+        _soul_type: i64,
+        _soul_count: i64,
+    ) -> Result<MountainSeaInfo> {
+        unsupported("mountain_sea::summon")
+    }
+
+    fn dark_city_expedition_query(&mut self) -> Result<DarkCityExpeditionInfo> {
+        unsupported("dark_city::expedition_query")
+    }
+
+    fn dark_city_expedition_start_fight(
+        &mut self,
+        _vip_boost: bool,
+    ) -> Result<DarkCityExpeditionInfo> {
+        unsupported("dark_city::expedition_start_fight")
+    }
+
+    fn dark_city_expedition_settle_fight(&mut self) -> Result<DarkCityExpeditionInfo> {
+        unsupported("dark_city::expedition_settle_fight")
+    }
+
+    fn dark_city_expedition_set_vip_pass(
+        &mut self,
+        _enabled: bool,
+    ) -> Result<DarkCityExpeditionInfo> {
+        unsupported("dark_city::expedition_set_vip_pass")
+    }
+
+    fn dark_city_reputation_query_exchange(&mut self) -> Result<DarkCityReputationInfo> {
+        unsupported("dark_city::reputation_query_exchange")
+    }
+
+    fn dark_city_reputation_exchange(
+        &mut self,
+        _index: i64,
+        _count: i64,
+    ) -> Result<DarkCityReputationInfo> {
+        unsupported("dark_city::reputation_exchange")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

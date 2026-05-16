@@ -352,6 +352,63 @@ pub struct SentinelSpiritExchangeInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountainSeaInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub fight_id: i64,
+    pub seal_count: i64,
+    pub success: i64,
+    pub attrs: Vec<i64>,
+    pub bosses: Vec<MountainSeaBossInfo>,
+    pub souls: Vec<MountainSeaSoulInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountainSeaBossInfo {
+    pub index: i64,
+    pub boss_type: i64,
+    pub fight_id: i64,
+    pub name: String,
+    pub status: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountainSeaSoulInfo {
+    pub soul_type: i64,
+    pub boss_type: i64,
+    pub name: String,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DarkCityExpeditionInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub fight_id: i64,
+    pub fight_index: i64,
+    pub vip: bool,
+    pub vip_pass_enabled: bool,
+    pub schedule: i64,
+    pub schedule_name: String,
+    pub added_reputation: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DarkCityReputationInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub reputation: i64,
+    pub exchanges: Vec<DarkCityExchangeItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DarkCityExchangeItem {
+    pub index: i64,
+    pub item_id: i64,
+    pub cost: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatActions {
     pub can_submit_action: bool,
     pub can_use_skill: bool,

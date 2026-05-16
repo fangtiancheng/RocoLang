@@ -10,20 +10,21 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, game, lookup, manor, news, news_times, profile, role, scene, sentinel_intelligence,
-    session, spirit, star_tower, system, RocoStdLib,
+    combat, dark_city, game, lookup, manor, mountain_sea, news, news_times, profile, role, scene,
+    sentinel_intelligence, session, spirit, star_tower, system, RocoStdLib,
 };
 use crate::types::{
     ActionResult, BagItemInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult,
     BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CombatActions,
-    CombatSideState, CombatSpiritState, CombatState, ManorFertilizerResult, ManorGroundInfo,
-    ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
-    ManorWeedResult, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo,
-    SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
-    SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
-    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
-    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
+    DarkCityReputationInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount,
+    ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult,
+    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
+    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
+    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     TalentRefreshResult, UserInfo,
@@ -156,6 +157,14 @@ impl RocoEngine {
         let mut sentinel_intelligence_module = rhai::Module::new();
         sentinel_intelligence::register(&mut sentinel_intelligence_module, stdlib.clone());
         engine.register_static_module("sentinel_intelligence", sentinel_intelligence_module.into());
+
+        let mut mountain_sea_module = rhai::Module::new();
+        mountain_sea::register(&mut mountain_sea_module, stdlib.clone());
+        engine.register_static_module("mountain_sea", mountain_sea_module.into());
+
+        let mut dark_city_module = rhai::Module::new();
+        dark_city::register(&mut dark_city_module, stdlib.clone());
+        engine.register_static_module("dark_city", dark_city_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -804,6 +813,67 @@ impl RocoEngine {
         });
         engine.register_get("spirits", |value: &mut SentinelIntelligenceInfo| {
             Self::to_array(&value.spirits)
+        });
+
+        engine.register_type_with_name::<MountainSeaBossInfo>("MountainSeaBossInfo");
+        register_to_string!(MountainSeaBossInfo);
+        register_getters!(
+            MountainSeaBossInfo,
+            index,
+            boss_type,
+            fight_id,
+            name,
+            status,
+        );
+
+        engine.register_type_with_name::<MountainSeaSoulInfo>("MountainSeaSoulInfo");
+        register_to_string!(MountainSeaSoulInfo);
+        register_getters!(MountainSeaSoulInfo, soul_type, boss_type, name, count);
+
+        engine.register_type_with_name::<MountainSeaInfo>("MountainSeaInfo");
+        register_to_string!(MountainSeaInfo);
+        register_getters!(
+            MountainSeaInfo,
+            result_code,
+            message,
+            fight_id,
+            seal_count,
+            success,
+        );
+        engine.register_get("attrs", |value: &mut MountainSeaInfo| {
+            Self::to_array(&value.attrs)
+        });
+        engine.register_get("bosses", |value: &mut MountainSeaInfo| {
+            Self::to_array(&value.bosses)
+        });
+        engine.register_get("souls", |value: &mut MountainSeaInfo| {
+            Self::to_array(&value.souls)
+        });
+
+        engine.register_type_with_name::<DarkCityExpeditionInfo>("DarkCityExpeditionInfo");
+        register_to_string!(DarkCityExpeditionInfo);
+        register_getters!(
+            DarkCityExpeditionInfo,
+            result_code,
+            message,
+            fight_id,
+            fight_index,
+            vip,
+            vip_pass_enabled,
+            schedule,
+            schedule_name,
+            added_reputation,
+        );
+
+        engine.register_type_with_name::<DarkCityExchangeItem>("DarkCityExchangeItem");
+        register_to_string!(DarkCityExchangeItem);
+        register_getters!(DarkCityExchangeItem, index, item_id, cost);
+
+        engine.register_type_with_name::<DarkCityReputationInfo>("DarkCityReputationInfo");
+        register_to_string!(DarkCityReputationInfo);
+        register_getters!(DarkCityReputationInfo, result_code, message, reputation);
+        engine.register_get("exchanges", |value: &mut DarkCityReputationInfo| {
+            Self::to_array(&value.exchanges)
         });
 
         engine.register_type_with_name::<BattleResult>("BattleResult");

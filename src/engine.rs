@@ -23,9 +23,10 @@ use crate::types::{
     SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
     SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
     SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
-    StarTowerStorey, StarTowerTop, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, TalentRefreshResult, UserInfo,
+    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    TalentRefreshResult, UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -705,6 +706,29 @@ impl RocoEngine {
         engine.register_get("exchanges", |value: &mut StarTowerTop| {
             Self::to_array(&value.exchanges)
         });
+        engine.register_get("missions", |value: &mut StarTowerTop| {
+            Self::to_array(&value.missions)
+        });
+        engine.register_get("rewards", |value: &mut StarTowerTop| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<StarTowerTopMission>("StarTowerTopMission");
+        register_to_string!(StarTowerTopMission);
+        register_getters!(StarTowerTopMission, index, description, completed);
+
+        engine.register_type_with_name::<StarTowerTopReward>("StarTowerTopReward");
+        register_to_string!(StarTowerTopReward);
+        register_getters!(
+            StarTowerTopReward,
+            index,
+            threshold,
+            name,
+            amount,
+            state,
+            claimed,
+            claimable,
+        );
 
         engine.register_type_with_name::<StarTowerInfo>("StarTowerInfo");
         register_to_string!(StarTowerInfo);

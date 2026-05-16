@@ -284,6 +284,26 @@ pub struct StarTowerTop {
     pub fight_id: i64,
     pub tokens: Vec<i64>,
     pub exchanges: Vec<i64>,
+    pub missions: Vec<StarTowerTopMission>,
+    pub rewards: Vec<StarTowerTopReward>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerTopMission {
+    pub index: i64,
+    pub description: String,
+    pub completed: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerTopReward {
+    pub index: i64,
+    pub threshold: i64,
+    pub name: String,
+    pub amount: String,
+    pub state: i64,
+    pub claimed: bool,
+    pub claimable: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

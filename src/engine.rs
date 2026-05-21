@@ -11,31 +11,34 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor, mountain_sea,
-    mystery_fusion, news, news_times, personality, profile, role, scene, sentinel_intelligence,
-    session, spirit, star_tower, summon, system, treasure_realm, type_ladder, weather, RocoStdLib,
+    mystery_fusion, news, news_times, personality, play_guide, profile, role, scene,
+    sentinel_intelligence, session, spirit, star_tower, summon, system, treasure_realm,
+    type_ladder, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
     BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
     BloodGiftItemRequirement, BloodGiftOption, CombatActions, CombatSideState, CombatSpiritState,
     CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
-    LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo,
-    LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult,
-    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
-    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
+    DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress, LadderFightRecord, LadderInfo,
+    LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
+    LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
+    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
+    ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
     MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
     MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
-    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    NewsTimesReportsResult, PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo,
+    SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
+    SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
+    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
+    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
     SummonRecord, SummonRewardItem, TalentRefreshResult, TreasureRealmInfo, TypeLadderFightRecord,
     TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo,
-    UserInfo,
+    UserInfo, WeekTaskActivity, WeekTaskInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -209,6 +212,10 @@ impl RocoEngine {
         let mut summon_module = rhai::Module::new();
         summon::register(&mut summon_module, stdlib.clone());
         engine.register_static_module("summon", summon_module.into());
+
+        let mut play_guide_module = rhai::Module::new();
+        play_guide::register(&mut play_guide_module, stdlib.clone());
+        engine.register_static_module("play_guide", play_guide_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -1083,6 +1090,74 @@ impl RocoEngine {
         });
         engine.register_get("records", |value: &mut SummonInfo| {
             Self::to_array(&value.records)
+        });
+
+        engine.register_type_with_name::<PlayGuideRewardItem>("PlayGuideRewardItem");
+        register_to_string!(PlayGuideRewardItem);
+        register_getters!(PlayGuideRewardItem, id, count, item_type);
+
+        engine.register_type_with_name::<WeekTaskActivity>("WeekTaskActivity");
+        register_to_string!(WeekTaskActivity);
+        register_getters!(WeekTaskActivity, activity_id, reward_count);
+
+        engine.register_type_with_name::<WeekTaskInfo>("WeekTaskInfo");
+        register_to_string!(WeekTaskInfo);
+        register_getters!(
+            WeekTaskInfo,
+            result_code,
+            message,
+            ticket_item_id,
+            ticket_count,
+        );
+        engine.register_get("progress", |value: &mut WeekTaskInfo| {
+            Self::to_array(&value.progress)
+        });
+        engine.register_get("button_states", |value: &mut WeekTaskInfo| {
+            Self::to_array(&value.button_states)
+        });
+        engine.register_get("new_activities", |value: &mut WeekTaskInfo| {
+            Self::to_array(&value.new_activities)
+        });
+        engine.register_get("old_activities", |value: &mut WeekTaskInfo| {
+            Self::to_array(&value.old_activities)
+        });
+        engine.register_get("rewards", |value: &mut WeekTaskInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<DiamondTaskProgress>("DiamondTaskProgress");
+        register_to_string!(DiamondTaskProgress);
+        register_getters!(DiamondTaskProgress, index, current, target, completed,);
+
+        engine.register_type_with_name::<DiamondProgressReward>("DiamondProgressReward");
+        register_to_string!(DiamondProgressReward);
+        register_getters!(
+            DiamondProgressReward,
+            index,
+            threshold,
+            state,
+            claimable,
+            claimed,
+        );
+
+        engine.register_type_with_name::<DiamondTaskInfo>("DiamondTaskInfo");
+        register_to_string!(DiamondTaskInfo);
+        register_getters!(DiamondTaskInfo, result_code, message, vip, reward_type);
+        engine.register_get("tasks", |value: &mut DiamondTaskInfo| {
+            Self::to_array(&value.tasks)
+        });
+        engine.register_get("rewards", |value: &mut DiamondTaskInfo| {
+            Self::to_array(&value.rewards)
+        });
+        engine.register_get("reward_items", |value: &mut DiamondTaskInfo| {
+            Self::to_array(&value.reward_items)
+        });
+
+        engine.register_type_with_name::<QqGameHallGiftInfo>("QqGameHallGiftInfo");
+        register_to_string!(QqGameHallGiftInfo);
+        register_getters!(QqGameHallGiftInfo, result_code, message);
+        engine.register_get("rewards", |value: &mut QqGameHallGiftInfo| {
+            Self::to_array(&value.rewards)
         });
 
         engine.register_type_with_name::<LadderSpiritInfo>("LadderSpiritInfo");

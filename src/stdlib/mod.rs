@@ -16,6 +16,7 @@ pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
 pub mod personality;
+pub mod play_guide;
 pub mod profile;
 pub mod role;
 pub mod scene;
@@ -759,6 +760,34 @@ pub trait RocoStdLib: Send {
 
     fn summon_query_record(&mut self) -> Result<SummonInfo> {
         unsupported("summon::query_record")
+    }
+
+    fn play_guide_week_task_query(&mut self) -> Result<WeekTaskInfo> {
+        unsupported("play_guide::week_task_query")
+    }
+
+    fn play_guide_week_task_claim_task(&mut self, _index: i64) -> Result<WeekTaskInfo> {
+        unsupported("play_guide::week_task_claim_task")
+    }
+
+    fn play_guide_week_task_exchange(
+        &mut self,
+        _exchange_type: i64,
+        _index: i64,
+    ) -> Result<WeekTaskInfo> {
+        unsupported("play_guide::week_task_exchange")
+    }
+
+    fn play_guide_diamond_task_query(&mut self) -> Result<DiamondTaskInfo> {
+        unsupported("play_guide::diamond_task_query")
+    }
+
+    fn play_guide_diamond_task_claim_reward(&mut self, _index: i64) -> Result<DiamondTaskInfo> {
+        unsupported("play_guide::diamond_task_claim_reward")
+    }
+
+    fn play_guide_qq_game_hall_gift(&mut self) -> Result<QqGameHallGiftInfo> {
+        unsupported("play_guide::qq_game_hall_gift")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

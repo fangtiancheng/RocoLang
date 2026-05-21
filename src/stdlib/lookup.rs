@@ -101,6 +101,13 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("get_ladder_match_config", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.get_ladder_match_config().map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_talent_info", move |talent_type: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_talent_info(talent_type).map_err(to_rhai_error)

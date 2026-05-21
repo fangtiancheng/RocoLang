@@ -10,27 +10,32 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, combat_result, combat_status, dark_city, game, lookup, manor, mountain_sea,
+    combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor, mountain_sea,
     mystery_fusion, news, news_times, personality, profile, role, scene, sentinel_intelligence,
-    session, spirit, star_tower, system, treasure_realm, weather, RocoStdLib,
+    session, spirit, star_tower, summon, system, treasure_realm, type_ladder, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
     BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
     BloodGiftItemRequirement, BloodGiftOption, CombatActions, CombatSideState, CombatSpiritState,
     CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
-    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
-    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
-    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo,
-    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
-    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
-    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
-    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
-    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, TalentRefreshResult, TreasureRealmInfo, UserInfo,
+    LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo,
+    LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult,
+    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
+    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
+    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo,
+    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
+    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
+    SummonRecord, SummonRewardItem, TalentRefreshResult, TreasureRealmInfo, TypeLadderFightRecord,
+    TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo,
+    UserInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -137,6 +142,14 @@ impl RocoEngine {
         game::register(&mut game_module, stdlib.clone());
         engine.register_static_module("game", game_module.into());
 
+        let mut ladder_module = rhai::Module::new();
+        ladder::register(&mut ladder_module, stdlib.clone());
+        engine.register_static_module("ladder", ladder_module.into());
+
+        let mut type_ladder_module = rhai::Module::new();
+        type_ladder::register(&mut type_ladder_module, stdlib.clone());
+        engine.register_static_module("type_ladder", type_ladder_module.into());
+
         let mut spirit_module = rhai::Module::new();
         spirit::register(&mut spirit_module, stdlib.clone());
         engine.register_static_module("spirit", spirit_module.into());
@@ -192,6 +205,10 @@ impl RocoEngine {
         let mut treasure_realm_module = rhai::Module::new();
         treasure_realm::register(&mut treasure_realm_module, stdlib.clone());
         engine.register_static_module("treasure_realm", treasure_realm_module.into());
+
+        let mut summon_module = rhai::Module::new();
+        summon::register(&mut summon_module, stdlib.clone());
+        engine.register_static_module("summon", summon_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -975,6 +992,276 @@ impl RocoEngine {
             Self::to_array(&value.commits)
         });
 
+        engine.register_type_with_name::<SummonRewardItem>("SummonRewardItem");
+        register_to_string!(SummonRewardItem);
+        register_getters!(SummonRewardItem, id, item_type, count);
+
+        engine.register_type_with_name::<SummonPoolState>("SummonPoolState");
+        register_to_string!(SummonPoolState);
+        register_getters!(
+            SummonPoolState,
+            version,
+            token_item_id,
+            token_count,
+            today_draw_count,
+            wish_index,
+            succeeded,
+            end_time,
+        );
+
+        engine.register_type_with_name::<SummonPoolConfig>("SummonPoolConfig");
+        register_to_string!(SummonPoolConfig);
+        register_getters!(
+            SummonPoolConfig,
+            version,
+            title,
+            vip_limit,
+            end_time,
+            daily_max,
+            token_item_id,
+            recommend,
+            info,
+            reward_text,
+        );
+        engine.register_get("rewards", |value: &mut SummonPoolConfig| {
+            Self::to_array(&value.rewards)
+        });
+        engine.register_get("wish_candidates", |value: &mut SummonPoolConfig| {
+            Self::to_array(&value.wish_candidates)
+        });
+
+        engine.register_type_with_name::<SummonExchangeItem>("SummonExchangeItem");
+        register_to_string!(SummonExchangeItem);
+        register_getters!(
+            SummonExchangeItem,
+            index,
+            reward,
+            cost,
+            need,
+            max,
+            day_max,
+            times,
+            day_times,
+            add,
+        );
+
+        engine.register_type_with_name::<SummonExchangeGroup>("SummonExchangeGroup");
+        register_to_string!(SummonExchangeGroup);
+        register_getters!(SummonExchangeGroup, kind);
+        engine.register_get("items", |value: &mut SummonExchangeGroup| {
+            Self::to_array(&value.items)
+        });
+
+        engine.register_type_with_name::<SummonRecord>("SummonRecord");
+        register_to_string!(SummonRecord);
+        register_getters!(
+            SummonRecord,
+            pool_version,
+            title,
+            id,
+            item_type,
+            count,
+            year,
+            month,
+            day,
+        );
+
+        engine.register_type_with_name::<SummonInfo>("SummonInfo");
+        register_to_string!(SummonInfo);
+        register_getters!(SummonInfo, result_code, message, vip, magic, count, show,);
+        engine.register_get("pools", |value: &mut SummonInfo| {
+            Self::to_array(&value.pools)
+        });
+        engine.register_get("config_pools", |value: &mut SummonInfo| {
+            Self::to_array(&value.config_pools)
+        });
+        engine.register_get("exchange_groups", |value: &mut SummonInfo| {
+            Self::to_array(&value.exchange_groups)
+        });
+        engine.register_get("rewards", |value: &mut SummonInfo| {
+            Self::to_array(&value.rewards)
+        });
+        engine.register_get("records", |value: &mut SummonInfo| {
+            Self::to_array(&value.records)
+        });
+
+        engine.register_type_with_name::<LadderSpiritInfo>("LadderSpiritInfo");
+        register_to_string!(LadderSpiritInfo);
+        register_getters!(LadderSpiritInfo, pet_id, pet_level, now_hp, full_hp, skin,);
+        engine.register_get("equipment_ids", |value: &mut LadderSpiritInfo| {
+            Self::to_array(&value.equipment_ids)
+        });
+
+        engine.register_type_with_name::<LadderQuestInfo>("LadderQuestInfo");
+        register_to_string!(LadderQuestInfo);
+        register_getters!(LadderQuestInfo, status, id, give_up);
+
+        engine.register_type_with_name::<LadderFightRecord>("LadderFightRecord");
+        register_to_string!(LadderFightRecord);
+        register_getters!(
+            LadderFightRecord,
+            win,
+            score,
+            round,
+            my_point,
+            other_point,
+            fight_type,
+        );
+        engine.register_get("my_spirits", |value: &mut LadderFightRecord| {
+            Self::to_array(&value.my_spirits)
+        });
+        engine.register_get("other_spirits", |value: &mut LadderFightRecord| {
+            Self::to_array(&value.other_spirits)
+        });
+
+        engine.register_type_with_name::<LadderInfo>("LadderInfo");
+        register_to_string!(LadderInfo);
+        register_getters!(
+            LadderInfo,
+            win_nums,
+            win_point,
+            spirit_info_flag,
+            left_time,
+            rank_level,
+            left_play_times,
+            left_reward_times,
+            season_reward_flag,
+            fight_days,
+            next_win_point,
+            show_achievement,
+            season,
+            all_nums,
+            left_play_times_df,
+            win_point_df,
+            win_nums_df,
+            all_nums_df,
+        );
+        engine.register_get("spirits", |value: &mut LadderInfo| {
+            Self::to_array(&value.spirits)
+        });
+        engine.register_get("backup_spirits", |value: &mut LadderInfo| {
+            Self::to_array(&value.backup_spirits)
+        });
+        engine.register_get("day_quests", |value: &mut LadderInfo| {
+            Self::to_array(&value.day_quests)
+        });
+        engine.register_get("achievement_list", |value: &mut LadderInfo| {
+            Self::to_array(&value.achievement_list)
+        });
+        engine.register_get("ban_list", |value: &mut LadderInfo| {
+            Self::to_array(&value.ban_list)
+        });
+        engine.register_get("records", |value: &mut LadderInfo| {
+            Self::to_array(&value.records)
+        });
+
+        engine.register_type_with_name::<LadderRankUser>("LadderRankUser");
+        register_to_string!(LadderRankUser);
+        register_getters!(
+            LadderRankUser,
+            uin,
+            name,
+            win_nums,
+            win_point,
+            rank_num,
+            achievement_num,
+            show_achievement,
+            rank_level,
+        );
+        engine.register_get("medals", |value: &mut LadderRankUser| {
+            Self::to_array(&value.medals)
+        });
+
+        engine.register_type_with_name::<LadderRankInfo>("LadderRankInfo");
+        register_to_string!(LadderRankInfo);
+        register_getters!(LadderRankInfo, rank_level, rank_change);
+        engine.register_get("users", |value: &mut LadderRankInfo| {
+            Self::to_array(&value.users)
+        });
+
+        engine.register_type_with_name::<TypeLadderRank>("TypeLadderRank");
+        register_to_string!(TypeLadderRank);
+        register_getters!(TypeLadderRank, rank, small_rank, star);
+
+        engine.register_type_with_name::<TypeLadderSpiritInfo>("TypeLadderSpiritInfo");
+        register_to_string!(TypeLadderSpiritInfo);
+        register_getters!(
+            TypeLadderSpiritInfo,
+            spirit_id,
+            level,
+            current_hp,
+            max_hp,
+            attribute,
+            eligibility,
+            eligibility_code,
+            skin,
+        );
+
+        engine.register_type_with_name::<TypeLadderFightRecord>("TypeLadderFightRecord");
+        register_to_string!(TypeLadderFightRecord);
+        register_getters!(TypeLadderFightRecord, win, round);
+        engine.register_get("my_spirits", |value: &mut TypeLadderFightRecord| {
+            Self::to_array(&value.my_spirits)
+        });
+        engine.register_get("opponent_spirits", |value: &mut TypeLadderFightRecord| {
+            Self::to_array(&value.opponent_spirits)
+        });
+
+        engine.register_type_with_name::<TypeLadderInfo>("TypeLadderInfo");
+        register_to_string!(TypeLadderInfo);
+        register_getters!(
+            TypeLadderInfo,
+            season,
+            win_count,
+            battle_count,
+            left_play_times,
+            proxy,
+            grade,
+            current_rank,
+            max_rank,
+            season_reward_available,
+            season_reward_flag,
+        );
+        engine.register_get("allowed_attributes", |value: &mut TypeLadderInfo| {
+            Self::to_array(&value.allowed_attributes)
+        });
+        engine.register_get("banned_spirit_ids", |value: &mut TypeLadderInfo| {
+            Self::to_array(&value.banned_spirit_ids)
+        });
+        engine.register_get("spirits", |value: &mut TypeLadderInfo| {
+            Self::to_array(&value.spirits)
+        });
+        engine.register_get("records", |value: &mut TypeLadderInfo| {
+            Self::to_array(&value.records)
+        });
+
+        engine.register_type_with_name::<TypeLadderRankUser>("TypeLadderRankUser");
+        register_to_string!(TypeLadderRankUser);
+        register_getters!(
+            TypeLadderRankUser,
+            uin,
+            name,
+            win_count,
+            battle_count,
+            rank_num,
+            score,
+        );
+
+        engine.register_type_with_name::<TypeLadderRankInfo>("TypeLadderRankInfo");
+        register_to_string!(TypeLadderRankInfo);
+        engine.register_get("my_info", |value: &mut TypeLadderRankInfo| {
+            value.my_info.clone()
+        });
+        engine.register_get("has_my_info", |value: &mut TypeLadderRankInfo| {
+            value.my_info.is_some()
+        });
+        engine.register_get("my_info_or_default", |value: &mut TypeLadderRankInfo| {
+            value.my_info.clone().unwrap_or_default()
+        });
+        engine.register_get("users", |value: &mut TypeLadderRankInfo| {
+            Self::to_array(&value.users)
+        });
+
         engine.register_type_with_name::<BattleResult>("BattleResult");
         register_to_string!(BattleResult);
         register_getters!(
@@ -1288,6 +1575,39 @@ impl RocoEngine {
             plugin_src,
             plugin_url,
         );
+
+        engine.register_type_with_name::<LadderQuestConfigEntry>("LadderQuestConfigEntry");
+        register_to_string!(LadderQuestConfigEntry);
+        register_getters!(LadderQuestConfigEntry, id, diff, description);
+
+        engine.register_type_with_name::<LadderSpiritCostEntry>("LadderSpiritCostEntry");
+        register_to_string!(LadderSpiritCostEntry);
+        register_getters!(LadderSpiritCostEntry, spirit_id, cost);
+
+        engine.register_type_with_name::<LadderMatchConfig>("LadderMatchConfig");
+        register_to_string!(LadderMatchConfig);
+        register_getters!(LadderMatchConfig, error);
+        engine.register_get("match_rewards", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.match_rewards)
+        });
+        engine.register_get("win_rewards", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.win_rewards)
+        });
+        engine.register_get("season_rewards", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.season_rewards)
+        });
+        engine.register_get("task0_descriptions", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.task0_descriptions)
+        });
+        engine.register_get("task1_descriptions", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.task1_descriptions)
+        });
+        engine.register_get("spirit_costs", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.spirit_costs)
+        });
+        engine.register_get("limit_spirits", |value: &mut LadderMatchConfig| {
+            Self::to_array(&value.limit_spirits)
+        });
 
         engine.register_type_with_name::<StaticSkillInfo>("StaticSkillInfo");
         register_to_string!(StaticSkillInfo);

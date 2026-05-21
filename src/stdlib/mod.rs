@@ -8,6 +8,7 @@ pub mod combat_result;
 pub mod combat_status;
 pub mod dark_city;
 pub mod game;
+pub mod ladder;
 pub mod lookup;
 pub mod manor;
 pub mod mountain_sea;
@@ -22,8 +23,10 @@ pub mod sentinel_intelligence;
 pub mod session;
 pub mod spirit;
 pub mod star_tower;
+pub mod summon;
 pub mod system;
 pub mod treasure_realm;
+pub mod type_ladder;
 pub mod util;
 pub mod weather;
 
@@ -226,6 +229,46 @@ pub trait RocoStdLib: Send {
         match self.recover_all_spirits() {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("recover_all_spirits returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
+    fn ladder_recover_spirits(&mut self) -> Result<bool> {
+        unsupported("ladder::recover_spirits")
+    }
+
+    fn ladder_query_info(&mut self) -> Result<LadderInfo> {
+        unsupported("ladder::query_info")
+    }
+
+    fn ladder_query_rank(&mut self) -> Result<LadderRankInfo> {
+        unsupported("ladder::query_rank")
+    }
+
+    fn ladder_try_recover_spirits(&mut self) -> Result<ActionResult> {
+        match self.ladder_recover_spirits() {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("recover_spirits returned false")),
+            Err(error) => Ok(ActionResult::failed(error.to_string())),
+        }
+    }
+
+    fn type_ladder_recover_spirits(&mut self) -> Result<bool> {
+        unsupported("type_ladder::recover_spirits")
+    }
+
+    fn type_ladder_query_info(&mut self) -> Result<TypeLadderInfo> {
+        unsupported("type_ladder::query_info")
+    }
+
+    fn type_ladder_query_rank(&mut self) -> Result<TypeLadderRankInfo> {
+        unsupported("type_ladder::query_rank")
+    }
+
+    fn type_ladder_try_recover_spirits(&mut self) -> Result<ActionResult> {
+        match self.type_ladder_recover_spirits() {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed("recover_spirits returned false")),
             Err(error) => Ok(ActionResult::failed(error.to_string())),
         }
     }
@@ -684,6 +727,40 @@ pub trait RocoStdLib: Send {
         unsupported("treasure_realm::get_gift")
     }
 
+    fn summon_query(&mut self) -> Result<SummonInfo> {
+        unsupported("summon::query")
+    }
+
+    fn summon_query_data(&mut self) -> Result<SummonInfo> {
+        unsupported("summon::query_data")
+    }
+
+    fn summon_set_wish(&mut self, _pool_version: i64, _wish_index: i64) -> Result<SummonInfo> {
+        unsupported("summon::set_wish")
+    }
+
+    fn summon_cancel_wish(&mut self, _pool_version: i64) -> Result<SummonInfo> {
+        unsupported("summon::cancel_wish")
+    }
+
+    fn summon_draw(&mut self, _pool_version: i64, _draw_count: i64) -> Result<SummonInfo> {
+        unsupported("summon::draw")
+    }
+
+    fn summon_exchange(
+        &mut self,
+        _exchange_kind: i64,
+        _pool_version: i64,
+        _item_index: i64,
+        _count: i64,
+    ) -> Result<SummonInfo> {
+        unsupported("summon::exchange")
+    }
+
+    fn summon_query_record(&mut self) -> Result<SummonInfo> {
+        unsupported("summon::query_record")
+    }
+
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {
         unsupported("lookup::lookup_item_info")
     }
@@ -725,6 +802,10 @@ pub trait RocoStdLib: Send {
 
     fn list_plugin_infos(&mut self) -> Result<Vec<StaticPluginInfo>> {
         unsupported("lookup::list_plugin_infos")
+    }
+
+    fn get_ladder_match_config(&mut self) -> Result<LadderMatchConfig> {
+        unsupported("lookup::get_ladder_match_config")
     }
 
     fn lookup_talent_info(&mut self, _talent_type: i64) -> Result<StaticTalentInfo> {

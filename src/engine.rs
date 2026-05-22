@@ -10,32 +10,33 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    capricorn, combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor,
-    mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role,
-    scene, sentinel_intelligence, session, spirit, star_tower, summon, system, taurus,
-    treasure_realm, type_ladder, weather, RocoStdLib,
+    aquarius, capricorn, combat, combat_result, combat_status, dark_city, game, ladder, lookup,
+    manor, mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide,
+    profile, role, scene, sentinel_intelligence, session, spirit, star_tower, summon, system,
+    taurus, treasure_realm, type_ladder, weather, RocoStdLib,
 };
 use crate::types::{
-    ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
-    BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
-    BloodGiftItemRequirement, BloodGiftOption, CapricornBagCandidate, CapricornInfo,
-    CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
-    CapricornSecondTask, CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot,
-    CombatActions, CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem,
-    DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo,
-    DiamondTaskProgress, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
-    LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo,
-    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
-    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
-    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
-    PiscesField, PiscesInfo, PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo,
-    SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
-    SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
-    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
-    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    ActionResult, AmendNatureCandidate, AmendNatureInfo, AquariusBagCandidate, AquariusCounter,
+    AquariusField, AquariusInfo, AquariusRewardItem, AquariusSecondExchangeInfo,
+    AquariusSecondStatusInfo, BagItemInfo, BattleCapturedSpirit, BattleResult,
+    BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement,
+    BloodGiftOption, CapricornBagCandidate, CapricornInfo, CapricornInviteListInfo,
+    CapricornPalaceNoteItem, CapricornPalaceNotesInfo, CapricornSecondTask,
+    CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot, CombatActions,
+    CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
+    DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
+    LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo,
+    LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult,
+    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
+    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
+    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesInfo,
+    PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo,
+    SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo,
+    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
@@ -232,6 +233,10 @@ impl RocoEngine {
         let mut taurus_module = rhai::Module::new();
         taurus::register(&mut taurus_module, stdlib.clone());
         engine.register_static_module("taurus", taurus_module.into());
+
+        let mut aquarius_module = rhai::Module::new();
+        aquarius::register(&mut aquarius_module, stdlib.clone());
+        engine.register_static_module("aquarius", aquarius_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -1335,6 +1340,96 @@ impl RocoEngine {
         engine.register_get("bag_candidates", |value: &mut TaurusInfo| {
             Self::to_array(&value.bag_candidates)
         });
+
+        engine.register_type_with_name::<AquariusField>("AquariusField");
+        register_to_string!(AquariusField);
+        register_getters!(AquariusField, name, value);
+
+        engine.register_type_with_name::<AquariusCounter>("AquariusCounter");
+        register_to_string!(AquariusCounter);
+        register_getters!(AquariusCounter, name, current, limit);
+
+        engine.register_type_with_name::<AquariusBagCandidate>("AquariusBagCandidate");
+        register_to_string!(AquariusBagCandidate);
+        register_getters!(
+            AquariusBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        engine.register_type_with_name::<AquariusRewardItem>("AquariusRewardItem");
+        register_to_string!(AquariusRewardItem);
+        register_getters!(
+            AquariusRewardItem,
+            item_index,
+            item_id,
+            count,
+            has_item_type,
+            item_type
+        );
+
+        engine.register_type_with_name::<AquariusInfo>("AquariusInfo");
+        register_to_string!(AquariusInfo);
+        register_getters!(AquariusInfo, result_code, message, request_context);
+        engine.register_get("fields", |value: &mut AquariusInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("counters", |value: &mut AquariusInfo| {
+            Self::to_array(&value.counters)
+        });
+        engine.register_get("item_counts", |value: &mut AquariusInfo| {
+            Self::to_array(&value.item_counts)
+        });
+        engine.register_get("states", |value: &mut AquariusInfo| {
+            Self::to_array(&value.states)
+        });
+        engine.register_get("bag_candidates", |value: &mut AquariusInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("reward_items", |value: &mut AquariusInfo| {
+            Self::to_array(&value.reward_items)
+        });
+
+        engine.register_type_with_name::<AquariusSecondStatusInfo>("AquariusSecondStatusInfo");
+        register_to_string!(AquariusSecondStatusInfo);
+        register_getters!(
+            AquariusSecondStatusInfo,
+            result_code,
+            message,
+            light_num,
+            tail_num,
+            boss_left_hp,
+            boss_full_hp,
+            left_fight_count,
+            add_hit_level,
+            today_sum_hit,
+            exchange_count0,
+            exchange_count1,
+        );
+
+        engine.register_type_with_name::<AquariusSecondExchangeInfo>("AquariusSecondExchangeInfo");
+        register_to_string!(AquariusSecondExchangeInfo);
+        register_getters!(
+            AquariusSecondExchangeInfo,
+            result_code,
+            message,
+            has_item,
+            item_id,
+            item_count,
+            item_type,
+            light_num,
+            tail_num,
+            exchange_count0,
+            exchange_count1,
+        );
 
         engine.register_type_with_name::<LadderSpiritInfo>("LadderSpiritInfo");
         register_to_string!(LadderSpiritInfo);

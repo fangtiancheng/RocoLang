@@ -757,6 +757,84 @@ pub struct TaurusInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusRewardItem {
+    pub item_index: i64,
+    pub item_id: i64,
+    pub count: i64,
+    pub has_item_type: bool,
+    pub item_type: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AquariusField>,
+    pub counters: Vec<AquariusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<AquariusBagCandidate>,
+    pub reward_items: Vec<AquariusRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusSecondStatusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub boss_left_hp: i64,
+    pub boss_full_hp: i64,
+    pub left_fight_count: i64,
+    pub add_hit_level: i64,
+    pub today_sum_hit: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusSecondExchangeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_item: bool,
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LadderInfo {
     pub win_nums: i64,
     pub win_point: i64,

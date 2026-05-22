@@ -632,6 +632,8 @@ pub struct CapricornTeamSnapshot {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapricornInviteListInfo {
+    pub result_code: i64,
+    pub message: String,
     pub players: Vec<CapricornTeamPlayer>,
     pub ticks: i64,
 }
@@ -717,6 +719,41 @@ pub struct PiscesInfo {
     pub fights: Vec<i64>,
     pub days: Vec<i64>,
     pub bag_candidates: Vec<PiscesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub bag_index: i64,
+    pub catch_time: i64,
+    pub level: i64,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<TaurusField>,
+    pub counters: Vec<TaurusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<TaurusBagCandidate>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

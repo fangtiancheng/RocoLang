@@ -12,8 +12,8 @@ use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     capricorn, combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor,
     mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role,
-    scene, sentinel_intelligence, session, spirit, star_tower, summon, system, treasure_realm,
-    type_ladder, weather, RocoStdLib,
+    scene, sentinel_intelligence, session, spirit, star_tower, summon, system, taurus,
+    treasure_realm, type_ladder, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
@@ -39,9 +39,10 @@ use crate::types::{
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
-    SummonRecord, SummonRewardItem, TalentRefreshResult, TreasureRealmInfo, TypeLadderFightRecord,
-    TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo,
-    UserInfo, WeekTaskActivity, WeekTaskInfo,
+    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
+    TaurusField, TaurusInfo, TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo,
+    TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo, UserInfo,
+    WeekTaskActivity, WeekTaskInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -227,6 +228,10 @@ impl RocoEngine {
         let mut pisces_module = rhai::Module::new();
         pisces::register(&mut pisces_module, stdlib.clone());
         engine.register_static_module("pisces", pisces_module.into());
+
+        let mut taurus_module = rhai::Module::new();
+        taurus::register(&mut taurus_module, stdlib.clone());
+        engine.register_static_module("taurus", taurus_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -1195,7 +1200,7 @@ impl RocoEngine {
 
         engine.register_type_with_name::<CapricornInviteListInfo>("CapricornInviteListInfo");
         register_to_string!(CapricornInviteListInfo);
-        register_getters!(CapricornInviteListInfo, ticks);
+        register_getters!(CapricornInviteListInfo, result_code, message, ticks);
         engine.register_get("players", |value: &mut CapricornInviteListInfo| {
             Self::to_array(&value.players)
         });
@@ -1289,6 +1294,45 @@ impl RocoEngine {
         });
         engine.register_get("days", |value: &mut PiscesInfo| Self::to_array(&value.days));
         engine.register_get("bag_candidates", |value: &mut PiscesInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+
+        engine.register_type_with_name::<TaurusField>("TaurusField");
+        register_to_string!(TaurusField);
+        register_getters!(TaurusField, name, value);
+
+        engine.register_type_with_name::<TaurusCounter>("TaurusCounter");
+        register_to_string!(TaurusCounter);
+        register_getters!(TaurusCounter, name, current, limit);
+
+        engine.register_type_with_name::<TaurusBagCandidate>("TaurusBagCandidate");
+        register_to_string!(TaurusBagCandidate);
+        register_getters!(
+            TaurusBagCandidate,
+            candidate_index,
+            spirit_id,
+            bag_index,
+            catch_time,
+            level,
+            need_money,
+        );
+
+        engine.register_type_with_name::<TaurusInfo>("TaurusInfo");
+        register_to_string!(TaurusInfo);
+        register_getters!(TaurusInfo, result_code, message, request_context);
+        engine.register_get("fields", |value: &mut TaurusInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("counters", |value: &mut TaurusInfo| {
+            Self::to_array(&value.counters)
+        });
+        engine.register_get("item_counts", |value: &mut TaurusInfo| {
+            Self::to_array(&value.item_counts)
+        });
+        engine.register_get("states", |value: &mut TaurusInfo| {
+            Self::to_array(&value.states)
+        });
+        engine.register_get("bag_candidates", |value: &mut TaurusInfo| {
             Self::to_array(&value.bag_candidates)
         });
 

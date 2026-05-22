@@ -605,6 +605,121 @@ pub struct QqGameHallGiftInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornPalaceNoteItem {
+    pub item_index: i64,
+    pub item_id: i64,
+    pub count: i64,
+    pub need: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornPalaceNotesInfo {
+    pub items: Vec<CapricornPalaceNoteItem>,
+    pub can_summon: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornTeamPlayer {
+    pub uin: i64,
+    pub nick: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CapricornTeamSnapshot {
+    pub players: Vec<CapricornTeamPlayer>,
+    pub ticks: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornInviteListInfo {
+    pub players: Vec<CapricornTeamPlayer>,
+    pub ticks: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornTeamOperationInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_team: bool,
+    pub team: CapricornTeamSnapshot,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CapricornSecondTask {
+    pub task_type: i64,
+    pub data1: i64,
+    pub data2: i64,
+    pub step: i64,
+    pub current: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub bag_index: i64,
+    pub catch_time: i64,
+    pub level: i64,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub finish: i64,
+    pub current: i64,
+    pub position: i64,
+    pub has_second_task: bool,
+    pub second_task: CapricornSecondTask,
+    pub remain: i64,
+    pub price: i64,
+    pub limit: i64,
+    pub progress_percent: i64,
+    pub reward_num: i64,
+    pub tips: i64,
+    pub bag_candidates: Vec<CapricornBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub bag_index: i64,
+    pub catch_time: i64,
+    pub level: i64,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<PiscesField>,
+    pub counters: Vec<PiscesCounter>,
+    pub lights: Vec<i64>,
+    pub exchanges: Vec<i64>,
+    pub fights: Vec<i64>,
+    pub days: Vec<i64>,
+    pub bag_candidates: Vec<PiscesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LadderInfo {
     pub win_nums: i64,
     pub win_point: i64,

@@ -3,6 +3,7 @@
 use crate::error::{Result, RocoError};
 use crate::types::*;
 
+pub mod capricorn;
 pub mod combat;
 pub mod combat_result;
 pub mod combat_status;
@@ -16,6 +17,7 @@ pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
 pub mod personality;
+pub mod pisces;
 pub mod play_guide;
 pub mod profile;
 pub mod role;
@@ -788,6 +790,227 @@ pub trait RocoStdLib: Send {
 
     fn play_guide_qq_game_hall_gift(&mut self) -> Result<QqGameHallGiftInfo> {
         unsupported("play_guide::qq_game_hall_gift")
+    }
+
+    fn capricorn_query_palace_notes(&mut self) -> Result<CapricornPalaceNotesInfo> {
+        unsupported("capricorn::query_palace_notes")
+    }
+
+    fn capricorn_query_invite_list(&mut self) -> Result<CapricornInviteListInfo> {
+        unsupported("capricorn::query_invite_list")
+    }
+
+    fn capricorn_invite_player(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::invite_player")
+    }
+
+    fn capricorn_cancel_invite(&mut self) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::cancel_invite")
+    }
+
+    fn capricorn_accept_invite(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::accept_invite")
+    }
+
+    fn capricorn_refuse_invite(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::refuse_invite")
+    }
+
+    fn capricorn_leave_team(&mut self) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::leave_team")
+    }
+
+    fn capricorn_disband_team(&mut self) -> Result<CapricornTeamOperationInfo> {
+        unsupported("capricorn::disband_team")
+    }
+
+    fn capricorn_star_palace_summon(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::star_palace_summon")
+    }
+
+    fn capricorn_star_palace_quick_summon(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::star_palace_quick_summon")
+    }
+
+    fn capricorn_second_query(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_query")
+    }
+
+    fn capricorn_second_random_task(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_random_task")
+    }
+
+    fn capricorn_second_settle_battle_task(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_settle_battle_task")
+    }
+
+    fn capricorn_second_give_up_task(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_give_up_task")
+    }
+
+    fn capricorn_second_accept_task(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_accept_task")
+    }
+
+    fn capricorn_second_answer_quiz(&mut self, _answer_index: i64) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_answer_quiz")
+    }
+
+    fn capricorn_second_query_bag(&mut self, _kind: i64) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_query_bag")
+    }
+
+    fn capricorn_second_level_up(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_level_up")
+    }
+
+    fn capricorn_second_buy_up(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_buy_up")
+    }
+
+    fn capricorn_second_evolve(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<CapricornInfo> {
+        unsupported("capricorn::second_evolve")
+    }
+
+    fn capricorn_third_query(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_query")
+    }
+
+    fn capricorn_third_settle_battle(&mut self, _boss_index: i64) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_settle_battle")
+    }
+
+    fn capricorn_third_buy_star_item(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_buy_star_item")
+    }
+
+    fn capricorn_third_buy_progress(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_buy_progress")
+    }
+
+    fn capricorn_third_add_challenge_count(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_add_challenge_count")
+    }
+
+    fn capricorn_third_buy_star_num(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_buy_star_num")
+    }
+
+    fn capricorn_third_query_bag(&mut self) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_query_bag")
+    }
+
+    fn capricorn_third_evolve(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<CapricornInfo> {
+        unsupported("capricorn::third_evolve")
+    }
+
+    fn pisces_first_query(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::first_query")
+    }
+
+    fn pisces_first_submit(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::first_submit")
+    }
+
+    fn pisces_first_get_gift(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::first_get_gift")
+    }
+
+    fn pisces_first_exchange(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::first_exchange")
+    }
+
+    fn pisces_first_buy(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::first_buy")
+    }
+
+    fn pisces_second_query(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::second_query")
+    }
+
+    fn pisces_second_submit(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_submit")
+    }
+
+    fn pisces_second_submit_without_spirit(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::second_submit_without_spirit")
+    }
+
+    fn pisces_second_get_gift(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_get_gift")
+    }
+
+    fn pisces_second_settle_fight(&mut self, _fight_index: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_settle_fight")
+    }
+
+    fn pisces_second_repair(&mut self, _repair_index: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_repair")
+    }
+
+    fn pisces_second_view(&mut self, _kind: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_view")
+    }
+
+    fn pisces_second_evolution(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::second_evolution")
+    }
+
+    fn pisces_third_query(&mut self) -> Result<PiscesInfo> {
+        unsupported("pisces::third_query")
+    }
+
+    fn pisces_third_settle_fight(&mut self, _boss_index: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_settle_fight")
+    }
+
+    fn pisces_third_buy(
+        &mut self,
+        _kind: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<PiscesInfo> {
+        unsupported("pisces::third_buy")
+    }
+
+    fn pisces_third_full_level(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_full_level")
+    }
+
+    fn pisces_third_complete(&mut self, _level_index: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_complete")
+    }
+
+    fn pisces_third_get_item(&mut self, _reward_index: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_get_item")
+    }
+
+    fn pisces_third_query_bag(&mut self, _kind: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_query_bag")
+    }
+
+    fn pisces_third_up(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<PiscesInfo> {
+        unsupported("pisces::third_up")
     }
 
     fn lookup_item_info(&mut self, _item_id: i64) -> Result<StaticItemInfo> {

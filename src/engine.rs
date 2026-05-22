@@ -10,24 +10,27 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor, mountain_sea,
-    mystery_fusion, news, news_times, personality, play_guide, profile, role, scene,
-    sentinel_intelligence, session, spirit, star_tower, summon, system, treasure_realm,
+    capricorn, combat, combat_result, combat_status, dark_city, game, ladder, lookup, manor,
+    mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role,
+    scene, sentinel_intelligence, session, spirit, star_tower, summon, system, treasure_realm,
     type_ladder, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AmendNatureCandidate, AmendNatureInfo, BagItemInfo, BattleCapturedSpirit,
     BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
-    BloodGiftItemRequirement, BloodGiftOption, CombatActions, CombatSideState, CombatSpiritState,
-    CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
-    DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress, LadderFightRecord, LadderInfo,
-    LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
-    LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
-    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
-    ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
-    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
-    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo,
+    BloodGiftItemRequirement, BloodGiftOption, CapricornBagCandidate, CapricornInfo,
+    CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
+    CapricornSecondTask, CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot,
+    CombatActions, CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem,
+    DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo,
+    DiamondTaskProgress, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
+    LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo,
+    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
+    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
+    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
+    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
+    PiscesField, PiscesInfo, PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo,
     SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
     SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
     SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
@@ -216,6 +219,14 @@ impl RocoEngine {
         let mut play_guide_module = rhai::Module::new();
         play_guide::register(&mut play_guide_module, stdlib.clone());
         engine.register_static_module("play_guide", play_guide_module.into());
+
+        let mut capricorn_module = rhai::Module::new();
+        capricorn::register(&mut capricorn_module, stdlib.clone());
+        engine.register_static_module("capricorn", capricorn_module.into());
+
+        let mut pisces_module = rhai::Module::new();
+        pisces::register(&mut pisces_module, stdlib.clone());
+        engine.register_static_module("pisces", pisces_module.into());
 
         let mut lookup_module = rhai::Module::new();
         lookup::register(&mut lookup_module, stdlib.clone());
@@ -1158,6 +1169,127 @@ impl RocoEngine {
         register_getters!(QqGameHallGiftInfo, result_code, message);
         engine.register_get("rewards", |value: &mut QqGameHallGiftInfo| {
             Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<CapricornPalaceNoteItem>("CapricornPalaceNoteItem");
+        register_to_string!(CapricornPalaceNoteItem);
+        register_getters!(CapricornPalaceNoteItem, item_index, item_id, count, need);
+
+        engine.register_type_with_name::<CapricornPalaceNotesInfo>("CapricornPalaceNotesInfo");
+        register_to_string!(CapricornPalaceNotesInfo);
+        register_getters!(CapricornPalaceNotesInfo, can_summon);
+        engine.register_get("items", |value: &mut CapricornPalaceNotesInfo| {
+            Self::to_array(&value.items)
+        });
+
+        engine.register_type_with_name::<CapricornTeamPlayer>("CapricornTeamPlayer");
+        register_to_string!(CapricornTeamPlayer);
+        register_getters!(CapricornTeamPlayer, uin, nick);
+
+        engine.register_type_with_name::<CapricornTeamSnapshot>("CapricornTeamSnapshot");
+        register_to_string!(CapricornTeamSnapshot);
+        register_getters!(CapricornTeamSnapshot, ticks);
+        engine.register_get("players", |value: &mut CapricornTeamSnapshot| {
+            Self::to_array(&value.players)
+        });
+
+        engine.register_type_with_name::<CapricornInviteListInfo>("CapricornInviteListInfo");
+        register_to_string!(CapricornInviteListInfo);
+        register_getters!(CapricornInviteListInfo, ticks);
+        engine.register_get("players", |value: &mut CapricornInviteListInfo| {
+            Self::to_array(&value.players)
+        });
+
+        engine.register_type_with_name::<CapricornTeamOperationInfo>("CapricornTeamOperationInfo");
+        register_to_string!(CapricornTeamOperationInfo);
+        register_getters!(
+            CapricornTeamOperationInfo,
+            result_code,
+            message,
+            has_team,
+            team,
+        );
+
+        engine.register_type_with_name::<CapricornSecondTask>("CapricornSecondTask");
+        register_to_string!(CapricornSecondTask);
+        register_getters!(CapricornSecondTask, task_type, data1, data2, step, current,);
+
+        engine.register_type_with_name::<CapricornBagCandidate>("CapricornBagCandidate");
+        register_to_string!(CapricornBagCandidate);
+        register_getters!(
+            CapricornBagCandidate,
+            candidate_index,
+            spirit_id,
+            bag_index,
+            catch_time,
+            level,
+            need_money,
+        );
+
+        engine.register_type_with_name::<CapricornInfo>("CapricornInfo");
+        register_to_string!(CapricornInfo);
+        register_getters!(
+            CapricornInfo,
+            result_code,
+            message,
+            request_context,
+            finish,
+            current,
+            position,
+            has_second_task,
+            second_task,
+            remain,
+            price,
+            limit,
+            progress_percent,
+            reward_num,
+            tips,
+        );
+        engine.register_get("bag_candidates", |value: &mut CapricornInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+
+        engine.register_type_with_name::<PiscesField>("PiscesField");
+        register_to_string!(PiscesField);
+        register_getters!(PiscesField, name, value);
+
+        engine.register_type_with_name::<PiscesCounter>("PiscesCounter");
+        register_to_string!(PiscesCounter);
+        register_getters!(PiscesCounter, name, current, limit);
+
+        engine.register_type_with_name::<PiscesBagCandidate>("PiscesBagCandidate");
+        register_to_string!(PiscesBagCandidate);
+        register_getters!(
+            PiscesBagCandidate,
+            candidate_index,
+            spirit_id,
+            bag_index,
+            catch_time,
+            level,
+            need_money,
+        );
+
+        engine.register_type_with_name::<PiscesInfo>("PiscesInfo");
+        register_to_string!(PiscesInfo);
+        register_getters!(PiscesInfo, result_code, message, request_context);
+        engine.register_get("fields", |value: &mut PiscesInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("counters", |value: &mut PiscesInfo| {
+            Self::to_array(&value.counters)
+        });
+        engine.register_get("lights", |value: &mut PiscesInfo| {
+            Self::to_array(&value.lights)
+        });
+        engine.register_get("exchanges", |value: &mut PiscesInfo| {
+            Self::to_array(&value.exchanges)
+        });
+        engine.register_get("fights", |value: &mut PiscesInfo| {
+            Self::to_array(&value.fights)
+        });
+        engine.register_get("days", |value: &mut PiscesInfo| Self::to_array(&value.days));
+        engine.register_get("bag_candidates", |value: &mut PiscesInfo| {
+            Self::to_array(&value.bag_candidates)
         });
 
         engine.register_type_with_name::<LadderSpiritInfo>("LadderSpiritInfo");

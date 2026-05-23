@@ -10,8 +10,8 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    aquarius, capricorn, combat, combat_result, combat_status, dark_city, game, ladder, lookup,
-    manor, mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide,
+    aquarius, cancer, capricorn, combat, combat_result, combat_status, dark_city, game, ladder,
+    lookup, manor, mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide,
     profile, role, scene, sentinel_intelligence, session, spirit, star_tower, summon, system,
     taurus, treasure_realm, type_ladder, weather, RocoStdLib,
 };
@@ -20,23 +20,24 @@ use crate::types::{
     AquariusField, AquariusInfo, AquariusRewardItem, AquariusSecondExchangeInfo,
     AquariusSecondStatusInfo, BagItemInfo, BattleCapturedSpirit, BattleResult,
     BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement,
-    BloodGiftOption, CapricornBagCandidate, CapricornInfo, CapricornInviteListInfo,
-    CapricornPalaceNoteItem, CapricornPalaceNotesInfo, CapricornSecondTask,
-    CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot, CombatActions,
-    CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
-    DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
-    LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo,
-    LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo, ManorFertilizerResult,
-    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
-    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
-    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
-    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesInfo,
-    PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo, SceneSpiritInfo, SentinelBossInfo,
-    SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo,
-    SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    BloodGiftOption, CancerInfo, CancerItemInfo, CancerPetInfo, CapricornBagCandidate,
+    CapricornInfo, CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
+    CapricornSecondTask, CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot,
+    CombatActions, CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem,
+    DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo,
+    DiamondTaskProgress, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
+    LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo,
+    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
+    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
+    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
+    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
+    PiscesField, PiscesInfo, PlayGuideRewardItem, QqGameHallGiftInfo, SceneRoleInfo,
+    SceneSpiritInfo, SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo,
+    SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
+    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
+    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
@@ -225,6 +226,10 @@ impl RocoEngine {
         let mut capricorn_module = rhai::Module::new();
         capricorn::register(&mut capricorn_module, stdlib.clone());
         engine.register_static_module("capricorn", capricorn_module.into());
+
+        let mut cancer_module = rhai::Module::new();
+        cancer::register(&mut cancer_module, stdlib.clone());
+        engine.register_static_module("cancer", cancer_module.into());
 
         let mut pisces_module = rhai::Module::new();
         pisces::register(&mut pisces_module, stdlib.clone());
@@ -1258,6 +1263,46 @@ impl RocoEngine {
         engine.register_get("bag_candidates", |value: &mut CapricornInfo| {
             Self::to_array(&value.bag_candidates)
         });
+
+        engine.register_type_with_name::<CancerItemInfo>("CancerItemInfo");
+        register_to_string!(CancerItemInfo);
+        register_getters!(CancerItemInfo, id, count, item_type);
+
+        engine.register_type_with_name::<CancerPetInfo>("CancerPetInfo");
+        register_to_string!(CancerPetInfo);
+        register_getters!(CancerPetInfo, id, catch_time, level, need_money);
+
+        engine.register_type_with_name::<CancerInfo>("CancerInfo");
+        register_to_string!(CancerInfo);
+        register_getters!(
+            CancerInfo,
+            kind,
+            result_code,
+            message,
+            request_context,
+            light_num,
+            tail_num,
+            boss_left_hp,
+            boss_full_hp,
+            left_fight_count,
+            add_hit_level,
+            today_sum_hit,
+            exchange_count0,
+            exchange_count1,
+            has_display_item,
+            display_item,
+            left_times,
+            step,
+            complete,
+            advance,
+            level,
+            power,
+            event,
+            pass,
+            finish,
+            schedule,
+        );
+        engine.register_get("pets", |value: &mut CancerInfo| Self::to_array(&value.pets));
 
         engine.register_type_with_name::<PiscesField>("PiscesField");
         register_to_string!(PiscesField);

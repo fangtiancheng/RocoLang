@@ -670,7 +670,14 @@ pub struct CapricornBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CapricornInfo {
+pub struct CapricornStarPalaceInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornSecondInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -682,6 +689,18 @@ pub struct CapricornInfo {
     pub position: i64,
     pub has_second_task: bool,
     pub second_task: CapricornSecondTask,
+    pub bag_candidates: Vec<CapricornBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CapricornThirdInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub has_finish: bool,
+    pub finish: i64,
+    pub has_current: bool,
+    pub current: i64,
     pub has_remain: bool,
     pub remain: i64,
     pub has_price: bool,
@@ -713,8 +732,7 @@ pub struct CancerPetInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CancerInfo {
-    pub kind: String,
+pub struct CancerSharpScorpionInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -729,9 +747,31 @@ pub struct CancerInfo {
     pub exchange_count1: i64,
     pub has_display_item: bool,
     pub display_item: CancerItemInfo,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CancerMendShapeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
     pub left_times: i64,
     pub step: i64,
     pub complete: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CancerMendShapeBagInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub pets: Vec<CancerPetInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CancerUnsealMemoriesInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
     pub advance: i64,
     pub level: i64,
     pub power: i64,
@@ -739,6 +779,13 @@ pub struct CancerInfo {
     pub pass: i64,
     pub finish: i64,
     pub schedule: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CancerUnsealMemoriesBagInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
     pub pets: Vec<CancerPetInfo>,
 }
 
@@ -769,7 +816,29 @@ pub struct VirgoPetInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VirgoInfo {
+pub struct VirgoServeGodInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<VirgoField>,
+    pub counters: Vec<VirgoCounter>,
+    pub states: Vec<i64>,
+    pub pets: Vec<VirgoPetInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoFindHalidomInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<VirgoField>,
+    pub counters: Vec<VirgoCounter>,
+    pub states: Vec<i64>,
+    pub pets: Vec<VirgoPetInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoBellFoxInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -836,7 +905,35 @@ pub struct PiscesBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PiscesInfo {
+pub struct PiscesFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<PiscesField>,
+    pub counters: Vec<PiscesCounter>,
+    pub lights: Vec<i64>,
+    pub exchanges: Vec<i64>,
+    pub fights: Vec<i64>,
+    pub days: Vec<i64>,
+    pub bag_candidates: Vec<PiscesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<PiscesField>,
+    pub counters: Vec<PiscesCounter>,
+    pub lights: Vec<i64>,
+    pub exchanges: Vec<i64>,
+    pub fights: Vec<i64>,
+    pub days: Vec<i64>,
+    pub bag_candidates: Vec<PiscesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PiscesThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -877,7 +974,7 @@ pub struct TaurusBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaurusInfo {
+pub struct TaurusFirstInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -886,6 +983,294 @@ pub struct TaurusInfo {
     pub item_counts: Vec<i64>,
     pub states: Vec<i64>,
     pub bag_candidates: Vec<TaurusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<TaurusField>,
+    pub counters: Vec<TaurusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<TaurusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaurusThirdInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<TaurusField>,
+    pub counters: Vec<TaurusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<TaurusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreeStartersField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreeStartersCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreeStartersRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreeStartersBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WaterSourceInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ThreeStartersField>,
+    pub counters: Vec<ThreeStartersCounter>,
+    pub rewards: Vec<ThreeStartersRewardItem>,
+    pub bag_candidates: Vec<ThreeStartersBagCandidate>,
+    pub has_battle: bool,
+    pub battle: i64,
+    pub has_schedule: bool,
+    pub schedule: i64,
+    pub has_time: bool,
+    pub time: i64,
+    pub has_increase: bool,
+    pub increase: i64,
+    pub water: Vec<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FiresWillInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ThreeStartersField>,
+    pub counters: Vec<ThreeStartersCounter>,
+    pub rewards: Vec<ThreeStartersRewardItem>,
+    pub bag_candidates: Vec<ThreeStartersBagCandidate>,
+    pub has_schedule: bool,
+    pub schedule: i64,
+    pub has_num: bool,
+    pub num: i64,
+    pub fire: Vec<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BatheSunInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ThreeStartersField>,
+    pub counters: Vec<ThreeStartersCounter>,
+    pub rewards: Vec<ThreeStartersRewardItem>,
+    pub bag_candidates: Vec<ThreeStartersBagCandidate>,
+    pub has_battle: bool,
+    pub battle: i64,
+    pub has_schedule: bool,
+    pub schedule: i64,
+    pub has_time: bool,
+    pub time: i64,
+    pub has_num: bool,
+    pub num: i64,
+    pub has_act: bool,
+    pub act: i64,
+    pub has_times: bool,
+    pub times: i64,
+    pub has_sun: bool,
+    pub sun: i64,
+    pub has_add: bool,
+    pub add: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<GeminiField>,
+    pub counters: Vec<GeminiCounter>,
+    pub scores: Vec<i64>,
+    pub sun_scores: Vec<i64>,
+    pub moon_scores: Vec<i64>,
+    pub rewards: Vec<GeminiRewardItem>,
+    pub bag_candidates: Vec<GeminiBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<GeminiField>,
+    pub counters: Vec<GeminiCounter>,
+    pub scores: Vec<i64>,
+    pub sun_scores: Vec<i64>,
+    pub moon_scores: Vec<i64>,
+    pub rewards: Vec<GeminiRewardItem>,
+    pub bag_candidates: Vec<GeminiBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeminiThirdInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<GeminiField>,
+    pub counters: Vec<GeminiCounter>,
+    pub scores: Vec<i64>,
+    pub sun_scores: Vec<i64>,
+    pub moon_scores: Vec<i64>,
+    pub rewards: Vec<GeminiRewardItem>,
+    pub bag_candidates: Vec<GeminiBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusScore {
+    pub score_index: i64,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusStarPicture {
+    pub picture_index: i64,
+    pub is_in: i64,
+    pub progress: i64,
+    pub finish: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<SagittariusField>,
+    pub counters: Vec<SagittariusCounter>,
+    pub scores: Vec<SagittariusScore>,
+    pub star_pictures: Vec<SagittariusStarPicture>,
+    pub rewards: Vec<SagittariusRewardItem>,
+    pub bag_candidates: Vec<SagittariusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<SagittariusField>,
+    pub counters: Vec<SagittariusCounter>,
+    pub scores: Vec<SagittariusScore>,
+    pub star_pictures: Vec<SagittariusStarPicture>,
+    pub rewards: Vec<SagittariusRewardItem>,
+    pub bag_candidates: Vec<SagittariusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SagittariusThirdInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<SagittariusField>,
+    pub counters: Vec<SagittariusCounter>,
+    pub scores: Vec<SagittariusScore>,
+    pub star_pictures: Vec<SagittariusStarPicture>,
+    pub rewards: Vec<SagittariusRewardItem>,
+    pub bag_candidates: Vec<SagittariusBagCandidate>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -923,7 +1308,31 @@ pub struct ScorpioBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ScorpioInfo {
+pub struct ScorpioFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ScorpioField>,
+    pub counters: Vec<ScorpioCounter>,
+    pub counts: Vec<i64>,
+    pub rewards: Vec<ScorpioReward>,
+    pub bag_candidates: Vec<ScorpioBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ScorpioField>,
+    pub counters: Vec<ScorpioCounter>,
+    pub counts: Vec<i64>,
+    pub rewards: Vec<ScorpioReward>,
+    pub bag_candidates: Vec<ScorpioBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -969,7 +1378,29 @@ pub struct AriesBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AriesInfo {
+pub struct AriesFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AriesField>,
+    pub counters: Vec<AriesCounter>,
+    pub rewards: Vec<AriesReward>,
+    pub bag_candidates: Vec<AriesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AriesField>,
+    pub counters: Vec<AriesCounter>,
+    pub rewards: Vec<AriesReward>,
+    pub bag_candidates: Vec<AriesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -1033,7 +1464,27 @@ pub struct LibraBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LibraInfo {
+pub struct LibraFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LibraField>,
+    pub counters: Vec<LibraCounter>,
+    pub bag_candidates: Vec<LibraBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LibraField>,
+    pub counters: Vec<LibraCounter>,
+    pub bag_candidates: Vec<LibraBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -1096,7 +1547,27 @@ pub struct LeoBagCandidate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LeoInfo {
+pub struct LeoFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LeoField>,
+    pub counters: Vec<LeoCounter>,
+    pub bag_candidates: Vec<LeoBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LeoField>,
+    pub counters: Vec<LeoCounter>,
+    pub bag_candidates: Vec<LeoBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
@@ -1168,7 +1639,33 @@ pub struct AquariusRewardItem {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AquariusInfo {
+pub struct AquariusFirstInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AquariusField>,
+    pub counters: Vec<AquariusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<AquariusBagCandidate>,
+    pub reward_items: Vec<AquariusRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusSecondInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AquariusField>,
+    pub counters: Vec<AquariusCounter>,
+    pub item_counts: Vec<i64>,
+    pub states: Vec<i64>,
+    pub bag_candidates: Vec<AquariusBagCandidate>,
+    pub reward_items: Vec<AquariusRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AquariusThirdInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,

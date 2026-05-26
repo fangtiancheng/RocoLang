@@ -11,33 +11,43 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     aquarius, aries, cancer, capricorn, combat, combat_result, combat_status, dark_city, game,
-    ladder, leo, libra, lookup, manor, mountain_sea, mystery_fusion, news, news_times, personality,
-    pisces, play_guide, profile, role, scene, scorpio, sentinel_intelligence, session, spirit,
-    star_tower, summon, system, taurus, treasure_realm, type_ladder, virgo, weather, RocoStdLib,
+    gemini, ladder, leo, libra, lookup, manor, mountain_sea, mystery_fusion, news, news_times,
+    personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
+    sentinel_intelligence, session, spirit, star_tower, summon, system, taurus, three_starters,
+    treasure_realm, type_ladder, virgo, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AmendNatureCandidate, AmendNatureInfo, AquariusBagCandidate, AquariusCounter,
-    AquariusField, AquariusInfo, AquariusRewardItem, AquariusSecondExchangeInfo,
-    AquariusSecondStatusInfo, AriesBagCandidate, AriesCounter, AriesField, AriesInfo, AriesReward,
-    AriesThirdExchangeInfo, AriesThirdStatusInfo, BagItemInfo, BattleCapturedSpirit, BattleResult,
-    BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement,
-    BloodGiftOption, CancerInfo, CancerItemInfo, CancerPetInfo, CapricornBagCandidate,
-    CapricornInfo, CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
-    CapricornSecondTask, CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot,
-    CombatActions, CombatSideState, CombatSpiritState, CombatState, DarkCityExchangeItem,
-    DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo,
-    DiamondTaskProgress, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
+    AquariusField, AquariusFirstInfo, AquariusRewardItem, AquariusSecondExchangeInfo,
+    AquariusSecondInfo, AquariusSecondStatusInfo, AquariusThirdInfo, AriesBagCandidate,
+    AriesCounter, AriesField, AriesFirstInfo, AriesReward, AriesSecondInfo, AriesThirdExchangeInfo,
+    AriesThirdInfo, AriesThirdStatusInfo, BagItemInfo, BatheSunInfo, BattleCapturedSpirit,
+    BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
+    BloodGiftItemRequirement, BloodGiftOption, CancerItemInfo, CancerMendShapeBagInfo,
+    CancerMendShapeInfo, CancerPetInfo, CancerSharpScorpionInfo, CancerUnsealMemoriesBagInfo,
+    CancerUnsealMemoriesInfo, CapricornBagCandidate, CapricornInviteListInfo,
+    CapricornPalaceNoteItem, CapricornPalaceNotesInfo, CapricornSecondInfo, CapricornSecondTask,
+    CapricornStarPalaceInfo, CapricornTeamOperationInfo, CapricornTeamPlayer,
+    CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState, CombatSpiritState,
+    CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
+    DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress, FiresWillInfo, GeminiBagCandidate,
+    GeminiCounter, GeminiField, GeminiFirstInfo, GeminiRewardItem, GeminiSecondInfo,
+    GeminiThirdInfo, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
     LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo,
-    LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstStatusInfo, LeoInfo,
-    LibraBagCandidate, LibraCounter, LibraField, LibraInfo, LibraThirdExchangeInfo,
-    LibraThirdStatusInfo, ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount,
-    ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult,
-    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo,
-    MysteryFusionInfo, MysteryFusionMaterialBag, MysteryFusionMaterialCandidate,
-    MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport, NewsTimesReportsResult,
-    PiscesBagCandidate, PiscesCounter, PiscesField, PiscesInfo, PlayGuideRewardItem,
-    QqGameHallGiftInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
-    ScorpioField, ScorpioInfo, ScorpioReward, SentinelBossInfo, SentinelExchangeInfo,
+    LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo,
+    LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo,
+    LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
+    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
+    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
+    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
+    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
+    PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem,
+    QqGameHallGiftInfo, SagittariusBagCandidate, SagittariusCounter, SagittariusField,
+    SagittariusFirstInfo, SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo,
+    SagittariusStarPicture, SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo,
+    ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo, ScorpioReward,
+    ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
     SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
     SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
     SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
@@ -46,10 +56,12 @@ use crate::types::{
     StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
     SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
     SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
-    TaurusField, TaurusInfo, TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo,
-    TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo, UserInfo,
-    VirgoBellFoxExchangeInfo, VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoInfo,
-    VirgoPetInfo, WeekTaskActivity, WeekTaskInfo,
+    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
+    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
+    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
+    TypeLadderSpiritInfo, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
+    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -247,6 +259,18 @@ impl RocoEngine {
         let mut taurus_module = rhai::Module::new();
         taurus::register(&mut taurus_module, stdlib.clone());
         engine.register_static_module("taurus", taurus_module.into());
+
+        let mut three_starters_module = rhai::Module::new();
+        three_starters::register(&mut three_starters_module, stdlib.clone());
+        engine.register_static_module("three_starters", three_starters_module.into());
+
+        let mut gemini_module = rhai::Module::new();
+        gemini::register(&mut gemini_module, stdlib.clone());
+        engine.register_static_module("gemini", gemini_module.into());
+
+        let mut sagittarius_module = rhai::Module::new();
+        sagittarius::register(&mut sagittarius_module, stdlib.clone());
+        engine.register_static_module("sagittarius", sagittarius_module.into());
 
         let mut aquarius_module = rhai::Module::new();
         aquarius::register(&mut aquarius_module, stdlib.clone());
@@ -535,6 +559,72 @@ impl RocoEngine {
                         })
                     },
                 );
+            };
+        }
+        macro_rules! register_virgo_cgi_info {
+            ($type:ty, $name:literal) => {
+                engine.register_type_with_name::<$type>($name);
+                register_to_string!($type);
+                register_getters!($type, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $type| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $type| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("states", |value: &mut $type| Self::to_array(&value.states));
+                engine.register_get("pets", |value: &mut $type| Self::to_array(&value.pets));
+            };
+        }
+        macro_rules! register_libra_cgi_info {
+            ($type:ty, $name:literal) => {
+                engine.register_type_with_name::<$type>($name);
+                register_to_string!($type);
+                register_getters!($type, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $type| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $type| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("bag_candidates", |value: &mut $type| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        macro_rules! register_scorpio_cgi_info {
+            ($type:ty, $name:literal) => {
+                engine.register_type_with_name::<$type>($name);
+                register_to_string!($type);
+                register_getters!($type, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $type| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $type| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("counts", |value: &mut $type| Self::to_array(&value.counts));
+                engine.register_get("rewards", |value: &mut $type| {
+                    Self::to_array(&value.rewards)
+                });
+                engine.register_get("bag_candidates", |value: &mut $type| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        macro_rules! register_sagittarius_cgi_info {
+            ($type:ty, $name:literal) => {
+                engine.register_type_with_name::<$type>($name);
+                register_to_string!($type);
+                register_getters!($type, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $type| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $type| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("scores", |value: &mut $type| Self::to_array(&value.scores));
+                engine.register_get("star_pictures", |value: &mut $type| {
+                    Self::to_array(&value.star_pictures)
+                });
+                engine.register_get("rewards", |value: &mut $type| {
+                    Self::to_array(&value.rewards)
+                });
+                engine.register_get("bag_candidates", |value: &mut $type| {
+                    Self::to_array(&value.bag_candidates)
+                });
             };
         }
 
@@ -1270,10 +1360,19 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<CapricornInfo>("CapricornInfo");
-        register_to_string!(CapricornInfo);
+        engine.register_type_with_name::<CapricornStarPalaceInfo>("CapricornStarPalaceInfo");
+        register_to_string!(CapricornStarPalaceInfo);
         register_getters!(
-            CapricornInfo,
+            CapricornStarPalaceInfo,
+            result_code,
+            message,
+            request_context,
+        );
+
+        engine.register_type_with_name::<CapricornSecondInfo>("CapricornSecondInfo");
+        register_to_string!(CapricornSecondInfo);
+        register_getters!(
+            CapricornSecondInfo,
             result_code,
             message,
             request_context,
@@ -1285,6 +1384,22 @@ impl RocoEngine {
             position,
             has_second_task,
             second_task,
+        );
+        engine.register_get("bag_candidates", |value: &mut CapricornSecondInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+
+        engine.register_type_with_name::<CapricornThirdInfo>("CapricornThirdInfo");
+        register_to_string!(CapricornThirdInfo);
+        register_getters!(
+            CapricornThirdInfo,
+            result_code,
+            message,
+            request_context,
+            has_finish,
+            finish,
+            has_current,
+            current,
             has_remain,
             remain,
             has_price,
@@ -1298,7 +1413,7 @@ impl RocoEngine {
             has_tips,
             tips,
         );
-        engine.register_get("bag_candidates", |value: &mut CapricornInfo| {
+        engine.register_get("bag_candidates", |value: &mut CapricornThirdInfo| {
             Self::to_array(&value.bag_candidates)
         });
 
@@ -1310,11 +1425,10 @@ impl RocoEngine {
         register_to_string!(CancerPetInfo);
         register_getters!(CancerPetInfo, id, catch_time, level, need_money);
 
-        engine.register_type_with_name::<CancerInfo>("CancerInfo");
-        register_to_string!(CancerInfo);
+        engine.register_type_with_name::<CancerSharpScorpionInfo>("CancerSharpScorpionInfo");
+        register_to_string!(CancerSharpScorpionInfo);
         register_getters!(
-            CancerInfo,
-            kind,
+            CancerSharpScorpionInfo,
             result_code,
             message,
             request_context,
@@ -1329,9 +1443,39 @@ impl RocoEngine {
             exchange_count1,
             has_display_item,
             display_item,
+        );
+
+        engine.register_type_with_name::<CancerMendShapeInfo>("CancerMendShapeInfo");
+        register_to_string!(CancerMendShapeInfo);
+        register_getters!(
+            CancerMendShapeInfo,
+            result_code,
+            message,
+            request_context,
             left_times,
             step,
             complete,
+        );
+
+        engine.register_type_with_name::<CancerMendShapeBagInfo>("CancerMendShapeBagInfo");
+        register_to_string!(CancerMendShapeBagInfo);
+        register_getters!(
+            CancerMendShapeBagInfo,
+            result_code,
+            message,
+            request_context,
+        );
+        engine.register_get("pets", |value: &mut CancerMendShapeBagInfo| {
+            Self::to_array(&value.pets)
+        });
+
+        engine.register_type_with_name::<CancerUnsealMemoriesInfo>("CancerUnsealMemoriesInfo");
+        register_to_string!(CancerUnsealMemoriesInfo);
+        register_getters!(
+            CancerUnsealMemoriesInfo,
+            result_code,
+            message,
+            request_context,
             advance,
             level,
             power,
@@ -1340,7 +1484,19 @@ impl RocoEngine {
             finish,
             schedule,
         );
-        engine.register_get("pets", |value: &mut CancerInfo| Self::to_array(&value.pets));
+
+        engine
+            .register_type_with_name::<CancerUnsealMemoriesBagInfo>("CancerUnsealMemoriesBagInfo");
+        register_to_string!(CancerUnsealMemoriesBagInfo);
+        register_getters!(
+            CancerUnsealMemoriesBagInfo,
+            result_code,
+            message,
+            request_context,
+        );
+        engine.register_get("pets", |value: &mut CancerUnsealMemoriesBagInfo| {
+            Self::to_array(&value.pets)
+        });
 
         engine.register_type_with_name::<VirgoField>("VirgoField");
         register_to_string!(VirgoField);
@@ -1365,19 +1521,9 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<VirgoInfo>("VirgoInfo");
-        register_to_string!(VirgoInfo);
-        register_getters!(VirgoInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut VirgoInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut VirgoInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("states", |value: &mut VirgoInfo| {
-            Self::to_array(&value.states)
-        });
-        engine.register_get("pets", |value: &mut VirgoInfo| Self::to_array(&value.pets));
+        register_virgo_cgi_info!(VirgoServeGodInfo, "VirgoServeGodInfo");
+        register_virgo_cgi_info!(VirgoFindHalidomInfo, "VirgoFindHalidomInfo");
+        register_virgo_cgi_info!(VirgoBellFoxInfo, "VirgoBellFoxInfo");
 
         engine.register_type_with_name::<VirgoBellFoxStatusInfo>("VirgoBellFoxStatusInfo");
         register_to_string!(VirgoBellFoxStatusInfo);
@@ -1436,28 +1582,30 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<PiscesInfo>("PiscesInfo");
-        register_to_string!(PiscesInfo);
-        register_getters!(PiscesInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut PiscesInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut PiscesInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("lights", |value: &mut PiscesInfo| {
-            Self::to_array(&value.lights)
-        });
-        engine.register_get("exchanges", |value: &mut PiscesInfo| {
-            Self::to_array(&value.exchanges)
-        });
-        engine.register_get("fights", |value: &mut PiscesInfo| {
-            Self::to_array(&value.fights)
-        });
-        engine.register_get("days", |value: &mut PiscesInfo| Self::to_array(&value.days));
-        engine.register_get("bag_candidates", |value: &mut PiscesInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
+        macro_rules! register_pisces_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("lights", |value: &mut $ty| Self::to_array(&value.lights));
+                engine.register_get("exchanges", |value: &mut $ty| {
+                    Self::to_array(&value.exchanges)
+                });
+                engine.register_get("fights", |value: &mut $ty| Self::to_array(&value.fights));
+                engine.register_get("days", |value: &mut $ty| Self::to_array(&value.days));
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+
+        register_pisces_info!(PiscesFirstInfo, "PiscesFirstInfo");
+        register_pisces_info!(PiscesSecondInfo, "PiscesSecondInfo");
+        register_pisces_info!(PiscesThirdInfo, "PiscesThirdInfo");
 
         engine.register_type_with_name::<TaurusField>("TaurusField");
         register_to_string!(TaurusField);
@@ -1483,24 +1631,270 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<TaurusInfo>("TaurusInfo");
-        register_to_string!(TaurusInfo);
-        register_getters!(TaurusInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut TaurusInfo| {
+        macro_rules! register_taurus_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("item_counts", |value: &mut $ty| {
+                    Self::to_array(&value.item_counts)
+                });
+                engine.register_get("states", |value: &mut $ty| Self::to_array(&value.states));
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        register_taurus_info!(TaurusFirstInfo, "TaurusFirstInfo");
+        register_taurus_info!(TaurusSecondInfo, "TaurusSecondInfo");
+        register_taurus_info!(TaurusThirdInfo, "TaurusThirdInfo");
+
+        engine.register_type_with_name::<ThreeStartersField>("ThreeStartersField");
+        register_to_string!(ThreeStartersField);
+        register_getters!(ThreeStartersField, name, value);
+
+        engine.register_type_with_name::<ThreeStartersCounter>("ThreeStartersCounter");
+        register_to_string!(ThreeStartersCounter);
+        register_getters!(ThreeStartersCounter, name, current, limit);
+
+        engine.register_type_with_name::<ThreeStartersRewardItem>("ThreeStartersRewardItem");
+        register_to_string!(ThreeStartersRewardItem);
+        register_getters!(
+            ThreeStartersRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<ThreeStartersBagCandidate>("ThreeStartersBagCandidate");
+        register_to_string!(ThreeStartersBagCandidate);
+        register_getters!(
+            ThreeStartersBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        engine.register_type_with_name::<WaterSourceInfo>("WaterSourceInfo");
+        register_to_string!(WaterSourceInfo);
+        register_getters!(
+            WaterSourceInfo,
+            result_code,
+            message,
+            request_context,
+            has_battle,
+            battle,
+            has_schedule,
+            schedule,
+            has_time,
+            time,
+            has_increase,
+            increase
+        );
+        engine.register_get("fields", |value: &mut WaterSourceInfo| {
             Self::to_array(&value.fields)
         });
-        engine.register_get("counters", |value: &mut TaurusInfo| {
+        engine.register_get("counters", |value: &mut WaterSourceInfo| {
             Self::to_array(&value.counters)
         });
-        engine.register_get("item_counts", |value: &mut TaurusInfo| {
-            Self::to_array(&value.item_counts)
+        engine.register_get("rewards", |value: &mut WaterSourceInfo| {
+            Self::to_array(&value.rewards)
         });
-        engine.register_get("states", |value: &mut TaurusInfo| {
-            Self::to_array(&value.states)
-        });
-        engine.register_get("bag_candidates", |value: &mut TaurusInfo| {
+        engine.register_get("bag_candidates", |value: &mut WaterSourceInfo| {
             Self::to_array(&value.bag_candidates)
         });
+        engine.register_get("water", |value: &mut WaterSourceInfo| {
+            Self::to_array(&value.water)
+        });
+
+        engine.register_type_with_name::<FiresWillInfo>("FiresWillInfo");
+        register_to_string!(FiresWillInfo);
+        register_getters!(
+            FiresWillInfo,
+            result_code,
+            message,
+            request_context,
+            has_schedule,
+            schedule,
+            has_num,
+            num
+        );
+        engine.register_get("fields", |value: &mut FiresWillInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("counters", |value: &mut FiresWillInfo| {
+            Self::to_array(&value.counters)
+        });
+        engine.register_get("rewards", |value: &mut FiresWillInfo| {
+            Self::to_array(&value.rewards)
+        });
+        engine.register_get("bag_candidates", |value: &mut FiresWillInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("fire", |value: &mut FiresWillInfo| {
+            Self::to_array(&value.fire)
+        });
+
+        engine.register_type_with_name::<BatheSunInfo>("BatheSunInfo");
+        register_to_string!(BatheSunInfo);
+        register_getters!(
+            BatheSunInfo,
+            result_code,
+            message,
+            request_context,
+            has_battle,
+            battle,
+            has_schedule,
+            schedule,
+            has_time,
+            time,
+            has_num,
+            num,
+            has_act,
+            act,
+            has_times,
+            times,
+            has_sun,
+            sun,
+            has_add,
+            add
+        );
+        engine.register_get("fields", |value: &mut BatheSunInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("counters", |value: &mut BatheSunInfo| {
+            Self::to_array(&value.counters)
+        });
+        engine.register_get("rewards", |value: &mut BatheSunInfo| {
+            Self::to_array(&value.rewards)
+        });
+        engine.register_get("bag_candidates", |value: &mut BatheSunInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+
+        engine.register_type_with_name::<GeminiField>("GeminiField");
+        register_to_string!(GeminiField);
+        register_getters!(GeminiField, name, value);
+
+        engine.register_type_with_name::<GeminiCounter>("GeminiCounter");
+        register_to_string!(GeminiCounter);
+        register_getters!(GeminiCounter, name, current, limit);
+
+        engine.register_type_with_name::<GeminiRewardItem>("GeminiRewardItem");
+        register_to_string!(GeminiRewardItem);
+        register_getters!(
+            GeminiRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<GeminiBagCandidate>("GeminiBagCandidate");
+        register_to_string!(GeminiBagCandidate);
+        register_getters!(
+            GeminiBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        macro_rules! register_gemini_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("scores", |value: &mut $ty| Self::to_array(&value.scores));
+                engine.register_get("sun_scores", |value: &mut $ty| {
+                    Self::to_array(&value.sun_scores)
+                });
+                engine.register_get("moon_scores", |value: &mut $ty| {
+                    Self::to_array(&value.moon_scores)
+                });
+                engine.register_get("rewards", |value: &mut $ty| Self::to_array(&value.rewards));
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        register_gemini_info!(GeminiFirstInfo, "GeminiFirstInfo");
+        register_gemini_info!(GeminiSecondInfo, "GeminiSecondInfo");
+        register_gemini_info!(GeminiThirdInfo, "GeminiThirdInfo");
+
+        engine.register_type_with_name::<SagittariusField>("SagittariusField");
+        register_to_string!(SagittariusField);
+        register_getters!(SagittariusField, name, value);
+
+        engine.register_type_with_name::<SagittariusCounter>("SagittariusCounter");
+        register_to_string!(SagittariusCounter);
+        register_getters!(SagittariusCounter, name, current, limit);
+
+        engine.register_type_with_name::<SagittariusScore>("SagittariusScore");
+        register_to_string!(SagittariusScore);
+        register_getters!(SagittariusScore, score_index, current, limit);
+
+        engine.register_type_with_name::<SagittariusStarPicture>("SagittariusStarPicture");
+        register_to_string!(SagittariusStarPicture);
+        register_getters!(
+            SagittariusStarPicture,
+            picture_index,
+            is_in,
+            progress,
+            finish
+        );
+
+        engine.register_type_with_name::<SagittariusRewardItem>("SagittariusRewardItem");
+        register_to_string!(SagittariusRewardItem);
+        register_getters!(
+            SagittariusRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<SagittariusBagCandidate>("SagittariusBagCandidate");
+        register_to_string!(SagittariusBagCandidate);
+        register_getters!(
+            SagittariusBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        register_sagittarius_cgi_info!(SagittariusFirstInfo, "SagittariusFirstInfo");
+        register_sagittarius_cgi_info!(SagittariusSecondInfo, "SagittariusSecondInfo");
+        register_sagittarius_cgi_info!(SagittariusThirdInfo, "SagittariusThirdInfo");
 
         engine.register_type_with_name::<ScorpioField>("ScorpioField");
         register_to_string!(ScorpioField);
@@ -1530,24 +1924,9 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<ScorpioInfo>("ScorpioInfo");
-        register_to_string!(ScorpioInfo);
-        register_getters!(ScorpioInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut ScorpioInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut ScorpioInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("counts", |value: &mut ScorpioInfo| {
-            Self::to_array(&value.counts)
-        });
-        engine.register_get("rewards", |value: &mut ScorpioInfo| {
-            Self::to_array(&value.rewards)
-        });
-        engine.register_get("bag_candidates", |value: &mut ScorpioInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
+        register_scorpio_cgi_info!(ScorpioFirstInfo, "ScorpioFirstInfo");
+        register_scorpio_cgi_info!(ScorpioSecondInfo, "ScorpioSecondInfo");
+        register_scorpio_cgi_info!(ScorpioThirdInfo, "ScorpioThirdInfo");
 
         engine.register_type_with_name::<AriesField>("AriesField");
         register_to_string!(AriesField);
@@ -1577,21 +1956,24 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<AriesInfo>("AriesInfo");
-        register_to_string!(AriesInfo);
-        register_getters!(AriesInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut AriesInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut AriesInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("rewards", |value: &mut AriesInfo| {
-            Self::to_array(&value.rewards)
-        });
-        engine.register_get("bag_candidates", |value: &mut AriesInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
+        macro_rules! register_aries_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("rewards", |value: &mut $ty| Self::to_array(&value.rewards));
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        register_aries_info!(AriesFirstInfo, "AriesFirstInfo");
+        register_aries_info!(AriesSecondInfo, "AriesSecondInfo");
+        register_aries_info!(AriesThirdInfo, "AriesThirdInfo");
 
         engine.register_type_with_name::<AriesThirdStatusInfo>("AriesThirdStatusInfo");
         register_to_string!(AriesThirdStatusInfo);
@@ -1647,18 +2029,9 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<LibraInfo>("LibraInfo");
-        register_to_string!(LibraInfo);
-        register_getters!(LibraInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut LibraInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut LibraInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("bag_candidates", |value: &mut LibraInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
+        register_libra_cgi_info!(LibraFirstInfo, "LibraFirstInfo");
+        register_libra_cgi_info!(LibraSecondInfo, "LibraSecondInfo");
+        register_libra_cgi_info!(LibraThirdInfo, "LibraThirdInfo");
 
         engine.register_type_with_name::<LibraThirdStatusInfo>("LibraThirdStatusInfo");
         register_to_string!(LibraThirdStatusInfo);
@@ -1714,18 +2087,23 @@ impl RocoEngine {
             need_money,
         );
 
-        engine.register_type_with_name::<LeoInfo>("LeoInfo");
-        register_to_string!(LeoInfo);
-        register_getters!(LeoInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut LeoInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut LeoInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("bag_candidates", |value: &mut LeoInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
+        macro_rules! register_leo_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+            };
+        }
+        register_leo_info!(LeoFirstInfo, "LeoFirstInfo");
+        register_leo_info!(LeoSecondInfo, "LeoSecondInfo");
+        register_leo_info!(LeoThirdInfo, "LeoThirdInfo");
 
         engine.register_type_with_name::<LeoFirstStatusInfo>("LeoFirstStatusInfo");
         register_to_string!(LeoFirstStatusInfo);
@@ -1792,27 +2170,30 @@ impl RocoEngine {
             item_type
         );
 
-        engine.register_type_with_name::<AquariusInfo>("AquariusInfo");
-        register_to_string!(AquariusInfo);
-        register_getters!(AquariusInfo, result_code, message, request_context);
-        engine.register_get("fields", |value: &mut AquariusInfo| {
-            Self::to_array(&value.fields)
-        });
-        engine.register_get("counters", |value: &mut AquariusInfo| {
-            Self::to_array(&value.counters)
-        });
-        engine.register_get("item_counts", |value: &mut AquariusInfo| {
-            Self::to_array(&value.item_counts)
-        });
-        engine.register_get("states", |value: &mut AquariusInfo| {
-            Self::to_array(&value.states)
-        });
-        engine.register_get("bag_candidates", |value: &mut AquariusInfo| {
-            Self::to_array(&value.bag_candidates)
-        });
-        engine.register_get("reward_items", |value: &mut AquariusInfo| {
-            Self::to_array(&value.reward_items)
-        });
+        macro_rules! register_aquarius_info {
+            ($ty:ty, $name:literal) => {
+                engine.register_type_with_name::<$ty>($name);
+                register_to_string!($ty);
+                register_getters!($ty, result_code, message, request_context);
+                engine.register_get("fields", |value: &mut $ty| Self::to_array(&value.fields));
+                engine.register_get("counters", |value: &mut $ty| {
+                    Self::to_array(&value.counters)
+                });
+                engine.register_get("item_counts", |value: &mut $ty| {
+                    Self::to_array(&value.item_counts)
+                });
+                engine.register_get("states", |value: &mut $ty| Self::to_array(&value.states));
+                engine.register_get("bag_candidates", |value: &mut $ty| {
+                    Self::to_array(&value.bag_candidates)
+                });
+                engine.register_get("reward_items", |value: &mut $ty| {
+                    Self::to_array(&value.reward_items)
+                });
+            };
+        }
+        register_aquarius_info!(AquariusFirstInfo, "AquariusFirstInfo");
+        register_aquarius_info!(AquariusSecondInfo, "AquariusSecondInfo");
+        register_aquarius_info!(AquariusThirdInfo, "AquariusThirdInfo");
 
         engine.register_type_with_name::<AquariusSecondStatusInfo>("AquariusSecondStatusInfo");
         register_to_string!(AquariusSecondStatusInfo);

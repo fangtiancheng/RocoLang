@@ -1209,6 +1209,64 @@ pub struct UnicornInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FourSeasonsRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FourSeasonsShopRewardInfo {
+    pub reward_id: i64,
+    pub reward_kind: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FourSeasonsMonthlySpiritRewardInfo {
+    pub month: i64,
+    pub reward_index: i64,
+    pub spirit_id: i64,
+    pub ticket_cost: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FourSeasonsInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub has_month: bool,
+    pub month: i64,
+    pub has_map: bool,
+    pub map: i64,
+    pub has_position_1based: bool,
+    pub position_1based: i64,
+    pub has_times: bool,
+    pub times: i64,
+    pub has_ticket: bool,
+    pub ticket: i64,
+    pub has_used_tool_index: bool,
+    pub used_tool_index: i64,
+    pub has_need_item_index: bool,
+    pub need_item_index: i64,
+    pub has_add: bool,
+    pub add: i64,
+    pub has_point: bool,
+    pub point: i64,
+    pub boxes: Vec<i64>,
+    pub tools: Vec<i64>,
+    pub tool_shop_indexes: Vec<i64>,
+    pub tool_shop_flags: Vec<i64>,
+    pub pass_boxes: Vec<i64>,
+    pub tool_costs: Vec<i64>,
+    pub event_item_counts: Vec<i64>,
+    pub shop_rewards: Vec<FourSeasonsShopRewardInfo>,
+    pub monthly_spirit_rewards: Vec<FourSeasonsMonthlySpiritRewardInfo>,
+    pub rewards: Vec<FourSeasonsRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,

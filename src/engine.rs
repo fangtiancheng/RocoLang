@@ -11,10 +11,11 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
-    dark_city, game, gemini, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea,
-    mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role, sagittarius,
-    scene, scorpio, sentinel_intelligence, session, spirit, star_tower, summon, system, taurus,
-    three_starters, treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
+    dark_city, four_seasons, game, gemini, ladder, leo, libra, lookup, magic_pioneer, manor,
+    mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role,
+    sagittarius, scene, scorpio, sentinel_intelligence, session, spirit, star_tower, summon,
+    system, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
+    RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -31,7 +32,8 @@ use crate::types::{
     CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState,
     CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
     DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
-    FiresWillInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
+    FiresWillInfo, FourSeasonsInfo, FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem,
+    FourSeasonsShopRewardInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
     GeminiRewardItem, GeminiSecondInfo, GeminiThirdInfo, LadderFightRecord, LadderInfo,
     LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
     LadderSpiritCostEntry, LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField,
@@ -233,6 +235,10 @@ impl RocoEngine {
         let mut unicorn_module = rhai::Module::new();
         unicorn::register(&mut unicorn_module, stdlib.clone());
         engine.register_static_module("unicorn", unicorn_module.into());
+
+        let mut four_seasons_module = rhai::Module::new();
+        four_seasons::register(&mut four_seasons_module, stdlib.clone());
+        engine.register_static_module("four_seasons", four_seasons_module.into());
 
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
@@ -1919,6 +1925,89 @@ impl RocoEngine {
             Self::to_array(&value.bag_candidates)
         });
         engine.register_get("rewards", |value: &mut UnicornInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<FourSeasonsRewardItem>("FourSeasonsRewardItem");
+        register_to_string!(FourSeasonsRewardItem);
+        register_getters!(
+            FourSeasonsRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<FourSeasonsShopRewardInfo>("FourSeasonsShopRewardInfo");
+        register_to_string!(FourSeasonsShopRewardInfo);
+        register_getters!(FourSeasonsShopRewardInfo, reward_id, reward_kind, count);
+
+        engine.register_type_with_name::<FourSeasonsMonthlySpiritRewardInfo>(
+            "FourSeasonsMonthlySpiritRewardInfo",
+        );
+        register_to_string!(FourSeasonsMonthlySpiritRewardInfo);
+        register_getters!(
+            FourSeasonsMonthlySpiritRewardInfo,
+            month,
+            reward_index,
+            spirit_id,
+            ticket_cost
+        );
+
+        engine.register_type_with_name::<FourSeasonsInfo>("FourSeasonsInfo");
+        register_to_string!(FourSeasonsInfo);
+        register_getters!(
+            FourSeasonsInfo,
+            result_code,
+            message,
+            request_context,
+            has_month,
+            month,
+            has_map,
+            map,
+            has_position_1based,
+            position_1based,
+            has_times,
+            times,
+            has_ticket,
+            ticket,
+            has_used_tool_index,
+            used_tool_index,
+            has_need_item_index,
+            need_item_index,
+            has_add,
+            add,
+            has_point,
+            point
+        );
+        engine.register_get("boxes", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.boxes)
+        });
+        engine.register_get("tools", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.tools)
+        });
+        engine.register_get("tool_shop_indexes", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.tool_shop_indexes)
+        });
+        engine.register_get("tool_shop_flags", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.tool_shop_flags)
+        });
+        engine.register_get("pass_boxes", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.pass_boxes)
+        });
+        engine.register_get("tool_costs", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.tool_costs)
+        });
+        engine.register_get("event_item_counts", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.event_item_counts)
+        });
+        engine.register_get("shop_rewards", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.shop_rewards)
+        });
+        engine.register_get("monthly_spirit_rewards", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.monthly_spirit_rewards)
+        });
+        engine.register_get("rewards", |value: &mut FourSeasonsInfo| {
             Self::to_array(&value.rewards)
         });
 

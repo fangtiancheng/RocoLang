@@ -12,6 +12,7 @@ pub mod combat;
 pub mod combat_result;
 pub mod combat_status;
 pub mod dark_city;
+pub mod four_seasons;
 pub mod game;
 pub mod gemini;
 pub mod ladder;
@@ -769,6 +770,34 @@ pub trait RocoStdLib: Send {
         _cost_kind: i64,
     ) -> Result<UnicornInfo> {
         unsupported("unicorn::exchange_skill_stone")
+    }
+
+    fn four_seasons_query(&mut self) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::query")
+    }
+    fn four_seasons_roll_dice(&mut self, _vip: bool) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::roll_dice")
+    }
+    fn four_seasons_submit_minigame(&mut self) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::submit_minigame")
+    }
+    fn four_seasons_upgrade_box(&mut self, _position: i64) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::upgrade_box")
+    }
+    fn four_seasons_use_tool(&mut self, _tool: i64) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::use_tool")
+    }
+    fn four_seasons_use_appointed_step_tool(&mut self, _step: i64) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::use_appointed_step_tool")
+    }
+    fn four_seasons_submit_event(&mut self) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::submit_event")
+    }
+    fn four_seasons_exchange_shop_item(&mut self, _slot: i64) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::exchange_shop_item")
+    }
+    fn four_seasons_claim_spirit_reward(&mut self, _index: i64) -> Result<FourSeasonsInfo> {
+        unsupported("four_seasons::claim_spirit_reward")
     }
 
     fn magic_pioneer_vanguard_lord_query(&mut self) -> Result<MagicPioneerInfo> {

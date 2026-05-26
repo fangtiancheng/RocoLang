@@ -11,8 +11,8 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     aquarius, aries, cancer, capricorn, combat, combat_result, combat_status, dark_city, game,
-    gemini, ladder, leo, libra, lookup, manor, mountain_sea, mystery_fusion, news, news_times,
-    personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
+    gemini, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea, mystery_fusion, news,
+    news_times, personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
     sentinel_intelligence, session, spirit, star_tower, summon, system, taurus, three_starters,
     treasure_realm, type_ladder, virgo, weather, RocoStdLib,
 };
@@ -37,29 +37,29 @@ use crate::types::{
     LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo,
     LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo,
     LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
-    ManorFertilizerResult, ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult,
-    ManorRewardInfo, ManorSowResult, ManorUprootResult, ManorWeedResult, MountainSeaBossInfo,
-    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
-    PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem,
-    QqGameHallGiftInfo, SagittariusBagCandidate, SagittariusCounter, SagittariusField,
-    SagittariusFirstInfo, SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo,
-    SagittariusStarPicture, SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo,
-    ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo, ScorpioReward,
-    ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
-    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
-    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
-    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
-    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
-    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
-    TypeLadderSpiritInfo, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
+    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
+    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
+    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
+    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo,
+    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
+    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
+    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
+    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
+    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
+    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
+    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
+    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
+    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
+    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
+    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
+    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
+    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
     VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
     VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
@@ -219,6 +219,10 @@ impl RocoEngine {
         let mut mountain_sea_module = rhai::Module::new();
         mountain_sea::register(&mut mountain_sea_module, stdlib.clone());
         engine.register_static_module("mountain_sea", mountain_sea_module.into());
+
+        let mut magic_pioneer_module = rhai::Module::new();
+        magic_pioneer::register(&mut magic_pioneer_module, stdlib.clone());
+        engine.register_static_module("magic_pioneer", magic_pioneer_module.into());
 
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
@@ -1686,6 +1690,40 @@ impl RocoEngine {
             has_need_money,
             need_money,
         );
+
+        engine.register_type_with_name::<MagicPioneerField>("MagicPioneerField");
+        register_to_string!(MagicPioneerField);
+        register_getters!(MagicPioneerField, name);
+        engine.register_get("values", |value: &mut MagicPioneerField| {
+            Self::to_array(&value.values)
+        });
+
+        engine.register_type_with_name::<MagicPioneerRewardItem>("MagicPioneerRewardItem");
+        register_to_string!(MagicPioneerRewardItem);
+        register_getters!(
+            MagicPioneerRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<MagicPioneerInfo>("MagicPioneerInfo");
+        register_to_string!(MagicPioneerInfo);
+        register_getters!(
+            MagicPioneerInfo,
+            pet,
+            cmd,
+            result_code,
+            message,
+            request_context
+        );
+        engine.register_get("fields", |value: &mut MagicPioneerInfo| {
+            Self::to_array(&value.fields)
+        });
+        engine.register_get("rewards", |value: &mut MagicPioneerInfo| {
+            Self::to_array(&value.rewards)
+        });
 
         engine.register_type_with_name::<WaterSourceInfo>("WaterSourceInfo");
         register_to_string!(WaterSourceInfo);

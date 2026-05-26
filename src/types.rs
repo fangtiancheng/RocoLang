@@ -659,9 +659,13 @@ pub struct CapricornSecondTask {
 pub struct CapricornBagCandidate {
     pub candidate_index: i64,
     pub spirit_id: i64,
+    pub has_bag_index: bool,
     pub bag_index: i64,
+    pub has_catch_time: bool,
     pub catch_time: i64,
+    pub has_level: bool,
     pub level: i64,
+    pub has_need_money: bool,
     pub need_money: i64,
 }
 
@@ -670,16 +674,25 @@ pub struct CapricornInfo {
     pub result_code: i64,
     pub message: String,
     pub request_context: String,
+    pub has_finish: bool,
     pub finish: i64,
+    pub has_current: bool,
     pub current: i64,
+    pub has_position: bool,
     pub position: i64,
     pub has_second_task: bool,
     pub second_task: CapricornSecondTask,
+    pub has_remain: bool,
     pub remain: i64,
+    pub has_price: bool,
     pub price: i64,
+    pub has_limit: bool,
     pub limit: i64,
+    pub has_progress_percent: bool,
     pub progress_percent: i64,
+    pub has_reward_num: bool,
     pub reward_num: i64,
+    pub has_tips: bool,
     pub tips: i64,
     pub bag_candidates: Vec<CapricornBagCandidate>,
 }
@@ -730,6 +743,72 @@ pub struct CancerInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoPetInfo {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<VirgoField>,
+    pub counters: Vec<VirgoCounter>,
+    pub states: Vec<i64>,
+    pub pets: Vec<VirgoPetInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoBellFoxStatusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub boss_left_hp: i64,
+    pub boss_full_hp: i64,
+    pub left_fight_count: i64,
+    pub add_hit_level: i64,
+    pub today_sum_hit: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VirgoBellFoxExchangeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_item: bool,
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PiscesField {
     pub name: String,
     pub value: String,
@@ -746,9 +825,13 @@ pub struct PiscesCounter {
 pub struct PiscesBagCandidate {
     pub candidate_index: i64,
     pub spirit_id: i64,
+    pub has_bag_index: bool,
     pub bag_index: i64,
+    pub has_catch_time: bool,
     pub catch_time: i64,
+    pub has_level: bool,
     pub level: i64,
+    pub has_need_money: bool,
     pub need_money: i64,
 }
 
@@ -783,9 +866,13 @@ pub struct TaurusCounter {
 pub struct TaurusBagCandidate {
     pub candidate_index: i64,
     pub spirit_id: i64,
+    pub has_bag_index: bool,
     pub bag_index: i64,
+    pub has_catch_time: bool,
     pub catch_time: i64,
+    pub has_level: bool,
     pub level: i64,
+    pub has_need_money: bool,
     pub need_money: i64,
 }
 
@@ -799,6 +886,249 @@ pub struct TaurusInfo {
     pub item_counts: Vec<i64>,
     pub states: Vec<i64>,
     pub bag_candidates: Vec<TaurusBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioReward {
+    pub reward_index: i64,
+    pub reward_type: i64,
+    pub reward_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScorpioInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<ScorpioField>,
+    pub counters: Vec<ScorpioCounter>,
+    pub counts: Vec<i64>,
+    pub rewards: Vec<ScorpioReward>,
+    pub bag_candidates: Vec<ScorpioBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesReward {
+    pub reward_index: i64,
+    pub reward_type: i64,
+    pub reward_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<AriesField>,
+    pub counters: Vec<AriesCounter>,
+    pub rewards: Vec<AriesReward>,
+    pub bag_candidates: Vec<AriesBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesThirdStatusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+    pub boss_left_hp: i64,
+    pub left_fight_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AriesThirdExchangeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_item: bool,
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LibraField>,
+    pub counters: Vec<LibraCounter>,
+    pub bag_candidates: Vec<LibraBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraThirdStatusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+    pub boss_left_hp: i64,
+    pub left_fight_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibraThirdExchangeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_item: bool,
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoCounter {
+    pub name: String,
+    pub current: i64,
+    pub limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub fields: Vec<LeoField>,
+    pub counters: Vec<LeoCounter>,
+    pub bag_candidates: Vec<LeoBagCandidate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoFirstStatusInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
+    pub boss_left_hp: i64,
+    pub left_fight_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LeoFirstExchangeInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub has_item: bool,
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+    pub light_num: i64,
+    pub tail_num: i64,
+    pub exchange_count0: i64,
+    pub exchange_count1: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

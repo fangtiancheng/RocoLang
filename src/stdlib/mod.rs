@@ -4,6 +4,7 @@ use crate::error::{Result, RocoError};
 use crate::types::*;
 
 pub mod aquarius;
+pub mod aries;
 pub mod cancer;
 pub mod capricorn;
 pub mod combat;
@@ -12,6 +13,8 @@ pub mod combat_status;
 pub mod dark_city;
 pub mod game;
 pub mod ladder;
+pub mod leo;
+pub mod libra;
 pub mod lookup;
 pub mod manor;
 pub mod mountain_sea;
@@ -24,6 +27,7 @@ pub mod play_guide;
 pub mod profile;
 pub mod role;
 pub mod scene;
+pub mod scorpio;
 pub mod sentinel_intelligence;
 pub mod session;
 pub mod spirit;
@@ -34,6 +38,7 @@ pub mod taurus;
 pub mod treasure_realm;
 pub mod type_ladder;
 pub mod util;
+pub mod virgo;
 pub mod weather;
 
 fn unsupported<T>(name: &str) -> Result<T> {
@@ -639,6 +644,105 @@ pub trait RocoStdLib: Send {
         unsupported("mountain_sea::summon")
     }
 
+    fn virgo_serve_god_query(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_query")
+    }
+
+    fn virgo_serve_god_accept_task(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_accept_task")
+    }
+
+    fn virgo_serve_god_give_up_task(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_give_up_task")
+    }
+
+    fn virgo_serve_god_finish_task(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_finish_task")
+    }
+
+    fn virgo_serve_god_buy_unlock(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_buy_unlock")
+    }
+
+    fn virgo_serve_god_settle_boss_combat(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_settle_boss_combat")
+    }
+
+    fn virgo_serve_god_query_bag(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_query_bag")
+    }
+
+    fn virgo_serve_god_upgrade_to_100(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_upgrade_to_100")
+    }
+
+    fn virgo_serve_god_upgrade(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<VirgoInfo> {
+        unsupported("virgo::serve_god_upgrade")
+    }
+
+    fn virgo_find_halidom_query(&mut self, _altar: bool) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_query")
+    }
+
+    fn virgo_find_halidom_clean(&mut self, _relic_index: i64) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_clean")
+    }
+
+    fn virgo_find_halidom_list_pet(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_list_pet")
+    }
+
+    fn virgo_find_halidom_put_pet(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_put_pet")
+    }
+
+    fn virgo_find_halidom_buy_pass(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_buy_pass")
+    }
+
+    fn virgo_find_halidom_buy_search_count(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_buy_search_count")
+    }
+
+    fn virgo_find_halidom_buy_top_level(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<VirgoInfo> {
+        unsupported("virgo::find_halidom_buy_top_level")
+    }
+
+    fn virgo_bell_fox_query_status(&mut self) -> Result<VirgoBellFoxStatusInfo> {
+        unsupported("virgo::bell_fox_query_status")
+    }
+
+    fn virgo_bell_fox_exchange_item(
+        &mut self,
+        _exchange_position: i64,
+    ) -> Result<VirgoBellFoxExchangeInfo> {
+        unsupported("virgo::bell_fox_exchange_item")
+    }
+
+    fn virgo_bell_fox_buy_tail(&mut self, _count: i64) -> Result<VirgoInfo> {
+        unsupported("virgo::bell_fox_buy_tail")
+    }
+
+    fn virgo_bell_fox_buy_wish(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::bell_fox_buy_wish")
+    }
+
+    fn virgo_bell_fox_exchange_pet(&mut self) -> Result<VirgoInfo> {
+        unsupported("virgo::bell_fox_exchange_pet")
+    }
+
     fn dark_city_expedition_query(&mut self) -> Result<DarkCityExpeditionInfo> {
         unsupported("dark_city::expedition_query")
     }
@@ -1182,6 +1286,324 @@ pub trait RocoStdLib: Send {
 
     fn taurus_third_get_task(&mut self) -> Result<TaurusInfo> {
         unsupported("taurus::third_get_task")
+    }
+
+    fn scorpio_first_query(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_query")
+    }
+
+    fn scorpio_first_submit_game(&mut self, _score: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_submit_game")
+    }
+
+    fn scorpio_first_query_bag(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_query_bag")
+    }
+
+    fn scorpio_first_evolve(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_evolve")
+    }
+
+    fn scorpio_first_level_up(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_level_up")
+    }
+
+    fn scorpio_first_buy_direct(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::first_buy_direct")
+    }
+
+    fn scorpio_second_query(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_query")
+    }
+
+    fn scorpio_second_settle(&mut self, _reward_source: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_settle")
+    }
+
+    fn scorpio_second_query_bag(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_query_bag")
+    }
+
+    fn scorpio_second_evolve(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_evolve")
+    }
+
+    fn scorpio_second_level_up(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_level_up")
+    }
+
+    fn scorpio_second_buy_direct(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_buy_direct")
+    }
+
+    fn scorpio_second_buy_challenge_count(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::second_buy_challenge_count")
+    }
+
+    fn scorpio_third_query(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::third_query")
+    }
+
+    fn scorpio_third_submit_game(&mut self, _success: bool) -> Result<ScorpioInfo> {
+        unsupported("scorpio::third_submit_game")
+    }
+
+    fn scorpio_third_exchange_pet(&mut self) -> Result<ScorpioInfo> {
+        unsupported("scorpio::third_exchange_pet")
+    }
+
+    fn scorpio_third_buy_guess_count(&mut self, _count: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::third_buy_guess_count")
+    }
+
+    fn scorpio_third_buy_red_sand(&mut self, _count: i64) -> Result<ScorpioInfo> {
+        unsupported("scorpio::third_buy_red_sand")
+    }
+
+    fn aries_first_query(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_query")
+    }
+
+    fn aries_first_start(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_start")
+    }
+
+    fn aries_first_buy_times(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_buy_times")
+    }
+
+    fn aries_first_dice(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_dice")
+    }
+
+    fn aries_first_settle_battle(&mut self, _battle_type: i64) -> Result<AriesInfo> {
+        unsupported("aries::first_settle_battle")
+    }
+
+    fn aries_first_query_bag(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_query_bag")
+    }
+
+    fn aries_first_level_up(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<AriesInfo> {
+        unsupported("aries::first_level_up")
+    }
+
+    fn aries_first_evolve(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<AriesInfo> {
+        unsupported("aries::first_evolve")
+    }
+
+    fn aries_first_buy_direct(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_buy_direct")
+    }
+
+    fn aries_first_get_gold(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::first_get_gold")
+    }
+
+    fn aries_second_query(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::second_query")
+    }
+
+    fn aries_second_submit_game(&mut self, _power: i64) -> Result<AriesInfo> {
+        unsupported("aries::second_submit_game")
+    }
+
+    fn aries_second_query_bag(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::second_query_bag")
+    }
+
+    fn aries_second_evolve(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<AriesInfo> {
+        unsupported("aries::second_evolve")
+    }
+
+    fn aries_second_buy_direct(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::second_buy_direct")
+    }
+
+    fn aries_second_buy_level(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<AriesInfo> {
+        unsupported("aries::second_buy_level")
+    }
+
+    fn aries_third_query_status(&mut self) -> Result<AriesThirdStatusInfo> {
+        unsupported("aries::third_query_status")
+    }
+
+    fn aries_third_exchange_item(
+        &mut self,
+        _exchange_position: i64,
+    ) -> Result<AriesThirdExchangeInfo> {
+        unsupported("aries::third_exchange_item")
+    }
+
+    fn aries_third_buy_tail(&mut self, _count: i64) -> Result<AriesInfo> {
+        unsupported("aries::third_buy_tail")
+    }
+
+    fn aries_third_buy_wish(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::third_buy_wish")
+    }
+
+    fn aries_third_exchange_pet(&mut self) -> Result<AriesInfo> {
+        unsupported("aries::third_exchange_pet")
+    }
+
+    fn libra_first_query(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::first_query")
+    }
+
+    fn libra_first_submit_game(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::first_submit_game")
+    }
+
+    fn libra_first_settle_fight(&mut self, _prop_index: i64) -> Result<LibraInfo> {
+        unsupported("libra::first_settle_fight")
+    }
+
+    fn libra_first_get_gift(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::first_get_gift")
+    }
+
+    fn libra_first_notify_full_level(
+        &mut self,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<LibraInfo> {
+        unsupported("libra::first_notify_full_level")
+    }
+
+    fn libra_first_query_bag(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::first_query_bag")
+    }
+
+    fn libra_first_advance(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<LibraInfo> {
+        unsupported("libra::first_advance")
+    }
+
+    fn libra_second_query(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::second_query")
+    }
+
+    fn libra_second_settle_fight(&mut self, _npc_index: i64) -> Result<LibraInfo> {
+        unsupported("libra::second_settle_fight")
+    }
+
+    fn libra_second_awaken(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::second_awaken")
+    }
+
+    fn libra_second_buy_challenge_count(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::second_buy_challenge_count")
+    }
+
+    fn libra_second_full_level(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<LibraInfo> {
+        unsupported("libra::second_full_level")
+    }
+
+    fn libra_second_query_bag(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::second_query_bag")
+    }
+
+    fn libra_second_evolution(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<LibraInfo> {
+        unsupported("libra::second_evolution")
+    }
+
+    fn libra_third_query_status(&mut self) -> Result<LibraThirdStatusInfo> {
+        unsupported("libra::third_query_status")
+    }
+
+    fn libra_third_exchange_item(
+        &mut self,
+        _exchange_position: i64,
+    ) -> Result<LibraThirdExchangeInfo> {
+        unsupported("libra::third_exchange_item")
+    }
+
+    fn libra_third_buy_tail(&mut self, _count: i64) -> Result<LibraInfo> {
+        unsupported("libra::third_buy_tail")
+    }
+
+    fn libra_third_buy_wish(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::third_buy_wish")
+    }
+
+    fn libra_third_exchange_pet(&mut self) -> Result<LibraInfo> {
+        unsupported("libra::third_exchange_pet")
+    }
+
+    fn leo_first_query_status(&mut self) -> Result<LeoFirstStatusInfo> {
+        unsupported("leo::first_query_status")
+    }
+
+    fn leo_first_exchange_item(&mut self, _exchange_position: i64) -> Result<LeoFirstExchangeInfo> {
+        unsupported("leo::first_exchange_item")
+    }
+
+    fn leo_first_buy_tail(&mut self, _count: i64) -> Result<LeoInfo> {
+        unsupported("leo::first_buy_tail")
+    }
+
+    fn leo_first_buy_wish(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::first_buy_wish")
+    }
+
+    fn leo_first_exchange_pet(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::first_exchange_pet")
+    }
+
+    fn leo_second_query(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::second_query")
+    }
+
+    fn leo_second_settle_combat(&mut self, _hunt_index: i64) -> Result<LeoInfo> {
+        unsupported("leo::second_settle_combat")
+    }
+
+    fn leo_second_submit_onekey(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::second_submit_onekey")
+    }
+
+    fn leo_second_query_spirit(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::second_query_spirit")
+    }
+
+    fn leo_second_submit_spirit(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<LeoInfo> {
+        unsupported("leo::second_submit_spirit")
+    }
+
+    fn leo_second_buy_full_level(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<LeoInfo> {
+        unsupported("leo::second_buy_full_level")
+    }
+
+    fn leo_third_query(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::third_query")
+    }
+
+    fn leo_third_submit_combat(&mut self, _challenge_index: i64, _win: bool) -> Result<LeoInfo> {
+        unsupported("leo::third_submit_combat")
+    }
+
+    fn leo_third_get_reward(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::third_get_reward")
+    }
+
+    fn leo_third_full_level(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::third_full_level")
+    }
+
+    fn leo_third_evolve(&mut self, _catch_time: i64) -> Result<LeoInfo> {
+        unsupported("leo::third_evolve")
+    }
+
+    fn leo_third_light_star(&mut self, _star_index: i64) -> Result<LeoInfo> {
+        unsupported("leo::third_light_star")
+    }
+
+    fn leo_third_query_bag(&mut self) -> Result<LeoInfo> {
+        unsupported("leo::third_query_bag")
     }
 
     fn aquarius_first_query(&mut self) -> Result<AquariusInfo> {

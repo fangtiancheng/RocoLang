@@ -10,40 +10,41 @@ use crate::debugger::{
 };
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
-    aquarius, aries, cancer, capricorn, combat, combat_result, combat_status, dark_city, game,
-    gemini, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea, mystery_fusion, news,
-    news_times, personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
-    sentinel_intelligence, session, spirit, star_tower, summon, system, taurus, three_starters,
-    treasure_realm, type_ladder, virgo, weather, RocoStdLib,
+    alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
+    dark_city, game, gemini, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea,
+    mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role, sagittarius,
+    scene, scorpio, sentinel_intelligence, session, spirit, star_tower, summon, system, taurus,
+    three_starters, treasure_realm, type_ladder, virgo, weather, RocoStdLib,
 };
 use crate::types::{
-    ActionResult, AmendNatureCandidate, AmendNatureInfo, AquariusBagCandidate, AquariusCounter,
-    AquariusField, AquariusFirstInfo, AquariusRewardItem, AquariusSecondExchangeInfo,
-    AquariusSecondInfo, AquariusSecondStatusInfo, AquariusThirdInfo, AriesBagCandidate,
-    AriesCounter, AriesField, AriesFirstInfo, AriesReward, AriesSecondInfo, AriesThirdExchangeInfo,
-    AriesThirdInfo, AriesThirdStatusInfo, BagItemInfo, BatheSunInfo, BattleCapturedSpirit,
-    BattleResult, BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo,
-    BloodGiftItemRequirement, BloodGiftOption, CancerItemInfo, CancerMendShapeBagInfo,
-    CancerMendShapeInfo, CancerPetInfo, CancerSharpScorpionInfo, CancerUnsealMemoriesBagInfo,
-    CancerUnsealMemoriesInfo, CapricornBagCandidate, CapricornInviteListInfo,
-    CapricornPalaceNoteItem, CapricornPalaceNotesInfo, CapricornSecondInfo, CapricornSecondTask,
-    CapricornStarPalaceInfo, CapricornTeamOperationInfo, CapricornTeamPlayer,
-    CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState, CombatSpiritState,
-    CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo,
-    DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress, FiresWillInfo, GeminiBagCandidate,
-    GeminiCounter, GeminiField, GeminiFirstInfo, GeminiRewardItem, GeminiSecondInfo,
-    GeminiThirdInfo, LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry,
-    LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo,
-    LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo,
-    LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo,
-    LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
-    MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
-    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
-    ManorUprootResult, ManorWeedResult, MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo,
-    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
+    AmendNatureInfo, AquariusBagCandidate, AquariusCounter, AquariusField, AquariusFirstInfo,
+    AquariusRewardItem, AquariusSecondExchangeInfo, AquariusSecondInfo, AquariusSecondStatusInfo,
+    AquariusThirdInfo, AriesBagCandidate, AriesCounter, AriesField, AriesFirstInfo, AriesReward,
+    AriesSecondInfo, AriesThirdExchangeInfo, AriesThirdInfo, AriesThirdStatusInfo, BagItemInfo,
+    BatheSunInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult, BattleSpiritResult,
+    BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CancerItemInfo,
+    CancerMendShapeBagInfo, CancerMendShapeInfo, CancerPetInfo, CancerSharpScorpionInfo,
+    CancerUnsealMemoriesBagInfo, CancerUnsealMemoriesInfo, CapricornBagCandidate,
+    CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
+    CapricornSecondInfo, CapricornSecondTask, CapricornStarPalaceInfo, CapricornTeamOperationInfo,
+    CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState,
+    CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
+    DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
+    FiresWillInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
+    GeminiRewardItem, GeminiSecondInfo, GeminiThirdInfo, LadderFightRecord, LadderInfo,
+    LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
+    LadderSpiritCostEntry, LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField,
+    LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo,
+    LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo, LibraSecondInfo,
+    LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo, MagicPioneerField,
+    MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
+    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
+    ManorWeedResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo, MountainSeaInfo,
+    MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
     MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
     NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
-    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo,
+    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
     SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
     SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
     SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
@@ -223,6 +224,10 @@ impl RocoEngine {
         let mut magic_pioneer_module = rhai::Module::new();
         magic_pioneer::register(&mut magic_pioneer_module, stdlib.clone());
         engine.register_static_module("magic_pioneer", magic_pioneer_module.into());
+
+        let mut alchemy_furnace_module = rhai::Module::new();
+        alchemy_furnace::register(&mut alchemy_furnace_module, stdlib.clone());
+        engine.register_static_module("alchemy_furnace", alchemy_furnace_module.into());
 
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
@@ -1722,6 +1727,112 @@ impl RocoEngine {
             Self::to_array(&value.fields)
         });
         engine.register_get("rewards", |value: &mut MagicPioneerInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<AlchemyFurnaceRewardItem>("AlchemyFurnaceRewardItem");
+        register_to_string!(AlchemyFurnaceRewardItem);
+        register_getters!(
+            AlchemyFurnaceRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<AlchemyFurnaceBagCandidate>("AlchemyFurnaceBagCandidate");
+        register_to_string!(AlchemyFurnaceBagCandidate);
+        register_getters!(
+            AlchemyFurnaceBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        engine.register_type_with_name::<MonkeyCultivationInfo>("MonkeyCultivationInfo");
+        register_to_string!(MonkeyCultivationInfo);
+        register_getters!(
+            MonkeyCultivationInfo,
+            result_code,
+            message,
+            request_context,
+            has_daytimes,
+            daytimes,
+            has_finish,
+            finish,
+            has_progress,
+            progress,
+            has_add_progress,
+            add_progress
+        );
+        engine.register_get("pill_counts", |value: &mut MonkeyCultivationInfo| {
+            Self::to_array(&value.pill_counts)
+        });
+        engine.register_get("rewards", |value: &mut MonkeyCultivationInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<MonkeyEvoInfo>("MonkeyEvoInfo");
+        register_to_string!(MonkeyEvoInfo);
+        register_getters!(
+            MonkeyEvoInfo,
+            result_code,
+            message,
+            request_context,
+            has_branch_type,
+            branch_type,
+            has_done,
+            done,
+            has_schedule,
+            schedule,
+            has_add_progress,
+            add_progress
+        );
+        engine.register_get("pill_counts", |value: &mut MonkeyEvoInfo| {
+            Self::to_array(&value.pill_counts)
+        });
+        engine.register_get("bag_candidates", |value: &mut MonkeyEvoInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("rewards", |value: &mut MonkeyEvoInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<RagingFireInfo>("RagingFireInfo");
+        register_to_string!(RagingFireInfo);
+        register_getters!(
+            RagingFireInfo,
+            result_code,
+            message,
+            request_context,
+            has_vip,
+            vip,
+            has_daytimes,
+            daytimes,
+            has_finish,
+            finish,
+            has_fusion,
+            fusion,
+            has_add_progress,
+            add_progress
+        );
+        engine.register_get("required_stone_indexes", |value: &mut RagingFireInfo| {
+            Self::to_array(&value.required_stone_indexes)
+        });
+        engine.register_get("progress", |value: &mut RagingFireInfo| {
+            Self::to_array(&value.progress)
+        });
+        engine.register_get("bag_candidates", |value: &mut RagingFireInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("rewards", |value: &mut RagingFireInfo| {
             Self::to_array(&value.rewards)
         });
 

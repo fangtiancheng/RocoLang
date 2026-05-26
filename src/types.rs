@@ -1070,6 +1070,84 @@ pub struct MagicPioneerInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlchemyFurnaceRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlchemyFurnaceBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MonkeyCultivationInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub pill_counts: Vec<i64>,
+    pub has_daytimes: bool,
+    pub daytimes: i64,
+    pub has_finish: bool,
+    pub finish: i64,
+    pub has_progress: bool,
+    pub progress: i64,
+    pub has_add_progress: bool,
+    pub add_progress: i64,
+    pub rewards: Vec<AlchemyFurnaceRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MonkeyEvoInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub pill_counts: Vec<i64>,
+    pub has_branch_type: bool,
+    pub branch_type: i64,
+    pub has_done: bool,
+    pub done: i64,
+    pub has_schedule: bool,
+    pub schedule: i64,
+    pub has_add_progress: bool,
+    pub add_progress: i64,
+    pub bag_candidates: Vec<AlchemyFurnaceBagCandidate>,
+    pub rewards: Vec<AlchemyFurnaceRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RagingFireInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub has_vip: bool,
+    pub vip: i64,
+    pub has_daytimes: bool,
+    pub daytimes: i64,
+    pub required_stone_indexes: Vec<i64>,
+    pub progress: Vec<i64>,
+    pub has_finish: bool,
+    pub finish: i64,
+    pub has_fusion: bool,
+    pub fusion: i64,
+    pub has_add_progress: bool,
+    pub add_progress: i64,
+    pub bag_candidates: Vec<AlchemyFurnaceBagCandidate>,
+    pub rewards: Vec<AlchemyFurnaceRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,

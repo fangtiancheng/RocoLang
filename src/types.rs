@@ -1148,6 +1148,67 @@ pub struct RagingFireInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnicornRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnicornBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnicornBossInfo {
+    pub slot: i64,
+    pub npc_index: i64,
+    pub has_spirit_id: bool,
+    pub spirit_id: i64,
+    pub has_fight_id: bool,
+    pub fight_id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnicornInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub bosses: Vec<UnicornBossInfo>,
+    pub has_finish: bool,
+    pub finish: i64,
+    pub has_start: bool,
+    pub start: i64,
+    pub has_total: bool,
+    pub total: i64,
+    pub has_book: bool,
+    pub book: i64,
+    pub cultivation_times: Vec<i64>,
+    pub evolution_energy_costs: Vec<i64>,
+    pub one_key_diamond_costs: Vec<i64>,
+    pub has_purple_vine_count: bool,
+    pub purple_vine_count: i64,
+    pub has_energy: bool,
+    pub energy: i64,
+    pub has_fruit_count: bool,
+    pub fruit_count: i64,
+    pub has_increase: bool,
+    pub increase: i64,
+    pub bag_candidates: Vec<UnicornBagCandidate>,
+    pub rewards: Vec<UnicornRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,

@@ -42,6 +42,7 @@ pub mod taurus;
 pub mod three_starters;
 pub mod treasure_realm;
 pub mod type_ladder;
+pub mod unicorn;
 pub mod util;
 pub mod virgo;
 pub mod weather;
@@ -727,6 +728,47 @@ pub trait RocoStdLib: Send {
         _catch_time: i64,
     ) -> Result<RagingFireInfo> {
         unsupported("alchemy_furnace::raging_fire_get_gift")
+    }
+
+    fn unicorn_query(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::query")
+    }
+    fn unicorn_summon(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::summon")
+    }
+    fn unicorn_settle_summon_fight(&mut self, _slot: i64) -> Result<UnicornInfo> {
+        unsupported("unicorn::settle_summon_fight")
+    }
+    fn unicorn_harvest(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::harvest")
+    }
+    fn unicorn_submit_minigame(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::submit_minigame")
+    }
+    fn unicorn_start_cultivation(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::start_cultivation")
+    }
+    fn unicorn_submit_cultivation_task(&mut self, _task: i64) -> Result<UnicornInfo> {
+        unsupported("unicorn::submit_cultivation_task")
+    }
+    fn unicorn_claim_cultivation_reward(&mut self) -> Result<UnicornInfo> {
+        unsupported("unicorn::claim_cultivation_reward")
+    }
+    fn unicorn_query_evolution_bag(&mut self, _stage: i64) -> Result<UnicornInfo> {
+        unsupported("unicorn::query_evolution_bag")
+    }
+    fn unicorn_evolve(&mut self, _stage: i64, _catch_time: i64) -> Result<UnicornInfo> {
+        unsupported("unicorn::evolve")
+    }
+    fn unicorn_one_key_evolve(&mut self, _stage: i64, _catch_time: i64) -> Result<UnicornInfo> {
+        unsupported("unicorn::one_key_evolve")
+    }
+    fn unicorn_exchange_skill_stone(
+        &mut self,
+        _skill: i64,
+        _cost_kind: i64,
+    ) -> Result<UnicornInfo> {
+        unsupported("unicorn::exchange_skill_stone")
     }
 
     fn magic_pioneer_vanguard_lord_query(&mut self) -> Result<MagicPioneerInfo> {

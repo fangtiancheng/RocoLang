@@ -14,7 +14,7 @@ use crate::stdlib::{
     dark_city, game, gemini, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea,
     mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role, sagittarius,
     scene, scorpio, sentinel_intelligence, session, spirit, star_tower, summon, system, taurus,
-    three_starters, treasure_realm, type_ladder, virgo, weather, RocoStdLib,
+    three_starters, treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -60,7 +60,8 @@ use crate::types::{
     TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
     ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
     TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
-    TypeLadderRankUser, TypeLadderSpiritInfo, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
+    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
     VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
     VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
@@ -228,6 +229,10 @@ impl RocoEngine {
         let mut alchemy_furnace_module = rhai::Module::new();
         alchemy_furnace::register(&mut alchemy_furnace_module, stdlib.clone());
         engine.register_static_module("alchemy_furnace", alchemy_furnace_module.into());
+
+        let mut unicorn_module = rhai::Module::new();
+        unicorn::register(&mut unicorn_module, stdlib.clone());
+        engine.register_static_module("unicorn", unicorn_module.into());
 
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
@@ -1833,6 +1838,87 @@ impl RocoEngine {
             Self::to_array(&value.bag_candidates)
         });
         engine.register_get("rewards", |value: &mut RagingFireInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<UnicornRewardItem>("UnicornRewardItem");
+        register_to_string!(UnicornRewardItem);
+        register_getters!(
+            UnicornRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<UnicornBagCandidate>("UnicornBagCandidate");
+        register_to_string!(UnicornBagCandidate);
+        register_getters!(
+            UnicornBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money,
+        );
+
+        engine.register_type_with_name::<UnicornBossInfo>("UnicornBossInfo");
+        register_to_string!(UnicornBossInfo);
+        register_getters!(
+            UnicornBossInfo,
+            slot,
+            npc_index,
+            has_spirit_id,
+            spirit_id,
+            has_fight_id,
+            fight_id
+        );
+
+        engine.register_type_with_name::<UnicornInfo>("UnicornInfo");
+        register_to_string!(UnicornInfo);
+        register_getters!(
+            UnicornInfo,
+            result_code,
+            message,
+            request_context,
+            has_finish,
+            finish,
+            has_start,
+            start,
+            has_total,
+            total,
+            has_book,
+            book,
+            has_purple_vine_count,
+            purple_vine_count,
+            has_energy,
+            energy,
+            has_fruit_count,
+            fruit_count,
+            has_increase,
+            increase
+        );
+        engine.register_get("bosses", |value: &mut UnicornInfo| {
+            Self::to_array(&value.bosses)
+        });
+        engine.register_get("cultivation_times", |value: &mut UnicornInfo| {
+            Self::to_array(&value.cultivation_times)
+        });
+        engine.register_get("evolution_energy_costs", |value: &mut UnicornInfo| {
+            Self::to_array(&value.evolution_energy_costs)
+        });
+        engine.register_get("one_key_diamond_costs", |value: &mut UnicornInfo| {
+            Self::to_array(&value.one_key_diamond_costs)
+        });
+        engine.register_get("bag_candidates", |value: &mut UnicornInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("rewards", |value: &mut UnicornInfo| {
             Self::to_array(&value.rewards)
         });
 

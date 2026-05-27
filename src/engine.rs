@@ -11,11 +11,11 @@ use crate::debugger::{
 use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
-    dark_city, four_seasons, game, gemini, ladder, leo, libra, lookup, magic_pioneer, manor,
-    mountain_sea, mystery_fusion, news, news_times, personality, pisces, play_guide, profile, role,
-    sagittarius, scene, scorpio, sentinel_intelligence, session, spirit, star_tower, summon,
-    system, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
-    RocoStdLib,
+    dark_city, diamond_tear, four_seasons, game, gemini, ice_crystal, ladder, leo, libra, lookup,
+    magic_pioneer, manor, mountain_sea, mystery_fusion, news, news_times, personality, pisces,
+    play_guide, profile, role, sagittarius, scene, scorpio, sentinel_intelligence, session, spirit,
+    star_tower, summon, system, taurus, three_starters, treasure_realm, type_ladder, unicorn,
+    virgo, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -32,40 +32,42 @@ use crate::types::{
     CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState,
     CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
     DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
-    FiresWillInfo, FourSeasonsInfo, FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem,
-    FourSeasonsShopRewardInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
-    GeminiRewardItem, GeminiSecondInfo, GeminiThirdInfo, LadderFightRecord, LadderInfo,
-    LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
-    LadderSpiritCostEntry, LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField,
-    LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo,
-    LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo, LibraSecondInfo,
-    LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo, MagicPioneerField,
-    MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
-    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
-    ManorWeedResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo, MountainSeaInfo,
-    MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
-    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
-    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
-    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
-    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
-    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
-    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
-    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
-    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
-    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
-    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
-    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
-    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
-    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
-    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
-    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
-    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
-    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
-    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
-    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
+    DiamondTearInfo, DiamondTearRewardItem, FiresWillInfo, FourSeasonsInfo,
+    FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem, FourSeasonsShopRewardInfo,
+    GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo, GeminiRewardItem,
+    GeminiSecondInfo, GeminiThirdInfo, IceCrystalBagCandidate, IceCrystalBattleInfo,
+    IceCrystalInfo, IceCrystalRewardItem, LadderFightRecord, LadderInfo, LadderMatchConfig,
+    LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry,
+    LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo,
+    LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField,
+    LibraFirstInfo, LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
+    MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
+    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
+    ManorUprootResult, ManorWeedResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
+    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
+    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
+    PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem,
+    QqGameHallGiftInfo, RagingFireInfo, SagittariusBagCandidate, SagittariusCounter,
+    SagittariusField, SagittariusFirstInfo, SagittariusRewardItem, SagittariusScore,
+    SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo, SceneRoleInfo,
+    SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo,
+    ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
+    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
+    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
+    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
+    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
+    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
+    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
+    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
+    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
+    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
+    WeekTaskActivity, WeekTaskInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -239,6 +241,14 @@ impl RocoEngine {
         let mut four_seasons_module = rhai::Module::new();
         four_seasons::register(&mut four_seasons_module, stdlib.clone());
         engine.register_static_module("four_seasons", four_seasons_module.into());
+
+        let mut ice_crystal_module = rhai::Module::new();
+        ice_crystal::register(&mut ice_crystal_module, stdlib.clone());
+        engine.register_static_module("ice_crystal", ice_crystal_module.into());
+
+        let mut diamond_tear_module = rhai::Module::new();
+        diamond_tear::register(&mut diamond_tear_module, stdlib.clone());
+        engine.register_static_module("diamond_tear", diamond_tear_module.into());
 
         let mut dark_city_module = rhai::Module::new();
         dark_city::register(&mut dark_city_module, stdlib.clone());
@@ -2008,6 +2018,105 @@ impl RocoEngine {
             Self::to_array(&value.monthly_spirit_rewards)
         });
         engine.register_get("rewards", |value: &mut FourSeasonsInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<DiamondTearRewardItem>("DiamondTearRewardItem");
+        register_to_string!(DiamondTearRewardItem);
+        register_getters!(
+            DiamondTearRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<DiamondTearInfo>("DiamondTearInfo");
+        register_to_string!(DiamondTearInfo);
+        register_getters!(
+            DiamondTearInfo,
+            result_code,
+            message,
+            request_context,
+            has_buy,
+            buy,
+            has_level,
+            level,
+            has_count_down,
+            count_down,
+            has_tear_state,
+            tear_state
+        );
+        engine.register_get("rewards", |value: &mut DiamondTearInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<IceCrystalBattleInfo>("IceCrystalBattleInfo");
+        register_to_string!(IceCrystalBattleInfo);
+        register_getters!(IceCrystalBattleInfo, battle_index, fight_id);
+
+        engine.register_type_with_name::<IceCrystalBagCandidate>("IceCrystalBagCandidate");
+        register_to_string!(IceCrystalBagCandidate);
+        register_getters!(
+            IceCrystalBagCandidate,
+            candidate_index,
+            spirit_id,
+            has_bag_index,
+            bag_index,
+            has_catch_time,
+            catch_time,
+            has_level,
+            level,
+            has_need_money,
+            need_money
+        );
+
+        engine.register_type_with_name::<IceCrystalRewardItem>("IceCrystalRewardItem");
+        register_to_string!(IceCrystalRewardItem);
+        register_getters!(
+            IceCrystalRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<IceCrystalInfo>("IceCrystalInfo");
+        register_to_string!(IceCrystalInfo);
+        register_getters!(
+            IceCrystalInfo,
+            result_code,
+            message,
+            request_context,
+            has_progress,
+            progress,
+            has_battle_times,
+            battle_times,
+            has_battle_index,
+            battle_index,
+            has_get_times,
+            get_times,
+            has_add,
+            add,
+            has_current_battle,
+            current_battle
+        );
+        engine.register_get("item_counts", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.item_counts)
+        });
+        engine.register_get("crystal_counts", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.crystal_counts)
+        });
+        engine.register_get("item_costs", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.item_costs)
+        });
+        engine.register_get("one_key_diamond_costs", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.one_key_diamond_costs)
+        });
+        engine.register_get("bag_candidates", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.bag_candidates)
+        });
+        engine.register_get("rewards", |value: &mut IceCrystalInfo| {
             Self::to_array(&value.rewards)
         });
 

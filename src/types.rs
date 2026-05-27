@@ -1267,6 +1267,83 @@ pub struct FourSeasonsInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiamondTearRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiamondTearInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub has_buy: bool,
+    pub buy: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_count_down: bool,
+    pub count_down: i64,
+    pub has_tear_state: bool,
+    pub tear_state: i64,
+    pub rewards: Vec<DiamondTearRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IceCrystalBattleInfo {
+    pub battle_index: i64,
+    pub fight_id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IceCrystalBagCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub has_bag_index: bool,
+    pub bag_index: i64,
+    pub has_catch_time: bool,
+    pub catch_time: i64,
+    pub has_level: bool,
+    pub level: i64,
+    pub has_need_money: bool,
+    pub need_money: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IceCrystalRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IceCrystalInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub has_progress: bool,
+    pub progress: i64,
+    pub has_battle_times: bool,
+    pub battle_times: i64,
+    pub has_battle_index: bool,
+    pub battle_index: i64,
+    pub has_get_times: bool,
+    pub get_times: i64,
+    pub has_add: bool,
+    pub add: i64,
+    pub item_counts: Vec<i64>,
+    pub crystal_counts: Vec<i64>,
+    pub item_costs: Vec<i64>,
+    pub one_key_diamond_costs: Vec<i64>,
+    pub has_current_battle: bool,
+    pub current_battle: IceCrystalBattleInfo,
+    pub bag_candidates: Vec<IceCrystalBagCandidate>,
+    pub rewards: Vec<IceCrystalRewardItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,

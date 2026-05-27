@@ -12,9 +12,11 @@ pub mod combat;
 pub mod combat_result;
 pub mod combat_status;
 pub mod dark_city;
+pub mod diamond_tear;
 pub mod four_seasons;
 pub mod game;
 pub mod gemini;
+pub mod ice_crystal;
 pub mod ladder;
 pub mod leo;
 pub mod libra;
@@ -798,6 +800,44 @@ pub trait RocoStdLib: Send {
     }
     fn four_seasons_claim_spirit_reward(&mut self, _index: i64) -> Result<FourSeasonsInfo> {
         unsupported("four_seasons::claim_spirit_reward")
+    }
+    fn diamond_tear_query(&mut self) -> Result<DiamondTearInfo> {
+        unsupported("diamond_tear::query")
+    }
+    fn diamond_tear_buy_pet(&mut self) -> Result<DiamondTearInfo> {
+        unsupported("diamond_tear::buy_pet")
+    }
+    fn diamond_tear_freeze(&mut self) -> Result<DiamondTearInfo> {
+        unsupported("diamond_tear::freeze")
+    }
+    fn diamond_tear_claim_diamond(&mut self) -> Result<DiamondTearInfo> {
+        unsupported("diamond_tear::claim_diamond")
+    }
+
+    fn ice_crystal_query(&mut self) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::query")
+    }
+    fn ice_crystal_charge_with_item(&mut self, _item: i64) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::charge_with_item")
+    }
+    fn ice_crystal_report_battle_win(&mut self) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::report_battle_win")
+    }
+    fn ice_crystal_condense_crystal(&mut self, _crystal: i64) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::condense_crystal")
+    }
+    fn ice_crystal_query_evolution_bag(&mut self, _target: i64) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::query_evolution_bag")
+    }
+    fn ice_crystal_evolve(&mut self, _target: i64, _catch_time: i64) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::evolve")
+    }
+    fn ice_crystal_one_key_evolve(
+        &mut self,
+        _target: i64,
+        _catch_time: i64,
+    ) -> Result<IceCrystalInfo> {
+        unsupported("ice_crystal::one_key_evolve")
     }
 
     fn magic_pioneer_vanguard_lord_query(&mut self) -> Result<MagicPioneerInfo> {

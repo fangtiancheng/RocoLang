@@ -12,10 +12,10 @@ use crate::error::{Result, RocoError, RocoScriptError};
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
     dark_city, diamond_tear, four_seasons, game, gemini, ice_crystal, ladder, leo, libra, lookup,
-    magic_pioneer, manor, mountain_sea, mystery_fusion, news, news_times, personality, pisces,
-    play_guide, profile, role, sagittarius, scene, scorpio, sentinel_intelligence, session, spirit,
-    star_tower, summon, system, taurus, three_starters, treasure_realm, type_ladder, unicorn,
-    virgo, weather, RocoStdLib,
+    magic_pioneer, manor, mountain_sea, multi_evolution, mystery_fusion, news, news_times,
+    personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
+    sentinel_intelligence, session, spirit, star_tower, summon, system, taurus, three_starters,
+    treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -44,30 +44,30 @@ use crate::types::{
     MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
     ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
     ManorUprootResult, ManorWeedResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo,
-    MountainSeaInfo, MountainSeaSoulInfo, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
-    PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem,
-    QqGameHallGiftInfo, RagingFireInfo, SagittariusBagCandidate, SagittariusCounter,
-    SagittariusField, SagittariusFirstInfo, SagittariusRewardItem, SagittariusScore,
-    SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo, SceneRoleInfo,
-    SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo,
-    ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
-    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
-    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
-    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
-    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
-    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
-    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
-    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
-    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
-    WeekTaskActivity, WeekTaskInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MultiEvolutionCandidate, MultiEvolutionInfo,
+    MultiEvolutionRewardItem, MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
+    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
+    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
+    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
+    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
+    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
+    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
+    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
+    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
+    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
+    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
+    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
+    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
+    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
+    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
+    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
+    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
 
 type PrintCallback = Arc<Mutex<dyn FnMut(&str) + Send>>;
@@ -245,6 +245,10 @@ impl RocoEngine {
         let mut ice_crystal_module = rhai::Module::new();
         ice_crystal::register(&mut ice_crystal_module, stdlib.clone());
         engine.register_static_module("ice_crystal", ice_crystal_module.into());
+
+        let mut multi_evolution_module = rhai::Module::new();
+        multi_evolution::register(&mut multi_evolution_module, stdlib.clone());
+        engine.register_static_module("multi_evolution", multi_evolution_module.into());
 
         let mut diamond_tear_module = rhai::Module::new();
         diamond_tear::register(&mut diamond_tear_module, stdlib.clone());
@@ -2117,6 +2121,50 @@ impl RocoEngine {
             Self::to_array(&value.bag_candidates)
         });
         engine.register_get("rewards", |value: &mut IceCrystalInfo| {
+            Self::to_array(&value.rewards)
+        });
+
+        engine.register_type_with_name::<MultiEvolutionCandidate>("MultiEvolutionCandidate");
+        register_to_string!(MultiEvolutionCandidate);
+        register_getters!(
+            MultiEvolutionCandidate,
+            candidate_index,
+            spirit_id,
+            catch_time,
+            condition_code,
+            condition_name
+        );
+
+        engine.register_type_with_name::<MultiEvolutionRewardItem>("MultiEvolutionRewardItem");
+        register_to_string!(MultiEvolutionRewardItem);
+        register_getters!(
+            MultiEvolutionRewardItem,
+            reward_id,
+            reward_kind,
+            raw_reward_type,
+            count
+        );
+
+        engine.register_type_with_name::<MultiEvolutionInfo>("MultiEvolutionInfo");
+        register_to_string!(MultiEvolutionInfo);
+        register_getters!(
+            MultiEvolutionInfo,
+            result_code,
+            message,
+            request_context,
+            has_pet_id,
+            pet_id,
+            has_result_side,
+            result_side,
+            has_item_id,
+            item_id,
+            count,
+            available
+        );
+        engine.register_get("candidates", |value: &mut MultiEvolutionInfo| {
+            Self::to_array(&value.candidates)
+        });
+        engine.register_get("rewards", |value: &mut MultiEvolutionInfo| {
             Self::to_array(&value.rewards)
         });
 

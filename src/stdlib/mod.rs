@@ -24,6 +24,7 @@ pub mod lookup;
 pub mod magic_pioneer;
 pub mod manor;
 pub mod mountain_sea;
+pub mod multi_evolution;
 pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
@@ -838,6 +839,61 @@ pub trait RocoStdLib: Send {
         _catch_time: i64,
     ) -> Result<IceCrystalInfo> {
         unsupported("ice_crystal::one_key_evolve")
+    }
+
+    fn multi_evolution_fire_query_candidates(&mut self, _slot: i64) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::fire_query_candidates")
+    }
+    fn multi_evolution_fire_evolve(
+        &mut self,
+        _slot: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+        _item_count: i64,
+        _fire_score: i64,
+    ) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::fire_evolve")
+    }
+    fn multi_evolution_fire_query_booster_item_count(&mut self) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::fire_query_booster_item_count")
+    }
+    fn multi_evolution_fire_claim_reward(&mut self) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::fire_claim_reward")
+    }
+    fn multi_evolution_fire_query_reward_available(&mut self) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::fire_query_reward_available")
+    }
+    fn multi_evolution_water_query_candidates(&mut self, _slot: i64) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::water_query_candidates")
+    }
+    fn multi_evolution_water_evolve(
+        &mut self,
+        _slot: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+    ) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::water_evolve")
+    }
+    fn multi_evolution_grass_query_candidates(&mut self, _slot: i64) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::grass_query_candidates")
+    }
+    fn multi_evolution_grass_first_evolve(
+        &mut self,
+        _slot: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+        _sunlight: i64,
+    ) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::grass_first_evolve")
+    }
+    fn multi_evolution_grass_second_evolve(
+        &mut self,
+        _slot: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+        _sunlight: i64,
+    ) -> Result<MultiEvolutionInfo> {
+        unsupported("multi_evolution::grass_second_evolve")
     }
 
     fn magic_pioneer_vanguard_lord_query(&mut self) -> Result<MagicPioneerInfo> {

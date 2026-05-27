@@ -1344,6 +1344,40 @@ pub struct IceCrystalInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiEvolutionCandidate {
+    pub candidate_index: i64,
+    pub spirit_id: i64,
+    pub catch_time: i64,
+    pub condition_code: i64,
+    pub condition_name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiEvolutionRewardItem {
+    pub reward_id: i64,
+    pub reward_kind: String,
+    pub raw_reward_type: i64,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiEvolutionInfo {
+    pub result_code: i64,
+    pub message: String,
+    pub request_context: String,
+    pub candidates: Vec<MultiEvolutionCandidate>,
+    pub rewards: Vec<MultiEvolutionRewardItem>,
+    pub has_pet_id: bool,
+    pub pet_id: i64,
+    pub has_result_side: bool,
+    pub result_side: i64,
+    pub has_item_id: bool,
+    pub item_id: i64,
+    pub count: i64,
+    pub available: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,

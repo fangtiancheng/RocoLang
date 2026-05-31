@@ -109,7 +109,47 @@ pub trait RocoStdLib: Send {
         unsupported("game::set_pause")
     }
 
+    fn start_mini_game(&mut self, _game_id: i64) -> Result<()> {
+        unsupported("game::start_mini_game")
+    }
+
+    fn submit_mini_game_score(
+        &mut self,
+        _game_id: i64,
+        _score: i64,
+        _game_type: i64,
+    ) -> Result<MiniGameSubmitResult> {
+        unsupported("game::submit_mini_game_score")
+    }
+
+    fn try_submit_mini_game_score(
+        &mut self,
+        game_id: i64,
+        score: i64,
+        game_type: i64,
+    ) -> Result<MiniGameSubmitTryResult> {
+        match self.submit_mini_game_score(game_id, score, game_type) {
+            Ok(result) if result.ok => Ok(MiniGameSubmitTryResult::ok(result)),
+            Ok(result) => Ok(MiniGameSubmitTryResult {
+                ok: false,
+                code: result.code,
+                message: result.message.clone(),
+                result,
+            }),
+            Err(RocoError::NetworkError(message)) | Err(RocoError::TimeoutError(message)) => {
+                Ok(MiniGameSubmitTryResult::network_error(message))
+            }
+            Err(error) => Ok(MiniGameSubmitTryResult::failed(error.to_string())),
+        }
+    }
+
     fn try_set_pause(&mut self, enabled: bool) -> Result<ActionResult> {
+        match self.get_pause() {
+            Ok(current) if current == enabled => return Ok(ActionResult::ok()),
+            Ok(_) => {}
+            Err(_) => {}
+        }
+
         match self.set_pause(enabled) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("set_pause returned false")),

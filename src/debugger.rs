@@ -1,16 +1,7 @@
 use rhai::{Array, Dynamic, Map};
 use serde::{Deserialize, Serialize};
 
-use crate::types::{
-    ActionResult, BagItemInfo, BattleCapturedSpirit, BattleInfo, BattleResult,
-    BattleResultQueryResult, BattleSpiritResult, BloodGiftInfo, BloodGiftItemRequirement,
-    BloodGiftOption, CombatActions, CombatSideState, CombatSpiritState, CombatState, RoundResult,
-    SceneRoleInfo, SceneSpiritInfo, SkillInfo, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritEquipmentBagInfo,
-    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StaticGuardianPetPropertyInfo,
-    StaticItemInfo, StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo,
-    StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, TalentRefreshResult, UserInfo,
-};
+include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
 
 const MAX_PREVIEW_CHARS: usize = 4_000;
 
@@ -126,56 +117,14 @@ fn preview_map(value: &Dynamic) -> Option<String> {
 
 fn preview_roco_type(value: &Dynamic) -> Option<String> {
     macro_rules! preview_as_json {
-        ($($type:ty),+ $(,)?) => {
-            $(
-                if let Some(preview) = serialize_preview::<$type>(value) {
-                    return Some(preview);
-                }
-            )+
+        ($type:ty, $name:literal) => {
+            if let Some(preview) = serialize_preview::<$type>(value) {
+                return Some(preview);
+            }
         };
     }
 
-    preview_as_json!(
-        ActionResult,
-        BagItemInfo,
-        BattleCapturedSpirit,
-        BattleInfo,
-        BattleResult,
-        BattleResultQueryResult,
-        BattleSpiritResult,
-        BloodGiftInfo,
-        BloodGiftItemRequirement,
-        BloodGiftOption,
-        CombatActions,
-        CombatSideState,
-        CombatSpiritState,
-        CombatState,
-        RoundResult,
-        SceneRoleInfo,
-        SceneSpiritInfo,
-        SkillInfo,
-        SkillPoolInfo,
-        SkillPoolSkillInfo,
-        SkillStoneResult,
-        SkillStoneSkillInfo,
-        SkillSwitchResult,
-        SpiritBagInfo,
-        SpiritEquipmentBagInfo,
-        SpiritEquipmentInfo,
-        SpiritInfo,
-        SpiritSkillInfo,
-        StaticGuardianPetPropertyInfo,
-        StaticItemInfo,
-        StaticMagicInfo,
-        StaticPluginInfo,
-        StaticSkillInfo,
-        StaticSpiritInfo,
-        StaticStriveItemInfo,
-        StaticTitleInfo,
-        StorageSpiritInfo,
-        TalentRefreshResult,
-        UserInfo,
-    );
+    for_each_roco_type!(preview_as_json);
 
     None
 }

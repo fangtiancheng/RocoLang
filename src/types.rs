@@ -206,6 +206,8 @@ pub struct BattleCapturedSpirit {
     pub spirit_id: i64,
     pub level: i64,
     pub disposition: i64,
+    pub property_list: Vec<i64>,
+    pub flair_list: Vec<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -2248,6 +2250,85 @@ impl ActionResult {
             ok: false,
             code: 2,
             message: message.into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MiniGameRewardItem {
+    pub id: i64,
+    pub count: i64,
+    pub item_type: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MiniGameExtraField {
+    pub key: String,
+    pub value: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MiniGameSubmitResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub game_id: i64,
+    pub score: i64,
+    pub game_type: i64,
+    pub items: Vec<MiniGameRewardItem>,
+    pub extra_fields: Vec<MiniGameExtraField>,
+}
+
+impl MiniGameSubmitResult {
+    pub fn failed(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 2,
+            message: message.into(),
+            game_id: 0,
+            score: 0,
+            game_type: 0,
+            items: Vec::new(),
+            extra_fields: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MiniGameSubmitTryResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub result: MiniGameSubmitResult,
+}
+
+impl MiniGameSubmitTryResult {
+    pub const CODE_NETWORK_ERROR: i64 = 1001;
+
+    pub fn ok(result: MiniGameSubmitResult) -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+            result,
+        }
+    }
+
+    pub fn failed(message: impl Into<String>) -> Self {
+        Self::failed_with_code(2, message)
+    }
+
+    pub fn network_error(message: impl Into<String>) -> Self {
+        Self::failed_with_code(Self::CODE_NETWORK_ERROR, message)
+    }
+
+    fn failed_with_code(code: i64, message: impl Into<String>) -> Self {
+        let message = message.into();
+        Self {
+            ok: false,
+            code,
+            result: MiniGameSubmitResult::failed(message.clone()),
+            message,
         }
     }
 }

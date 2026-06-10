@@ -2846,6 +2846,10 @@ pub trait RocoStdLib: Send {
         unsupported("combat::wait_round_end")
     }
 
+    fn wait_next_action(&mut self) -> Result<bool> {
+        unsupported("combat::wait_next_action")
+    }
+
     fn get_battle_result(&mut self) -> Result<BattleResult> {
         unsupported("combat::get_battle_result")
     }

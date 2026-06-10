@@ -42,6 +42,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     register_stdlib_fn_0!(module, stdlib, "combat_escape", combat_escape);
     register_stdlib_fn_0!(module, stdlib, "try_combat_escape", try_combat_escape);
     register_stdlib_fn_0!(module, stdlib, "wait_round_end", wait_round_end);
+    register_stdlib_fn_0!(module, stdlib, "wait_next_action", wait_next_action);
     register_stdlib_fn_0!(module, stdlib, "get_battle_result", get_battle_result);
     register_stdlib_fn_0!(
         module,

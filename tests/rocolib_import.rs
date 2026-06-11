@@ -437,19 +437,21 @@ fn debug_runner_pauses_on_line_breakpoint_and_reports_call_stack() {
         .find_map(|event| match event {
             RocoDebugEvent::Paused {
                 reason,
-                source,
-                line,
+                location,
                 stack,
                 locals,
                 ..
-            } => Some((reason, source, line, stack, locals)),
+            } => {
+                let (_, line, _) = location.parts();
+                Some((reason, location.source(), line, stack, locals))
+            }
             _ => None,
         })
         .expect("line breakpoint should pause");
 
     assert_eq!(paused.0, "breakpoint:0");
-    assert_eq!(paused.1.as_deref(), Some("debug_test.rhai"));
-    assert_eq!(*paused.2, Some(4));
+    assert_eq!(paused.1, Some("debug_test.rhai"));
+    assert_eq!(paused.2, Some(4));
     assert!(
         paused.3.iter().any(|frame| frame.function_name == "value"),
         "pause event should include function call stack"
@@ -578,7 +580,7 @@ fn debug_runner_can_update_breakpoints_while_paused() {
         .expect("events lock")
         .iter()
         .filter_map(|event| match event {
-            RocoDebugEvent::Paused { line, .. } => *line,
+            RocoDebugEvent::Paused { location, .. } => location.parts().1,
             _ => None,
         })
         .collect::<Vec<_>>();
@@ -629,7 +631,7 @@ fn imported_rocolib_frames_expose_stable_source_id() {
         .expect("events lock")
         .iter()
         .filter_map(|event| match event {
-            RocoDebugEvent::Paused { source, .. } => source.clone(),
+            RocoDebugEvent::Paused { location, .. } => location.source().map(ToString::to_string),
             _ => None,
         })
         .collect::<Vec<_>>();

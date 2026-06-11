@@ -380,20 +380,6 @@ impl RocoEngine {
         }
     }
 
-    fn trim_rhai_position_suffix(message: &str) -> &str {
-        let Some((prefix, suffix)) = message.rsplit_once(" (line ") else {
-            return message;
-        };
-        if !suffix.ends_with(')') || !suffix.contains(", position ") {
-            return message;
-        }
-        prefix
-    }
-
-    fn clean_rhai_message(message: String) -> String {
-        Self::trim_rhai_position_suffix(&message).to_string()
-    }
-
     fn map_eval_error(error: Box<rhai::EvalAltResult>) -> RocoError {
         let position = error.position();
         let kind = match error.as_ref() {
@@ -412,7 +398,7 @@ impl RocoEngine {
         };
         RocoError::ScriptError(RocoScriptError {
             kind,
-            message: Self::clean_rhai_message(error.to_string()),
+            message: error.to_string(),
             location: Self::script_location(source, position),
         })
     }
@@ -488,9 +474,10 @@ impl RocoEngine {
                             .iter()
                             .map(|frame| RocoDebugStackFrame {
                                 function_name: frame.fn_name.to_string(),
-                                source: frame.source.as_ref().map(ToString::to_string),
-                                line: frame.pos.line(),
-                                column: frame.pos.position(),
+                                location: Self::script_location(
+                                    frame.source.as_ref().map(ToString::to_string),
+                                    frame.pos,
+                                ),
                                 args_preview: frame.args.iter().map(dynamic_preview).collect(),
                             })
                             .collect();
@@ -507,9 +494,7 @@ impl RocoEngine {
 
                         (hooks.on_event)(RocoDebugEvent::Paused {
                             reason,
-                            source: source.map(ToString::to_string),
-                            line: pos.line(),
-                            column: pos.position(),
+                            location: Self::script_location(source.map(ToString::to_string), pos),
                             stack,
                             locals,
                         });
@@ -589,7 +574,7 @@ impl RocoEngine {
         let position = error.position();
         RocoError::ScriptError(RocoScriptError {
             kind: RocoScriptErrorKind::Parse,
-            message: Self::clean_rhai_message(error.to_string()),
+            message: error.to_string(),
             location: Self::script_location(source, position),
         })
     }

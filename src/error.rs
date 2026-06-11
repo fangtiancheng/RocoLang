@@ -1,10 +1,11 @@
 //! Error types for RocoLang.
 
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 pub type Result<T> = std::result::Result<T, RocoError>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoScriptErrorKind {
     Parse,
     Runtime,
@@ -35,7 +36,7 @@ impl fmt::Display for RocoScriptErrorKind {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoScriptPosition {
     Line { line: usize },
     LineColumn { line: usize, column: usize },
@@ -65,7 +66,7 @@ impl fmt::Display for RocoScriptPosition {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoScriptLocation {
     Unknown,
     Anonymous {
@@ -115,7 +116,7 @@ impl fmt::Display for RocoScriptLocation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RocoScriptError {
     pub kind: RocoScriptErrorKind,
     pub message: String,

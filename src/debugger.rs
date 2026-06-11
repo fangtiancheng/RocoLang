@@ -1,6 +1,8 @@
 use rhai::{Array, Dynamic, Map};
 use serde::{Deserialize, Serialize};
 
+use crate::error::RocoScriptLocation;
+
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
 
 const MAX_PREVIEW_CHARS: usize = 4_000;
@@ -33,9 +35,7 @@ pub enum RocoDebugCommand {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RocoDebugStackFrame {
     pub function_name: String,
-    pub source: Option<String>,
-    pub line: Option<usize>,
-    pub column: Option<usize>,
+    pub location: RocoScriptLocation,
     pub args_preview: Vec<String>,
 }
 
@@ -52,9 +52,7 @@ pub enum RocoDebugEvent {
     Started,
     Paused {
         reason: String,
-        source: Option<String>,
-        line: Option<usize>,
-        column: Option<usize>,
+        location: RocoScriptLocation,
         stack: Vec<RocoDebugStackFrame>,
         locals: Vec<RocoDebugLocalVariable>,
     },

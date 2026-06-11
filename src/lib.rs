@@ -19,5 +19,14 @@ pub use engine::RocoEngine;
 pub use error::{
     Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
 };
-pub use stdlib::RocoStdLib;
+pub use stdlib::{
+    RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
+    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
+    RocoCombatStdLib, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoLeoActivityStdLib,
+    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
+    RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
+    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoStdLib,
+    RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RocoZodiacActivityStdLib,
+};
 pub use types::*;

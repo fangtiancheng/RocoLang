@@ -1,7 +1,13 @@
 use roco_lang::{
-    BattleInfo, BattleResult, CombatActions, Result, RocoEngine, RocoError, RocoStdLib,
-    RoundResult, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo,
-    StaticSpiritInfo,
+    BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
+    RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
+    RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoError, RocoEvolutionActivityStdLib,
+    RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
+    RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
+    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
+    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -16,7 +22,7 @@ impl ErrorTestStdLib {
     }
 }
 
-impl RocoStdLib for ErrorTestStdLib {
+impl RocoRuntimeStdLib for ErrorTestStdLib {
     fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         if self.should_fail {
             Err(RocoError::ServerRejected(
@@ -31,7 +37,9 @@ impl RocoStdLib for ErrorTestStdLib {
     fn get_current_scene(&mut self) -> Result<i64> {
         Ok(1)
     }
+}
 
+impl RocoSpiritStdLib for ErrorTestStdLib {
     fn fetch_spirit(&mut self, _spirit_id: i64, _catch_time: i64) -> Result<bool> {
         Ok(true)
     }
@@ -58,10 +66,6 @@ impl RocoStdLib for ErrorTestStdLib {
         Ok(SpiritBagInfo { spirits: vec![] })
     }
 
-    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
-        Ok(Default::default())
-    }
-
     fn get_skills(&mut self, _position: i64) -> Result<[Option<SkillInfo>; 4]> {
         Ok([None, None, None, None])
     }
@@ -76,7 +80,9 @@ impl RocoStdLib for ErrorTestStdLib {
     ) -> Result<bool> {
         Ok(true)
     }
+}
 
+impl RocoLookupStdLib for ErrorTestStdLib {
     fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo> {
         Err(RocoError::StdLibError(format!(
             "item info not found: {item_id}"
@@ -93,6 +99,12 @@ impl RocoStdLib for ErrorTestStdLib {
         Err(RocoError::StdLibError(format!(
             "spirit info not found: {spirit_id}"
         )))
+    }
+}
+
+impl RocoCombatStdLib for ErrorTestStdLib {
+    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
+        Ok(Default::default())
     }
 
     fn invite_pk(&mut self, target_uin: i64) -> Result<BattleInfo> {
@@ -235,7 +247,9 @@ impl RocoStdLib for ErrorTestStdLib {
     fn get_current_round(&mut self) -> Result<i64> {
         Ok(0)
     }
+}
 
+impl RocoSystemStdLib for ErrorTestStdLib {
     fn sleep(&mut self, _ms: i64) -> Result<()> {
         Ok(())
     }
@@ -332,3 +346,41 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+impl RocoManorActivityStdLib for ErrorTestStdLib {}
+
+impl RocoNewsActivityStdLib for ErrorTestStdLib {}
+
+impl RocoTowerActivityStdLib for ErrorTestStdLib {}
+
+impl RocoAlchemyActivityStdLib for ErrorTestStdLib {}
+
+impl RocoEvolutionActivityStdLib for ErrorTestStdLib {}
+
+impl RocoMagicPioneerActivityStdLib for ErrorTestStdLib {}
+
+impl RocoAdventureActivityStdLib for ErrorTestStdLib {}
+
+impl RocoAriesActivityStdLib for ErrorTestStdLib {}
+
+impl RocoLibraActivityStdLib for ErrorTestStdLib {}
+
+impl RocoLeoActivityStdLib for ErrorTestStdLib {}
+
+impl RocoCancerActivityStdLib for ErrorTestStdLib {}
+
+impl RocoVirgoActivityStdLib for ErrorTestStdLib {}
+
+impl RocoPiscesActivityStdLib for ErrorTestStdLib {}
+
+impl RocoTaurusActivityStdLib for ErrorTestStdLib {}
+
+impl RocoThreeStartersActivityStdLib for ErrorTestStdLib {}
+
+impl RocoGeminiActivityStdLib for ErrorTestStdLib {}
+
+impl RocoSagittariusActivityStdLib for ErrorTestStdLib {}
+
+impl RocoScorpioActivityStdLib for ErrorTestStdLib {}
+
+impl RocoAquariusActivityStdLib for ErrorTestStdLib {}

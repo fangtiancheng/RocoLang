@@ -1,7 +1,15 @@
 use roco_lang::{
-    ActionResult, Result, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoEngine, RocoError, RocoScriptErrorKind, RocoScriptLocation, RocoStdLib,
-    SceneRoleInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
+    ActionResult, Result, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
+    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
+    RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
+    RocoDebugHooks, RocoEngine, RocoError, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib,
+    RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
+    RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoSpiritStdLib,
+    RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
+    SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -33,7 +41,26 @@ impl MockStdLib {
     }
 }
 
-impl RocoStdLib for MockStdLib {
+impl RocoRuntimeStdLib for MockStdLib {
+    fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
+        Ok(vec![SceneRoleInfo {
+            uin: 470926678,
+            id: 470926678,
+            nick_name: "Target".to_string(),
+            level: 100,
+            loc_x: 10,
+            loc_y: 20,
+            pk_state: 0,
+            is_in_combat: false,
+            is_vip: true,
+            vip_level: 5,
+            trainer_level: 20,
+            trainer_exp: 1234,
+        }])
+    }
+}
+
+impl RocoSpiritStdLib for MockStdLib {
     fn start_combat(
         &mut self,
         server_type: i64,
@@ -67,45 +94,6 @@ impl RocoStdLib for MockStdLib {
         self.swapped_positions
             .push((first_position, second_position));
         Ok(true)
-    }
-
-    fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
-        Ok(vec![SceneRoleInfo {
-            uin: 470926678,
-            id: 470926678,
-            nick_name: "Target".to_string(),
-            level: 100,
-            loc_x: 10,
-            loc_y: 20,
-            pk_state: 0,
-            is_in_combat: false,
-            is_vip: true,
-            vip_level: 5,
-            trainer_level: 20,
-            trainer_exp: 1234,
-        }])
-    }
-
-    fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
-        Ok(skill_ids
-            .into_iter()
-            .map(|id| StaticSkillInfo {
-                id,
-                name: format!("Skill {id}"),
-                description: String::new(),
-                description2: String::new(),
-                power: "0".to_string(),
-                pp_max: 0,
-                property: 0,
-                src: String::new(),
-                attack_type: 0,
-                speed: 0,
-                damage_type: 0,
-                catch_rate: 0,
-                super_form_id: 0,
-                super_form_src: String::new(),
-            })
-            .collect())
     }
 
     fn list_storage_spirits(&mut self) -> Result<Vec<StorageSpiritInfo>> {
@@ -169,6 +157,30 @@ impl RocoStdLib for MockStdLib {
                 inherited: false,
             }],
         })
+    }
+}
+
+impl RocoLookupStdLib for MockStdLib {
+    fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
+        Ok(skill_ids
+            .into_iter()
+            .map(|id| StaticSkillInfo {
+                id,
+                name: format!("Skill {id}"),
+                description: String::new(),
+                description2: String::new(),
+                power: "0".to_string(),
+                pp_max: 0,
+                property: 0,
+                src: String::new(),
+                attack_type: 0,
+                speed: 0,
+                damage_type: 0,
+                catch_rate: 0,
+                super_form_id: 0,
+                super_form_src: String::new(),
+            })
+            .collect())
     }
 }
 
@@ -662,3 +674,45 @@ fn enum_like_modules_expose_combat_constants() {
 
     assert!(result.as_int().expect("int result") > 11);
 }
+
+impl RocoCombatStdLib for MockStdLib {}
+
+impl RocoSystemStdLib for MockStdLib {}
+
+impl RocoManorActivityStdLib for MockStdLib {}
+
+impl RocoNewsActivityStdLib for MockStdLib {}
+
+impl RocoTowerActivityStdLib for MockStdLib {}
+
+impl RocoAlchemyActivityStdLib for MockStdLib {}
+
+impl RocoEvolutionActivityStdLib for MockStdLib {}
+
+impl RocoMagicPioneerActivityStdLib for MockStdLib {}
+
+impl RocoAdventureActivityStdLib for MockStdLib {}
+
+impl RocoAriesActivityStdLib for MockStdLib {}
+
+impl RocoLibraActivityStdLib for MockStdLib {}
+
+impl RocoLeoActivityStdLib for MockStdLib {}
+
+impl RocoCancerActivityStdLib for MockStdLib {}
+
+impl RocoVirgoActivityStdLib for MockStdLib {}
+
+impl RocoPiscesActivityStdLib for MockStdLib {}
+
+impl RocoTaurusActivityStdLib for MockStdLib {}
+
+impl RocoThreeStartersActivityStdLib for MockStdLib {}
+
+impl RocoGeminiActivityStdLib for MockStdLib {}
+
+impl RocoSagittariusActivityStdLib for MockStdLib {}
+
+impl RocoScorpioActivityStdLib for MockStdLib {}
+
+impl RocoAquariusActivityStdLib for MockStdLib {}

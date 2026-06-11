@@ -1,5 +1,12 @@
 use roco_lang::{
-    BattleInfo, BattleResult, CombatActions, Result, RocoEngine, RocoStdLib, RoundResult,
+    BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
+    RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
+    RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoEvolutionActivityStdLib,
+    RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
+    RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
+    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
     SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -23,7 +30,7 @@ impl MockStdLib {
     }
 }
 
-impl RocoStdLib for MockStdLib {
+impl RocoRuntimeStdLib for MockStdLib {
     fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
         self.scene_id = scene_id;
@@ -33,7 +40,9 @@ impl RocoStdLib for MockStdLib {
     fn get_current_scene(&mut self) -> Result<i64> {
         Ok(self.scene_id)
     }
+}
 
+impl RocoSpiritStdLib for MockStdLib {
     fn fetch_spirit(&mut self, spirit_id: i64, catch_time: i64) -> Result<bool> {
         println!(
             "Fetching spirit {} with catch_time {}",
@@ -81,10 +90,6 @@ impl RocoStdLib for MockStdLib {
         })
     }
 
-    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
-        Ok(Default::default())
-    }
-
     fn get_skills(&mut self, position: i64) -> Result<[Option<SkillInfo>; 4]> {
         println!("Getting skills at position {}", position);
         Ok([
@@ -119,7 +124,9 @@ impl RocoStdLib for MockStdLib {
         );
         Ok(true)
     }
+}
 
+impl RocoLookupStdLib for MockStdLib {
     fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo> {
         Ok(StaticItemInfo {
             id: item_id,
@@ -195,6 +202,12 @@ impl RocoStdLib for MockStdLib {
             skinnum: 0,
             exp_type: 0,
         })
+    }
+}
+
+impl RocoCombatStdLib for MockStdLib {
+    fn get_combat_lineup(&mut self) -> Result<[Option<SpiritInfo>; 6]> {
+        Ok(Default::default())
     }
 
     fn invite_pk(&mut self, target_uin: i64) -> Result<BattleInfo> {
@@ -355,7 +368,9 @@ impl RocoStdLib for MockStdLib {
     fn get_current_round(&mut self) -> Result<i64> {
         Ok(self.round)
     }
+}
 
+impl RocoSystemStdLib for MockStdLib {
     fn sleep(&mut self, ms: i64) -> Result<()> {
         println!("Sleeping for {}ms", ms);
         Ok(())
@@ -416,3 +431,41 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+impl RocoManorActivityStdLib for MockStdLib {}
+
+impl RocoNewsActivityStdLib for MockStdLib {}
+
+impl RocoTowerActivityStdLib for MockStdLib {}
+
+impl RocoAlchemyActivityStdLib for MockStdLib {}
+
+impl RocoEvolutionActivityStdLib for MockStdLib {}
+
+impl RocoMagicPioneerActivityStdLib for MockStdLib {}
+
+impl RocoAdventureActivityStdLib for MockStdLib {}
+
+impl RocoAriesActivityStdLib for MockStdLib {}
+
+impl RocoLibraActivityStdLib for MockStdLib {}
+
+impl RocoLeoActivityStdLib for MockStdLib {}
+
+impl RocoCancerActivityStdLib for MockStdLib {}
+
+impl RocoVirgoActivityStdLib for MockStdLib {}
+
+impl RocoPiscesActivityStdLib for MockStdLib {}
+
+impl RocoTaurusActivityStdLib for MockStdLib {}
+
+impl RocoThreeStartersActivityStdLib for MockStdLib {}
+
+impl RocoGeminiActivityStdLib for MockStdLib {}
+
+impl RocoSagittariusActivityStdLib for MockStdLib {}
+
+impl RocoScorpioActivityStdLib for MockStdLib {}
+
+impl RocoAquariusActivityStdLib for MockStdLib {}

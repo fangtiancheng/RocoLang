@@ -23,6 +23,13 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     );
     register_stdlib_fn_1!(module, stdlib, "use_skill", use_skill, skill_id: i64);
     register_stdlib_fn_1!(module, stdlib, "try_use_skill", try_use_skill, skill_id: i64);
+    register_stdlib_fn_1!(
+        module,
+        stdlib,
+        "try_use_skill_and_wait",
+        try_use_skill_and_wait,
+        skill_id: i64
+    );
     register_stdlib_fn_1!(module, stdlib, "use_item", use_item, item_id: i64);
     register_stdlib_fn_1!(module, stdlib, "try_use_item", try_use_item, item_id: i64);
     register_stdlib_fn_1!(
@@ -39,8 +46,21 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         try_change_spirit,
         position: i64
     );
+    register_stdlib_fn_1!(
+        module,
+        stdlib,
+        "try_change_spirit_and_wait",
+        try_change_spirit_and_wait,
+        position: i64
+    );
     register_stdlib_fn_0!(module, stdlib, "combat_escape", combat_escape);
     register_stdlib_fn_0!(module, stdlib, "try_combat_escape", try_combat_escape);
+    register_stdlib_fn_0!(
+        module,
+        stdlib,
+        "try_combat_escape_and_wait",
+        try_combat_escape_and_wait
+    );
     register_stdlib_fn_0!(module, stdlib, "wait_round_end", wait_round_end);
     register_stdlib_fn_0!(module, stdlib, "wait_next_action", wait_next_action);
     register_stdlib_fn_0!(module, stdlib, "get_battle_result", get_battle_result);
@@ -70,6 +90,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         });
     }
     register_stdlib_fn_0!(module, stdlib, "get_combat_state", get_combat_state);
+    register_stdlib_fn_0!(module, stdlib, "get_action_snapshot", get_action_snapshot);
     register_stdlib_fn_1!(module, stdlib, "can_use_skill", can_use_skill, skill_id: i64);
     register_stdlib_fn_1!(module, stdlib, "can_use_item", can_use_item, item_id: i64);
     register_stdlib_fn_1!(

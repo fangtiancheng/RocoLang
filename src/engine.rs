@@ -29,47 +29,47 @@ use crate::types::{
     CancerUnsealMemoriesBagInfo, CancerUnsealMemoriesInfo, CapricornBagCandidate,
     CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
     CapricornSecondInfo, CapricornSecondTask, CapricornStarPalaceInfo, CapricornTeamOperationInfo,
-    CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActions, CombatSideState,
-    CombatSpiritState, CombatState, DarkCityExchangeItem, DarkCityExpeditionInfo,
-    DarkCityReputationInfo, DiamondProgressReward, DiamondTaskInfo, DiamondTaskProgress,
-    DiamondTearInfo, DiamondTearRewardItem, FiresWillInfo, FourSeasonsInfo,
-    FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem, FourSeasonsShopRewardInfo,
-    GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo, GeminiRewardItem,
-    GeminiSecondInfo, GeminiThirdInfo, IceCrystalBagCandidate, IceCrystalBattleInfo,
-    IceCrystalInfo, IceCrystalRewardItem, LadderFightRecord, LadderInfo, LadderMatchConfig,
-    LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry,
-    LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo,
-    LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField,
-    LibraFirstInfo, LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
-    MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
-    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
-    ManorUprootResult, ManorWeedResult, MiniGameExtraField, MiniGameRewardItem,
-    MiniGameSubmitResult, MiniGameSubmitTryResult, MonkeyCultivationInfo, MonkeyEvoInfo,
-    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, MultiEvolutionCandidate,
-    MultiEvolutionInfo, MultiEvolutionRewardItem, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter,
-    PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem,
-    QqGameHallGiftInfo, RagingFireInfo, SagittariusBagCandidate, SagittariusCounter,
-    SagittariusField, SagittariusFirstInfo, SagittariusRewardItem, SagittariusScore,
-    SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo, SceneRoleInfo,
-    SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo,
-    ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
-    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SkillPoolInfo, SkillPoolSkillInfo,
-    SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
-    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
-    StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
-    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
-    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
-    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
-    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
-    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
-    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
-    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
-    WeekTaskActivity, WeekTaskInfo,
+    CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActionResult,
+    CombatActionSnapshot, CombatActions, CombatSideState, CombatSpiritState, CombatState,
+    DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward,
+    DiamondTaskInfo, DiamondTaskProgress, DiamondTearInfo, DiamondTearRewardItem, FiresWillInfo,
+    FourSeasonsInfo, FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem,
+    FourSeasonsShopRewardInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
+    GeminiRewardItem, GeminiSecondInfo, GeminiThirdInfo, IceCrystalBagCandidate,
+    IceCrystalBattleInfo, IceCrystalInfo, IceCrystalRewardItem, LadderFightRecord, LadderInfo,
+    LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser,
+    LadderSpiritCostEntry, LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField,
+    LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo,
+    LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo, LibraSecondInfo,
+    LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo, MagicPioneerField,
+    MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
+    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
+    ManorWeedResult, MiniGameExtraField, MiniGameRewardItem, MiniGameSubmitResult,
+    MiniGameSubmitTryResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo,
+    MountainSeaInfo, MountainSeaSoulInfo, MultiEvolutionCandidate, MultiEvolutionInfo,
+    MultiEvolutionRewardItem, MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
+    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
+    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
+    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
+    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
+    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
+    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
+    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
+    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
+    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
+    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
+    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
+    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
+    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
+    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
+    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
+    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
+    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
+    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
@@ -688,7 +688,23 @@ impl RocoEngine {
         engine.register_get("rival_side", |value: &mut CombatState| {
             value.rival_side.clone()
         });
+        register_getters!(CombatActionSnapshot, is_finished);
+        engine.register_get("state", |value: &mut CombatActionSnapshot| {
+            value.state.clone()
+        });
+        engine.register_get("actions", |value: &mut CombatActionSnapshot| {
+            value.actions.clone()
+        });
         register_getters!(ActionResult, ok, code, message);
+        register_getters!(
+            CombatActionResult,
+            ok,
+            code,
+            message,
+            ack_received,
+            combat_finished,
+            next_action_ready
+        );
         register_getters!(MiniGameRewardItem, id, count, item_type);
         register_getters!(MiniGameExtraField, key, value);
         register_getters!(

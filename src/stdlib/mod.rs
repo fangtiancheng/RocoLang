@@ -429,6 +429,14 @@ pub trait RocoStdLib: Send {
         unsupported("combat::get_combat_state")
     }
 
+    fn get_action_snapshot(&mut self) -> Result<CombatActionSnapshot> {
+        Ok(CombatActionSnapshot {
+            is_finished: self.is_combat_finished()?,
+            state: self.get_combat_state()?,
+            actions: self.get_combat_actions()?,
+        })
+    }
+
     fn query_skill_pool(&mut self, _position: i64) -> Result<SkillPoolInfo> {
         unsupported("spirit::query_skill_pool")
     }
@@ -2788,6 +2796,24 @@ pub trait RocoStdLib: Send {
         }
     }
 
+    fn try_use_skill_and_wait(&mut self, skill_id: i64) -> Result<CombatActionResult> {
+        let action = self.try_use_skill(skill_id)?;
+        if !action.ok {
+            return Ok(if action.code == 1 {
+                CombatActionResult::unavailable(action.message)
+            } else {
+                CombatActionResult::failed(action.message)
+            });
+        }
+        let combat_finished = self.is_combat_finished()?;
+        let next_action_ready = if combat_finished {
+            true
+        } else {
+            self.wait_next_action()?
+        };
+        Ok(CombatActionResult::ok(combat_finished, next_action_ready))
+    }
+
     fn use_item(&mut self, _item_id: i64) -> Result<bool> {
         unsupported("combat::use_item")
     }
@@ -2824,6 +2850,24 @@ pub trait RocoStdLib: Send {
         }
     }
 
+    fn try_change_spirit_and_wait(&mut self, position: i64) -> Result<CombatActionResult> {
+        let action = self.try_change_spirit(position)?;
+        if !action.ok {
+            return Ok(if action.code == 1 {
+                CombatActionResult::unavailable(action.message)
+            } else {
+                CombatActionResult::failed(action.message)
+            });
+        }
+        let combat_finished = self.is_combat_finished()?;
+        let next_action_ready = if combat_finished {
+            true
+        } else {
+            self.wait_next_action()?
+        };
+        Ok(CombatActionResult::ok(combat_finished, next_action_ready))
+    }
+
     fn combat_escape(&mut self) -> Result<bool> {
         unsupported("combat::combat_escape")
     }
@@ -2840,6 +2884,24 @@ pub trait RocoStdLib: Send {
             Ok(false) => Ok(ActionResult::failed("combat_escape returned false")),
             Err(error) => Ok(ActionResult::failed(error.to_string())),
         }
+    }
+
+    fn try_combat_escape_and_wait(&mut self) -> Result<CombatActionResult> {
+        let action = self.try_combat_escape()?;
+        if !action.ok {
+            return Ok(if action.code == 1 {
+                CombatActionResult::unavailable(action.message)
+            } else {
+                CombatActionResult::failed(action.message)
+            });
+        }
+        let combat_finished = self.is_combat_finished()?;
+        let next_action_ready = if combat_finished {
+            true
+        } else {
+            self.wait_next_action()?
+        };
+        Ok(CombatActionResult::ok(combat_finished, next_action_ready))
     }
 
     fn wait_round_end(&mut self) -> Result<RoundResult> {

@@ -2215,6 +2215,13 @@ pub struct CombatState {
     pub rival_side: CombatSideState,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatActionSnapshot {
+    pub is_finished: bool,
+    pub state: CombatState,
+    pub actions: CombatActions,
+}
+
 /// Standard result shape for operation-style `try_*` APIs.
 ///
 /// `try_*` functions should not raise expected business failures such as
@@ -2250,6 +2257,51 @@ impl ActionResult {
             ok: false,
             code: 2,
             message: message.into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CombatActionResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub ack_received: bool,
+    pub combat_finished: bool,
+    pub next_action_ready: bool,
+}
+
+impl CombatActionResult {
+    pub fn ok(combat_finished: bool, next_action_ready: bool) -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+            ack_received: true,
+            combat_finished,
+            next_action_ready,
+        }
+    }
+
+    pub fn unavailable(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 1,
+            message: message.into(),
+            ack_received: false,
+            combat_finished: false,
+            next_action_ready: false,
+        }
+    }
+
+    pub fn failed(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 2,
+            message: message.into(),
+            ack_received: false,
+            combat_finished: false,
+            next_action_ready: false,
         }
     }
 }

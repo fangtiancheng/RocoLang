@@ -1,11 +1,22 @@
 use std::sync::{Arc, Mutex};
 
-use rhai::{Array, Dynamic, EvalAltResult};
+use rhai::{Array, Dynamic, EvalAltResult, NativeCallContext, Position};
 
 use crate::error::RocoError;
 
 pub fn to_rhai_error(err: RocoError) -> Box<EvalAltResult> {
     EvalAltResult::ErrorRuntime(err.to_string().into(), rhai::Position::NONE).into()
+}
+
+pub fn to_rhai_error_at(err: RocoError, position: Position) -> Box<EvalAltResult> {
+    EvalAltResult::ErrorRuntime(err.to_string().into(), position).into()
+}
+
+pub fn to_rhai_error_in_context(
+    err: RocoError,
+    context: &NativeCallContext<'_>,
+) -> Box<EvalAltResult> {
+    to_rhai_error_at(err, context.call_position())
 }
 
 pub fn lock_stdlib<T>(
@@ -35,9 +46,10 @@ pub fn named_id_array(items: &[(i64, &str)]) -> Array {
 macro_rules! register_stdlib_fn_0 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move || {
+        $module.set_native_fn($name, move |context: rhai::NativeCallContext| {
             let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-            lib.$method().map_err($crate::stdlib::util::to_rhai_error)
+            lib.$method()
+                .map_err(|error| $crate::stdlib::util::to_rhai_error_in_context(error, &context))
         });
     }};
 }
@@ -45,10 +57,10 @@ macro_rules! register_stdlib_fn_0 {
 macro_rules! register_stdlib_fn_1 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $arg:ident : $ty:ty) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move |$arg: $ty| {
+        $module.set_native_fn($name, move |context: rhai::NativeCallContext, $arg: $ty| {
             let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
             lib.$method($arg)
-                .map_err($crate::stdlib::util::to_rhai_error)
+                .map_err(|error| $crate::stdlib::util::to_rhai_error_in_context(error, &context))
         });
     }};
 }
@@ -56,44 +68,60 @@ macro_rules! register_stdlib_fn_1 {
 macro_rules! register_stdlib_fn_2 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $arg1:ident : $ty1:ty, $arg2:ident : $ty2:ty) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move |$arg1: $ty1, $arg2: $ty2| {
-            let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-            lib.$method($arg1, $arg2)
-                .map_err($crate::stdlib::util::to_rhai_error)
-        });
+        $module.set_native_fn(
+            $name,
+            move |context: rhai::NativeCallContext, $arg1: $ty1, $arg2: $ty2| {
+                let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
+                lib.$method($arg1, $arg2).map_err(|error| {
+                    $crate::stdlib::util::to_rhai_error_in_context(error, &context)
+                })
+            },
+        );
     }};
 }
 
 macro_rules! register_stdlib_fn_3 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $a:ident : $ta:ty, $b:ident : $tb:ty, $c:ident : $tc:ty) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move |$a: $ta, $b: $tb, $c: $tc| {
-            let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-            lib.$method($a, $b, $c)
-                .map_err($crate::stdlib::util::to_rhai_error)
-        });
+        $module.set_native_fn(
+            $name,
+            move |context: rhai::NativeCallContext, $a: $ta, $b: $tb, $c: $tc| {
+                let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
+                lib.$method($a, $b, $c).map_err(|error| {
+                    $crate::stdlib::util::to_rhai_error_in_context(error, &context)
+                })
+            },
+        );
     }};
 }
 
 macro_rules! register_stdlib_fn_4 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $a:ident : $ta:ty, $b:ident : $tb:ty, $c:ident : $tc:ty, $d:ident : $td:ty) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move |$a: $ta, $b: $tb, $c: $tc, $d: $td| {
-            let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-            lib.$method($a, $b, $c, $d)
-                .map_err($crate::stdlib::util::to_rhai_error)
-        });
+        $module.set_native_fn(
+            $name,
+            move |context: rhai::NativeCallContext, $a: $ta, $b: $tb, $c: $tc, $d: $td| {
+                let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
+                lib.$method($a, $b, $c, $d).map_err(|error| {
+                    $crate::stdlib::util::to_rhai_error_in_context(error, &context)
+                })
+            },
+        );
     }};
 }
 
 macro_rules! register_stdlib_fn_5 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident, $a:ident : $ta:ty, $b:ident : $tb:ty, $c:ident : $tc:ty, $d:ident : $td:ty, $e:ident : $te:ty) => {{
         let stdlib = $stdlib.clone();
-        $module.set_native_fn($name, move |$a: $ta, $b: $tb, $c: $tc, $d: $td, $e: $te| {
-            let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-            lib.$method($a, $b, $c, $d, $e)
-                .map_err($crate::stdlib::util::to_rhai_error)
-        });
+        $module.set_native_fn(
+            $name,
+            move |context: rhai::NativeCallContext, $a: $ta, $b: $tb, $c: $tc, $d: $td, $e: $te| {
+                let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
+                lib.$method($a, $b, $c, $d, $e).map_err(|error| {
+                    $crate::stdlib::util::to_rhai_error_in_context(error, &context)
+                })
+            },
+        );
     }};
 }
 
@@ -102,10 +130,18 @@ macro_rules! register_stdlib_fn_7 {
         let stdlib = $stdlib.clone();
         $module.set_native_fn(
             $name,
-            move |$a: $ta, $b: $tb, $c: $tc, $d: $td, $e: $te, $f: $tf, $g: $tg| {
+            move |context: rhai::NativeCallContext,
+                  $a: $ta,
+                  $b: $tb,
+                  $c: $tc,
+                  $d: $td,
+                  $e: $te,
+                  $f: $tf,
+                  $g: $tg| {
                 let mut lib = $crate::stdlib::util::lock_stdlib(&stdlib)?;
-                lib.$method($a, $b, $c, $d, $e, $f, $g)
-                    .map_err($crate::stdlib::util::to_rhai_error)
+                lib.$method($a, $b, $c, $d, $e, $f, $g).map_err(|error| {
+                    $crate::stdlib::util::to_rhai_error_in_context(error, &context)
+                })
             },
         );
     }};

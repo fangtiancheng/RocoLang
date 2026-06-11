@@ -1,6 +1,6 @@
 use roco_lang::{
     ActionResult, Result, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoEngine, RocoStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
+    RocoDebugHooks, RocoEngine, RocoError, RocoStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
     SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -245,6 +245,28 @@ fn imports_built_in_role_cache_helpers() {
             "#,
         )
         .expect("built-in role cache helpers should import and run");
+}
+
+#[test]
+fn stdlib_runtime_error_reports_call_location() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+    let error = engine
+        .eval(
+            r#"
+                let before = 1;
+                profile::get_user_info();
+            "#,
+        )
+        .expect_err("unsupported stdlib call should fail");
+
+    let RocoError::ScriptError(error) = error else {
+        panic!("expected script error");
+    };
+    assert_eq!(error.kind, "runtime");
+    assert!(error.message.contains("profile::get_user_info"));
+    assert_eq!(error.line, Some(3));
+    assert!(error.column.is_some());
 }
 
 #[test]

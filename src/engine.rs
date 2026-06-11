@@ -8,7 +8,9 @@ use crate::debugger::{
     dynamic_preview, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
     RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
-use crate::error::{Result, RocoError, RocoScriptError};
+use crate::error::{
+    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
+};
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
     dark_city, diamond_tear, four_seasons, game, gemini, ice_crystal, ladder, leo, libra, lookup,
@@ -361,17 +363,47 @@ impl RocoEngine {
         self.engine.eval_ast(ast).map_err(Self::map_eval_error)
     }
 
+    fn script_position(position: rhai::Position) -> Option<RocoScriptPosition> {
+        position.line().map(|line| match position.position() {
+            Some(column) => RocoScriptPosition::LineColumn { line, column },
+            None => RocoScriptPosition::Line { line },
+        })
+    }
+
+    fn script_location(source: Option<String>, position: rhai::Position) -> RocoScriptLocation {
+        let Some(position) = Self::script_position(position) else {
+            return RocoScriptLocation::Unknown;
+        };
+        match source {
+            Some(source) if !source.is_empty() => RocoScriptLocation::Source { source, position },
+            _ => RocoScriptLocation::Anonymous { position },
+        }
+    }
+
+    fn trim_rhai_position_suffix(message: &str) -> &str {
+        let Some((prefix, suffix)) = message.rsplit_once(" (line ") else {
+            return message;
+        };
+        if !suffix.ends_with(')') || !suffix.contains(", position ") {
+            return message;
+        }
+        prefix
+    }
+
+    fn clean_rhai_message(message: String) -> String {
+        Self::trim_rhai_position_suffix(&message).to_string()
+    }
+
     fn map_eval_error(error: Box<rhai::EvalAltResult>) -> RocoError {
         let position = error.position();
         let kind = match error.as_ref() {
-            rhai::EvalAltResult::ErrorParsing(..) => "parse",
-            rhai::EvalAltResult::ErrorTerminated(..) => "terminated",
-            rhai::EvalAltResult::ErrorRuntime(..) => "runtime",
-            rhai::EvalAltResult::ErrorInFunctionCall(..) => "function_call",
-            rhai::EvalAltResult::ErrorInModule(..) => "module",
-            _ => "script",
-        }
-        .to_string();
+            rhai::EvalAltResult::ErrorParsing(..) => RocoScriptErrorKind::Parse,
+            rhai::EvalAltResult::ErrorTerminated(..) => RocoScriptErrorKind::Terminated,
+            rhai::EvalAltResult::ErrorRuntime(..) => RocoScriptErrorKind::Runtime,
+            rhai::EvalAltResult::ErrorInFunctionCall(..) => RocoScriptErrorKind::FunctionCall,
+            rhai::EvalAltResult::ErrorInModule(..) => RocoScriptErrorKind::Module,
+            _ => RocoScriptErrorKind::Eval,
+        };
         let source = match error.as_ref() {
             rhai::EvalAltResult::ErrorInFunctionCall(_, source, ..) if !source.is_empty() => {
                 Some(source.clone())
@@ -380,10 +412,8 @@ impl RocoEngine {
         };
         RocoError::ScriptError(RocoScriptError {
             kind,
-            message: error.to_string(),
-            source,
-            line: position.line(),
-            column: position.position(),
+            message: Self::clean_rhai_message(error.to_string()),
+            location: Self::script_location(source, position),
         })
     }
 
@@ -558,11 +588,9 @@ impl RocoEngine {
     fn map_parse_error(error: rhai::ParseError, source: Option<String>) -> RocoError {
         let position = error.position();
         RocoError::ScriptError(RocoScriptError {
-            kind: "parse".to_string(),
-            message: error.to_string(),
-            source,
-            line: position.line(),
-            column: position.position(),
+            kind: RocoScriptErrorKind::Parse,
+            message: Self::clean_rhai_message(error.to_string()),
+            location: Self::script_location(source, position),
         })
     }
 

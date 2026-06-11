@@ -1,7 +1,7 @@
 use roco_lang::{
     ActionResult, Result, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoEngine, RocoError, RocoStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
-    SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
+    RocoDebugHooks, RocoEngine, RocoError, RocoScriptErrorKind, RocoScriptLocation, RocoStdLib,
+    SceneRoleInfo, SpiritBagInfo, SpiritInfo, SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -263,10 +263,13 @@ fn stdlib_runtime_error_reports_call_location() {
     let RocoError::ScriptError(error) = error else {
         panic!("expected script error");
     };
-    assert_eq!(error.kind, "runtime");
+    assert_eq!(error.kind, RocoScriptErrorKind::Runtime);
     assert!(error.message.contains("profile::get_user_info"));
-    assert_eq!(error.line, Some(3));
-    assert!(error.column.is_some());
+    let RocoScriptLocation::Anonymous { position } = error.location else {
+        panic!("expected anonymous script error location");
+    };
+    assert_eq!(position.line(), 3);
+    assert!(position.column().is_some());
 }
 
 #[test]

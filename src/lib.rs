@@ -16,6 +16,8 @@ pub use debugger::{
     RocoDebugLocalVariable, RocoDebugStackFrame,
 };
 pub use engine::RocoEngine;
-pub use error::{Result, RocoError, RocoScriptError};
+pub use error::{
+    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
+};
 pub use stdlib::RocoStdLib;
 pub use types::*;

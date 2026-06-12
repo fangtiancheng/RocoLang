@@ -17,7 +17,12 @@ pub use debugger::{
 };
 pub use engine::RocoEngine;
 pub use error::{
-    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
+    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation,
+    RocoScriptPosition, RocoStdLibError, ScriptActivityOperationError, ScriptBridgeError,
+    ScriptCombatActionError, ScriptCombatPhase, ScriptCombatRuntimeError, ScriptCombatWaitError,
+    ScriptFunctionContextError, ScriptLookupEntity, ScriptLookupError, ScriptPendingResponseError,
+    ScriptQueryError, ScriptResponseError, ScriptSessionMemoryError, ScriptSessionValueKind,
+    ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemError,
 };
 pub use stdlib::{
     RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,

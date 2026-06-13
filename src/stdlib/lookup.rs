@@ -6,6 +6,15 @@ use rhai::Module;
 use crate::stdlib::util::{lock_stdlib, to_array, to_rhai_error};
 use crate::stdlib::RocoStdLib;
 
+fn array_int_type_error(name: &str, message: impl ToString) -> Box<rhai::EvalAltResult> {
+    to_rhai_error(crate::error::RocoError::InvalidParam(
+        crate::error::RocoInvalidParamError::RhaiTypeMismatch {
+            name: name.to_string(),
+            message: message.to_string(),
+        },
+    ))
+}
+
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
     {
         let stdlib = stdlib.clone();
@@ -20,9 +29,9 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
             let item_ids = item_ids
                 .into_iter()
                 .map(|value| {
-                    value.as_int().map_err(|err| {
-                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
-                    })
+                    value
+                        .as_int()
+                        .map_err(|err| array_int_type_error("item_ids[]", err))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let mut lib = lock_stdlib(&stdlib)?;
@@ -135,9 +144,9 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
             let skill_ids = skill_ids
                 .into_iter()
                 .map(|value| {
-                    value.as_int().map_err(|err| {
-                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
-                    })
+                    value
+                        .as_int()
+                        .map_err(|err| array_int_type_error("skill_ids[]", err))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let mut lib = lock_stdlib(&stdlib)?;
@@ -159,9 +168,9 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
             let spirit_ids = spirit_ids
                 .into_iter()
                 .map(|value| {
-                    value.as_int().map_err(|err| {
-                        to_rhai_error(crate::error::RocoError::InvalidParam(err.to_string()))
-                    })
+                    value
+                        .as_int()
+                        .map_err(|err| array_int_type_error("spirit_ids[]", err))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let mut lib = lock_stdlib(&stdlib)?;

@@ -1,6 +1,6 @@
 //! Standard library trait and namespace registration modules.
 
-use crate::error::{Result, RocoError};
+use crate::error::{Result, ScriptUnsupportedError};
 
 pub mod alchemy_furnace;
 pub mod aquarius;
@@ -55,7 +55,8 @@ pub mod traits;
 pub use traits::*;
 
 fn unsupported<T>(name: &str) -> Result<T> {
-    Err(RocoError::StdLibError(format!(
-        "{name} unsupported by this runtime"
-    )))
+    Err(ScriptUnsupportedError::Function {
+        name: name.to_string(),
+    }
+    .into())
 }

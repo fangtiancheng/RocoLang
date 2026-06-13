@@ -17,12 +17,16 @@ pub use debugger::{
 };
 pub use engine::RocoEngine;
 pub use error::{
-    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation,
-    RocoScriptPosition, RocoStdLibError, ScriptActivityOperationError, ScriptBridgeError,
-    ScriptCombatActionError, ScriptCombatPhase, ScriptCombatRuntimeError, ScriptCombatWaitError,
-    ScriptFunctionContextError, ScriptLookupEntity, ScriptLookupError, ScriptPendingResponseError,
-    ScriptQueryError, ScriptResponseError, ScriptSessionMemoryError, ScriptSessionValueKind,
-    ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemError,
+    Result, RocoError, RocoGeneralError, RocoInvalidParamError, RocoNetworkError, RocoParamRange,
+    RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
+    RocoServerRejectedError, RocoStdLibError, RocoTimeoutError, ScriptActivityOperationError,
+    ScriptBackendCombatRuntimeErrorKind, ScriptBridgeError, ScriptCombatActionError,
+    ScriptCombatActionValidationKind, ScriptCombatPhase, ScriptCombatRuntimeError,
+    ScriptCombatWaitError, ScriptFunctionContextError, ScriptLookupEntity, ScriptLookupError,
+    ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
+    ScriptRequestSystemFailureKind, ScriptResponseError, ScriptSessionMemoryError,
+    ScriptSessionValueKind, ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemError,
+    ScriptUnsupportedError,
 };
 pub use stdlib::{
     RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,

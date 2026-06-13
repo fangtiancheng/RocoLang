@@ -74,8 +74,11 @@ pub trait RocoRuntimeStdLib: Send {
                 message: result.message.clone(),
                 result,
             }),
-            Err(RocoError::NetworkError(message)) | Err(RocoError::TimeoutError(message)) => {
-                Ok(MiniGameSubmitTryResult::network_error(message))
+            Err(RocoError::NetworkError(error)) => {
+                Ok(MiniGameSubmitTryResult::network_error(error.message()))
+            }
+            Err(RocoError::TimeoutError(error)) => {
+                Ok(MiniGameSubmitTryResult::network_error(error.message()))
             }
             Err(error) => Ok(MiniGameSubmitTryResult::failed(error.to_string())),
         }

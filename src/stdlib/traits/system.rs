@@ -9,9 +9,11 @@ pub trait RocoSystemStdLib: Send {
     fn now_ms(&mut self) -> Result<i64> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .map_err(|error| RocoError::StdLibError(error.to_string()))?;
+            .map_err(|error| ScriptSystemError::CurrentTimeBeforeUnixEpoch {
+                message: error.to_string(),
+            })?;
         i64::try_from(now.as_millis())
-            .map_err(|_| RocoError::StdLibError("current timestamp exceeds i64 range".to_string()))
+            .map_err(|_| ScriptSystemError::CurrentTimestampExceedsI64.into())
     }
 
     fn sleep_until_ms(&mut self, target_ms: i64) -> Result<()> {

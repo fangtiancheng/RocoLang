@@ -5,8 +5,9 @@ use roco_lang::{
     RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
     RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
-    RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
+    RocoScorpioActivityStdLib, RocoServerRejectedError, RocoSpiritStdLib, RocoSystemStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, RoundResult, ScriptLookupEntity, ScriptLookupError, ScriptQueryError,
     SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -26,7 +27,9 @@ impl RocoRuntimeStdLib for ErrorTestStdLib {
     fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         if self.should_fail {
             Err(RocoError::ServerRejected(
-                "move_to_scene rejected".to_string(),
+                RocoServerRejectedError::Message {
+                    message: "move_to_scene rejected".to_string(),
+                },
             ))
         } else {
             println!("Moving to scene {} (timeout: {}ms)", scene_id, timeout_ms);
@@ -84,21 +87,27 @@ impl RocoSpiritStdLib for ErrorTestStdLib {
 
 impl RocoLookupStdLib for ErrorTestStdLib {
     fn lookup_item_info(&mut self, item_id: i64) -> Result<StaticItemInfo> {
-        Err(RocoError::StdLibError(format!(
-            "item info not found: {item_id}"
-        )))
+        Err(ScriptLookupError::NotFound {
+            entity: ScriptLookupEntity::ItemInfo,
+            key: item_id.to_string(),
+        }
+        .into())
     }
 
     fn lookup_skill_info(&mut self, skill_id: i64) -> Result<StaticSkillInfo> {
-        Err(RocoError::StdLibError(format!(
-            "skill info not found: {skill_id}"
-        )))
+        Err(ScriptLookupError::NotFound {
+            entity: ScriptLookupEntity::SkillInfo,
+            key: skill_id.to_string(),
+        }
+        .into())
     }
 
     fn lookup_spirit_info(&mut self, spirit_id: i64) -> Result<StaticSpiritInfo> {
-        Err(RocoError::StdLibError(format!(
-            "spirit info not found: {spirit_id}"
-        )))
+        Err(ScriptLookupError::NotFound {
+            entity: ScriptLookupEntity::SpiritInfo,
+            key: spirit_id.to_string(),
+        }
+        .into())
     }
 }
 
@@ -192,7 +201,7 @@ impl RocoCombatStdLib for ErrorTestStdLib {
 
     fn get_my_hp(&mut self) -> Result<i64> {
         if self.should_fail {
-            Err(RocoError::StdLibError("HP query failed".to_string()))
+            Err(ScriptQueryError::NoActiveSpirit.into())
         } else {
             Ok(100)
         }

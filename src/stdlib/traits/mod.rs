@@ -7,7 +7,7 @@ mod spirit;
 mod system;
 
 use super::unsupported;
-use crate::error::{Result, RocoError};
+use crate::error::{Result, RocoError, ScriptSystemError};
 use crate::types::*;
 
 pub use activity::*;

@@ -139,7 +139,8 @@ pub enum RocoStdLibError {
     ActivityOperation(ScriptActivityOperationError),
     Bridge(ScriptBridgeError),
     Response(ScriptResponseError),
-    Message(String),
+    Request(ScriptRequestError),
+    Unsupported(ScriptUnsupportedError),
 }
 
 impl fmt::Display for RocoStdLibError {
@@ -159,7 +160,8 @@ impl fmt::Display for RocoStdLibError {
             Self::ActivityOperation(error) => write!(f, "{error}"),
             Self::Bridge(error) => write!(f, "{error}"),
             Self::Response(error) => write!(f, "{error}"),
-            Self::Message(message) => f.write_str(message),
+            Self::Request(error) => write!(f, "{error}"),
+            Self::Unsupported(error) => write!(f, "{error}"),
         }
     }
 }
@@ -316,8 +318,16 @@ impl fmt::Display for ScriptCombatActionError {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ScriptCombatRuntimeError {
-    AutoFinishPresentationFailed { message: String },
-    MarkFrontendLoadedFailed { message: String },
+    AutoFinishPresentationFailed {
+        message: String,
+    },
+    MarkFrontendLoadedFailed {
+        message: String,
+    },
+    Backend {
+        kind: ScriptBackendCombatRuntimeErrorKind,
+        message: String,
+    },
 }
 
 impl fmt::Display for ScriptCombatRuntimeError {
@@ -332,6 +342,52 @@ impl fmt::Display for ScriptCombatRuntimeError {
             Self::MarkFrontendLoadedFailed { message } => {
                 write!(f, "failed to mark script combat frontend loaded: {message}")
             }
+            Self::Backend { kind, message } => {
+                write!(f, "combat runtime {}: {message}", kind.as_str())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptBackendCombatRuntimeErrorKind {
+    BattleFacts,
+    SideResolution,
+    InvalidReadyPhasePayload,
+    MissingStartContext,
+    InvalidPhase,
+    MissingStartSummary,
+    MissingSideRegistry,
+    MissingHistoryRecorder,
+    MissingBattleFactsForHistorySnapshot,
+    MissingObservedInitialStateForRoundHistory,
+    MissingRoundBarrierForPresentation,
+    HistoryRecorder,
+    HistoryProjection,
+    ChangeSpiritOwnerWithoutBattleFacts,
+}
+
+impl ScriptBackendCombatRuntimeErrorKind {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::BattleFacts => "battle facts",
+            Self::SideResolution => "side resolution",
+            Self::InvalidReadyPhasePayload => "invalid ready phase payload",
+            Self::MissingStartContext => "missing start context",
+            Self::InvalidPhase => "invalid phase",
+            Self::MissingStartSummary => "missing start summary",
+            Self::MissingSideRegistry => "missing side registry",
+            Self::MissingHistoryRecorder => "missing history recorder",
+            Self::MissingBattleFactsForHistorySnapshot => {
+                "missing battle facts for history snapshot"
+            }
+            Self::MissingObservedInitialStateForRoundHistory => {
+                "missing observed initial state for round history"
+            }
+            Self::MissingRoundBarrierForPresentation => "missing round barrier for presentation",
+            Self::HistoryRecorder => "history recorder",
+            Self::HistoryProjection => "history projection",
+            Self::ChangeSpiritOwnerWithoutBattleFacts => "change spirit owner without battle facts",
         }
     }
 }
@@ -530,8 +586,18 @@ impl fmt::Display for ScriptSystemError {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ScriptActivityOperationError {
-    MysteryFusionMaterialCountExceedsLimit { count: usize, limit: usize },
-    SummonDrawCountInvalid { count: i64 },
+    MysteryFusionMaterialCountExceedsLimit {
+        count: usize,
+        limit: usize,
+    },
+    SummonDrawCountInvalid {
+        count: i64,
+    },
+    InvalidOption {
+        activity: String,
+        field: String,
+        value: u32,
+    },
 }
 
 impl fmt::Display for ScriptActivityOperationError {
@@ -544,6 +610,11 @@ impl fmt::Display for ScriptActivityOperationError {
             Self::SummonDrawCountInvalid { count } => {
                 write!(f, "summon::draw draw_count must be 1 or 10, got {count}")
             }
+            Self::InvalidOption {
+                activity,
+                field,
+                value,
+            } => write!(f, "{activity} invalid {field}: {value}"),
         }
     }
 }
@@ -577,6 +648,211 @@ impl fmt::Display for ScriptResponseError {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptRequestError {
+    NoRunningScriptForRequest,
+    NoRunningScriptForCombatCommand,
+    PauseStateUnknown,
+    EquipItemPositionMustBeOneBased,
+    ClearLineupRequiresBatchSupport,
+    PendingReplyRefreshFailed {
+        context: String,
+        kind: ScriptRequestSystemFailureKind,
+    },
+    WaitStateRejected {
+        context: String,
+        kind: ScriptRequestSystemFailureKind,
+    },
+    InvalidCombatIntent {
+        kind: String,
+        spirit_index: u8,
+        value: u32,
+        message: String,
+    },
+    InvalidCombatCommand {
+        kind: ScriptCombatActionValidationKind,
+    },
+    InvalidCombatServerType {
+        value: u8,
+        message: String,
+    },
+    InvalidCombatType {
+        value: u8,
+        message: String,
+    },
+}
+
+impl fmt::Display for ScriptRequestError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NoRunningScriptForRequest => {
+                f.write_str("script request submitted while no script is running")
+            }
+            Self::NoRunningScriptForCombatCommand => {
+                f.write_str("script combat command submitted while no script is running")
+            }
+            Self::PauseStateUnknown => f.write_str(
+                "pause state is unknown; call game::try_set_pause or game::set_pause first",
+            ),
+            Self::EquipItemPositionMustBeOneBased => {
+                f.write_str("equip_item position must be 1-based")
+            }
+            Self::ClearLineupRequiresBatchSupport => {
+                f.write_str("clear_lineup requires confirmed batch request support")
+            }
+            Self::PendingReplyRefreshFailed { context, kind } => {
+                write!(f, "{context} failed to refresh pending script reply: {kind}")
+            }
+            Self::WaitStateRejected { context, kind } => {
+                write!(f, "{context} failed to set script wait state: {kind}")
+            }
+            Self::InvalidCombatIntent {
+                kind,
+                spirit_index,
+                value,
+                message,
+            } => write!(
+                f,
+                "invalid combat intent kind={kind} spirit_index={spirit_index} value={value}: {message}"
+            ),
+            Self::InvalidCombatCommand { kind } => {
+                write!(f, "invalid combat command: {kind}")
+            }
+            Self::InvalidCombatServerType { value, message } => {
+                write!(f, "invalid combat server_type {value}: {message}")
+            }
+            Self::InvalidCombatType { value, message } => {
+                write!(f, "invalid combat_type {value}: {message}")
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptCombatActionValidationKind {
+    CannotSubmitAction,
+    BattleFactsUnavailable,
+    InvalidActivePosition { position: u8 },
+    SpiritPositionMismatch { active: u8, request: u8 },
+    ActiveSpiritNotFound { position: u8 },
+    ActiveSpiritFainted { position: u8 },
+    ActionAvailabilityUnavailable,
+    ActionUnavailable { action: String },
+    SkillUnavailableOrNoPp { skill_id: u32 },
+    TargetSpiritAlreadyActive { position: u8 },
+    TargetSpiritNotFound { position: u8 },
+    TargetSpiritFainted { position: u8 },
+    InvalidItemId { item_id: u32 },
+}
+
+impl fmt::Display for ScriptCombatActionValidationKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::CannotSubmitAction => {
+                f.write_str("cannot submit combat action in current combat runtime phase")
+            }
+            Self::BattleFactsUnavailable => f.write_str("combat battle facts unavailable"),
+            Self::InvalidActivePosition { position } => {
+                write!(f, "invalid active spirit position: {position}")
+            }
+            Self::SpiritPositionMismatch { active, request } => write!(
+                f,
+                "combat action spirit_position mismatch: active={active}, request={request}"
+            ),
+            Self::ActiveSpiritNotFound { position } => {
+                write!(f, "active spirit not found: {position}")
+            }
+            Self::ActiveSpiritFainted { position } => {
+                write!(f, "active spirit is fainted: {position}")
+            }
+            Self::ActionAvailabilityUnavailable => {
+                f.write_str("combat action availability unavailable")
+            }
+            Self::ActionUnavailable { action } => {
+                write!(f, "cannot {action} in current combat facts")
+            }
+            Self::SkillUnavailableOrNoPp { skill_id } => {
+                write!(f, "skill unavailable or no PP: skill_id={skill_id}")
+            }
+            Self::TargetSpiritAlreadyActive { position } => {
+                write!(f, "target spirit is already active: {position}")
+            }
+            Self::TargetSpiritNotFound { position } => {
+                write!(f, "no spirit at target position: {position}")
+            }
+            Self::TargetSpiritFainted { position } => {
+                write!(f, "target spirit is fainted: {position}")
+            }
+            Self::InvalidItemId { item_id } => write!(f, "invalid combat item id: {item_id}"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptRequestSystemFailureKind {
+    DraftUpdateWhileRunning,
+    ScriptAlreadyRunning,
+    NoRunningScript,
+    NoDebugScriptRunning,
+    InactiveSession {
+        session_id: u64,
+        current_session_id: u64,
+    },
+    MissingPendingReply {
+        serial_num: u32,
+    },
+    SendResponseFailed {
+        message: String,
+    },
+    SendDebugCommandFailed {
+        message: String,
+    },
+}
+
+impl fmt::Display for ScriptRequestSystemFailureKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::DraftUpdateWhileRunning => {
+                f.write_str("cannot update script draft while script is running")
+            }
+            Self::ScriptAlreadyRunning => {
+                f.write_str("script is running; stop it before running a new task")
+            }
+            Self::NoRunningScript => f.write_str("no script running"),
+            Self::NoDebugScriptRunning => f.write_str("no debug script running"),
+            Self::InactiveSession {
+                session_id,
+                current_session_id,
+            } => write!(
+                f,
+                "inactive script session session_id={session_id} current_session_id={current_session_id}"
+            ),
+            Self::MissingPendingReply { serial_num } => {
+                write!(f, "no pending script reply for serial_num={serial_num}")
+            }
+            Self::SendResponseFailed { message } => {
+                write!(f, "failed to send response: {message}")
+            }
+            Self::SendDebugCommandFailed { message } => {
+                write!(f, "failed to send debug command: {message}")
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptUnsupportedError {
+    Function { name: String },
+}
+
+impl fmt::Display for ScriptUnsupportedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Function { name } => write!(f, "{name} unsupported by this runtime"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ScriptPendingResponseError {
     ExternalGameExtraFieldParseFailed {
         key: String,
@@ -596,6 +872,9 @@ pub enum ScriptPendingResponseError {
         expected_spirit_index: u8,
         actual_req_type: u8,
         actual_spirit_index: u8,
+    },
+    SkillPoolIndexExceedsI64 {
+        index: usize,
     },
     MissingScriptSessionForActionWait,
     StorageSpiritDetailEmpty,
@@ -634,6 +913,9 @@ impl fmt::Display for ScriptPendingResponseError {
                 f,
                 "combat action ack mismatch: expected req_type={expected_req_type} spirit_index={expected_spirit_index}, got req_type={actual_req_type} spirit_index={actual_spirit_index}"
             ),
+            Self::SkillPoolIndexExceedsI64 { index } => {
+                write!(f, "skill pool index exceeds i64 range: {index}")
+            }
             Self::MissingScriptSessionForActionWait => {
                 f.write_str("script action wait requested while no script is running")
             }
@@ -642,17 +924,197 @@ impl fmt::Display for ScriptPendingResponseError {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoParamRange {
+    Inclusive { min: i64, max: i64 },
+    MinInclusive { min: i64 },
+    TypeBounds { type_name: String },
+}
+
+impl fmt::Display for RocoParamRange {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Inclusive { min, max } => write!(f, "{min}..={max}"),
+            Self::MinInclusive { min } => write!(f, ">={min}"),
+            Self::TypeBounds { type_name } => write!(f, "valid {type_name} range"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoInvalidParamError {
+    OutOfRange {
+        name: String,
+        value: i64,
+        expected: RocoParamRange,
+    },
+    MustBePositive {
+        name: String,
+        value: i64,
+    },
+    MustBeNonZero {
+        name: String,
+        value: i64,
+    },
+    RhaiTypeMismatch {
+        name: String,
+        message: String,
+    },
+    Rejected {
+        name: String,
+        message: String,
+    },
+    InvalidTimestamp {
+        value: i64,
+        message: String,
+    },
+}
+
+impl RocoInvalidParamError {
+    pub fn type_bounds(name: impl Into<String>, value: i64, type_name: impl Into<String>) -> Self {
+        Self::OutOfRange {
+            name: name.into(),
+            value,
+            expected: RocoParamRange::TypeBounds {
+                type_name: type_name.into(),
+            },
+        }
+    }
+
+    pub fn inclusive(name: impl Into<String>, value: i64, min: i64, max: i64) -> Self {
+        Self::OutOfRange {
+            name: name.into(),
+            value,
+            expected: RocoParamRange::Inclusive { min, max },
+        }
+    }
+
+    pub fn min_inclusive(name: impl Into<String>, value: i64, min: i64) -> Self {
+        Self::OutOfRange {
+            name: name.into(),
+            value,
+            expected: RocoParamRange::MinInclusive { min },
+        }
+    }
+}
+
+impl fmt::Display for RocoInvalidParamError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::OutOfRange {
+                name,
+                value,
+                expected,
+            } => write!(f, "{name} out of range: {value}, expected {expected}"),
+            Self::MustBePositive { name, value } => {
+                write!(f, "{name} must be positive: {value}")
+            }
+            Self::MustBeNonZero { name, value } => {
+                write!(f, "{name} must be non-zero: {value}")
+            }
+            Self::RhaiTypeMismatch { name, message } => {
+                write!(f, "{name} has invalid Rhai type: {message}")
+            }
+            Self::Rejected { name, message } => write!(f, "{name} rejected: {message}"),
+            Self::InvalidTimestamp { value, message } => {
+                write!(f, "invalid timestamp {value}: {message}")
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoNetworkError {
+    ChannelClosed,
+    HttpRequestFailed { message: String },
+    NetResponseParseFailed { message: String },
+}
+
+impl RocoNetworkError {
+    pub fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl fmt::Display for RocoNetworkError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ChannelClosed => f.write_str("Channel closed"),
+            Self::HttpRequestFailed { message } => write!(f, "HTTP request failed: {message}"),
+            Self::NetResponseParseFailed { message } => {
+                write!(f, "failed to parse network response: {message}")
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoTimeoutError {
+    WaitingForResponse { serial_num: u32, timeout_ms: i64 },
+}
+
+impl RocoTimeoutError {
+    pub fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl fmt::Display for RocoTimeoutError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::WaitingForResponse {
+                serial_num,
+                timeout_ms,
+            } => write!(
+                f,
+                "Timeout waiting for response (serial_num={serial_num}, timeout={timeout_ms}ms)"
+            ),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoServerRejectedError {
+    ReturnCode { message: String },
+    HttpResponse { message: String },
+    Message { message: String },
+}
+
+impl fmt::Display for RocoServerRejectedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ReturnCode { message } => write!(f, "return code rejected: {message}"),
+            Self::HttpResponse { message } => write!(f, "HTTP response rejected: {message}"),
+            Self::Message { message } => f.write_str(message),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoGeneralError {
+    LockPoisoned { message: String },
+    Message { message: String },
+}
+
+impl fmt::Display for RocoGeneralError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::LockPoisoned { message } => write!(f, "lock poisoned: {message}"),
+            Self::Message { message } => f.write_str(message),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum RocoError {
     ScriptError(RocoScriptError),
     StdLib(RocoStdLibError),
-    StdLibError(String),
-    InvalidParam(String),
-    NetworkError(String),
-    TimeoutError(String),
-    ServerRejected(String),
+    InvalidParam(RocoInvalidParamError),
+    NetworkError(RocoNetworkError),
+    TimeoutError(RocoTimeoutError),
+    ServerRejected(RocoServerRejectedError),
     AssertionError(String),
-    Other(String),
+    Other(RocoGeneralError),
 }
 
 impl fmt::Display for RocoError {
@@ -670,46 +1132,21 @@ impl fmt::Display for RocoError {
                 write!(f, ": [{}] {}", error.kind, error.message)
             }
             RocoError::StdLib(error) => write!(f, "StdLib error: {}", error),
-            RocoError::StdLibError(msg) => write!(f, "StdLib error: {}", msg),
-            RocoError::InvalidParam(msg) => write!(f, "Invalid parameter: {}", msg),
-            RocoError::NetworkError(msg) => write!(f, "Network error: {}", msg),
-            RocoError::TimeoutError(msg) => write!(f, "Timeout error: {}", msg),
-            RocoError::ServerRejected(msg) => write!(f, "Server rejected: {}", msg),
+            RocoError::InvalidParam(error) => write!(f, "Invalid parameter: {}", error),
+            RocoError::NetworkError(error) => write!(f, "Network error: {}", error),
+            RocoError::TimeoutError(error) => write!(f, "Timeout error: {}", error),
+            RocoError::ServerRejected(error) => write!(f, "Server rejected: {}", error),
             RocoError::AssertionError(msg) => write!(f, "Assertion failed: {}", msg),
-            RocoError::Other(msg) => write!(f, "Error: {}", msg),
+            RocoError::Other(error) => write!(f, "Error: {}", error),
         }
     }
 }
 
 impl std::error::Error for RocoError {}
 
-impl From<String> for RocoError {
-    fn from(s: String) -> Self {
-        RocoError::Other(s)
-    }
-}
-
-impl From<&str> for RocoError {
-    fn from(s: &str) -> Self {
-        RocoError::Other(s.to_string())
-    }
-}
-
 impl From<RocoStdLibError> for RocoError {
     fn from(error: RocoStdLibError) -> Self {
         RocoError::StdLib(error)
-    }
-}
-
-impl From<String> for RocoStdLibError {
-    fn from(message: String) -> Self {
-        RocoStdLibError::Message(message)
-    }
-}
-
-impl From<&str> for RocoStdLibError {
-    fn from(message: &str) -> Self {
-        RocoStdLibError::Message(message.to_string())
     }
 }
 
@@ -797,6 +1234,18 @@ impl From<ScriptResponseError> for RocoStdLibError {
     }
 }
 
+impl From<ScriptRequestError> for RocoStdLibError {
+    fn from(error: ScriptRequestError) -> Self {
+        RocoStdLibError::Request(error)
+    }
+}
+
+impl From<ScriptUnsupportedError> for RocoStdLibError {
+    fn from(error: ScriptUnsupportedError) -> Self {
+        RocoStdLibError::Unsupported(error)
+    }
+}
+
 impl From<ScriptFunctionContextError> for RocoError {
     fn from(error: ScriptFunctionContextError) -> Self {
         RocoError::StdLib(RocoStdLibError::FunctionContext(error))
@@ -878,5 +1327,17 @@ impl From<ScriptBridgeError> for RocoError {
 impl From<ScriptResponseError> for RocoError {
     fn from(error: ScriptResponseError) -> Self {
         RocoError::StdLib(RocoStdLibError::Response(error))
+    }
+}
+
+impl From<ScriptRequestError> for RocoError {
+    fn from(error: ScriptRequestError) -> Self {
+        RocoError::StdLib(RocoStdLibError::Request(error))
+    }
+}
+
+impl From<ScriptUnsupportedError> for RocoError {
+    fn from(error: ScriptUnsupportedError) -> Self {
+        RocoError::StdLib(RocoStdLibError::Unsupported(error))
     }
 }

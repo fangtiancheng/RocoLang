@@ -394,7 +394,7 @@ impl ScriptBackendCombatRuntimeErrorKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ScriptCombatWaitError {
-    TimeoutWaitingRoundSettled {
+    TimeoutWaitingCombatAction {
         phase: ScriptCombatPhase,
         elapsed_ms: u128,
     },
@@ -403,9 +403,9 @@ pub enum ScriptCombatWaitError {
 impl fmt::Display for ScriptCombatWaitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::TimeoutWaitingRoundSettled { phase, elapsed_ms } => write!(
+            Self::TimeoutWaitingCombatAction { phase, elapsed_ms } => write!(
                 f,
-                "timeout waiting for combat round to settle, phase {}, elapsed_ms={elapsed_ms}",
+                "timeout waiting for combat action, phase {}, elapsed_ms={elapsed_ms}",
                 phase.as_str()
             ),
         }

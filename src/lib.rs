@@ -29,14 +29,17 @@ pub use error::{
     ScriptUnsupportedError,
 };
 pub use stdlib::{
-    RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
-    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
-    RocoCombatStdLib, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoLeoActivityStdLib,
+    documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
+    registered_stdlib_function_registrations, stdlib_function_docs, RocoActivityStdLib,
+    RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib,
+    RocoAriesActivityStdLib, RocoCancerActivityStdLib, RocoCombatStdLib,
+    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoLeoActivityStdLib,
     RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
     RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
     RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
     RocoSpiritStdLib, RocoStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
     RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
-    RocoZodiacActivityStdLib,
+    RocoZodiacActivityStdLib, StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey,
+    StdlibFunctionRegistration, StdlibParamDoc, StdlibReturnDoc,
 };
 pub use types::*;

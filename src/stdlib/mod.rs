@@ -23,6 +23,7 @@ pub mod libra;
 pub mod lookup;
 pub mod magic_pioneer;
 pub mod manor;
+pub mod metadata;
 pub mod mountain_sea;
 pub mod multi_evolution;
 pub mod mystery_fusion;
@@ -55,6 +56,12 @@ pub mod weather;
 
 pub mod traits;
 
+pub use metadata::{
+    documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
+    registered_stdlib_function_registrations, stdlib_function_docs, StdlibFieldDoc,
+    StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration, StdlibParamDoc,
+    StdlibReturnDoc,
+};
 pub use traits::*;
 
 fn unsupported<T>(name: &str) -> Result<T> {

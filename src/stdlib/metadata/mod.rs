@@ -326,4 +326,54 @@ mod tests {
             "missing return docs for struct returns: {missing:?}"
         );
     }
+
+    #[test]
+    fn stdlib_docs_do_not_contain_mojibake_or_replacement_text() {
+        let docs = stdlib_function_docs();
+        let mut bad = Vec::new();
+        for doc in docs {
+            for value in [
+                doc.description.as_str(),
+                doc.returns.as_str(),
+                doc.signature.as_str(),
+            ] {
+                if looks_corrupted(value) {
+                    bad.push(format!("{}::{}: {}", doc.module, doc.name, value));
+                }
+            }
+            for param in &doc.params {
+                if looks_corrupted(&param.description) {
+                    bad.push(format!(
+                        "{}::{} param {}: {}",
+                        doc.module, doc.name, param.name, param.description
+                    ));
+                }
+            }
+            if let Some(return_doc) = &doc.return_doc {
+                if looks_corrupted(&return_doc.description) {
+                    bad.push(format!(
+                        "{}::{} return: {}",
+                        doc.module, doc.name, return_doc.description
+                    ));
+                }
+                for field in &return_doc.fields {
+                    if looks_corrupted(&field.description) {
+                        bad.push(format!(
+                            "{}::{} field {}: {}",
+                            doc.module, doc.name, field.name, field.description
+                        ));
+                    }
+                }
+            }
+        }
+
+        assert!(bad.is_empty(), "corrupted stdlib docs found: {bad:?}");
+    }
+
+    fn looks_corrupted(value: &str) -> bool {
+        value.contains("????")
+            || value.contains('�')
+            || value.contains('鍙')
+            || value.contains('杩')
+    }
 }

@@ -69,6 +69,16 @@ pub trait RocoLookupStdLib: Send {
         unsupported("lookup::lookup_spirit_info")
     }
 
+    fn try_lookup_spirit_info(&mut self, spirit_id: i64) -> Result<StaticSpiritInfoLookupResult> {
+        match self.lookup_spirit_info(spirit_id) {
+            Ok(info) => Ok(StaticSpiritInfoLookupResult::ok(info)),
+            Err(error) => Ok(StaticSpiritInfoLookupResult::not_found(
+                spirit_id,
+                error.to_string(),
+            )),
+        }
+    }
+
     fn lookup_spirits_info(&mut self, _spirit_ids: Vec<i64>) -> Result<Vec<StaticSpiritInfo>> {
         unsupported("lookup::lookup_spirits_info")
     }

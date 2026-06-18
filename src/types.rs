@@ -2881,3 +2881,79 @@ pub struct StaticSpiritInfo {
     pub skinnum: i64,
     pub exp_type: i64,
 }
+
+impl StaticSpiritInfo {
+    pub fn unknown(spirit_id: i64) -> Self {
+        Self {
+            id: spirit_id,
+            name: format!("未知({spirit_id})"),
+            description: String::new(),
+            features: Vec::new(),
+            group: Vec::new(),
+            src: String::new(),
+            avatar: String::new(),
+            icon_src: String::new(),
+            preview_src: String::new(),
+            move_speed: 0,
+            height: String::new(),
+            weight: String::new(),
+            color: String::new(),
+            interest: String::new(),
+            habitat: String::new(),
+            evolution: Vec::new(),
+            catchrate: 0,
+            boss_phyle: String::new(),
+            boss_reward: String::new(),
+            scene_id: 0,
+            condition: String::new(),
+            require_level: String::new(),
+            wg: 0,
+            mg: 0,
+            mk: 0,
+            sm: 0,
+            sd: 0,
+            fy: 0,
+            reward: 0,
+            evolution_form_id: 0,
+            evolution_to_ids: Vec::new(),
+            evolution_edges: Vec::new(),
+            get_form: String::new(),
+            state: 0,
+            start_time: String::new(),
+            end_time: String::new(),
+            first_id: 0,
+            propo_level: 0,
+            is_in_book: false,
+            skinnum: 0,
+            exp_type: 0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticSpiritInfoLookupResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub result: StaticSpiritInfo,
+}
+
+impl StaticSpiritInfoLookupResult {
+    pub fn ok(result: StaticSpiritInfo) -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+            result,
+        }
+    }
+
+    pub fn not_found(spirit_id: i64, message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 1,
+            message: message.into(),
+            result: StaticSpiritInfo::unknown(spirit_id),
+        }
+    }
+}

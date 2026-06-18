@@ -47,6 +47,13 @@ pub fn register_functions<T: RocoStdLib + 'static>(module: &mut Module, stdlib: 
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("status", move |message: &str| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.status(message).map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("assert", move |condition: bool, message: &str| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.assert(condition, message).map_err(to_rhai_error)

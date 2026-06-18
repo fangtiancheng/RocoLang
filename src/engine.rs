@@ -65,16 +65,16 @@ use crate::types::{
     SpiritSkillInfo, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
     StarTowerTopMission, StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo,
     StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritEvolutionEdge,
-    StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
-    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
-    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
-    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
-    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
-    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
-    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
-    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
-    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
-    WeekTaskActivity, WeekTaskInfo,
+    StaticSpiritInfo, StaticSpiritInfoLookupResult, StaticStriveItemInfo, StaticTitleInfo,
+    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
+    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
+    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
+    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
+    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
+    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
+    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
+    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
@@ -2816,6 +2816,10 @@ impl RocoEngine {
         register_getters!(StaticSpiritEvolutionEdge, target_id, kind);
         engine.register_get("evolution_edges", |value: &mut StaticSpiritInfo| {
             Self::to_array(&value.evolution_edges)
+        });
+        register_getters!(StaticSpiritInfoLookupResult, ok, code, message);
+        engine.register_get("result", |value: &mut StaticSpiritInfoLookupResult| {
+            value.result.clone()
         });
     }
 }

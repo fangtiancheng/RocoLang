@@ -164,6 +164,13 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn("try_lookup_spirit_info", move |spirit_id: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.try_lookup_spirit_info(spirit_id).map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("lookup_spirits_info", move |spirit_ids: Array| {
             let spirit_ids = spirit_ids
                 .into_iter()

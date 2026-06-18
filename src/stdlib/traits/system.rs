@@ -32,6 +32,10 @@ pub trait RocoSystemStdLib: Send {
         unsupported("system::log")
     }
 
+    fn status(&mut self, _message: &str) -> Result<()> {
+        unsupported("system::status")
+    }
+
     fn assert(&mut self, condition: bool, message: &str) -> Result<()> {
         if condition {
             Ok(())

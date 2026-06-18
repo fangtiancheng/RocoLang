@@ -6,10 +6,11 @@ use roco_lang::{
     RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
     RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
-    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoSpiritStdLib,
-    RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
-    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo, SpiritInfo,
-    SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
+    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoSpiritBookStdLib,
+    RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo,
+    SpiritBookEntry, SpiritBookGroup, SpiritBookInfo, SpiritBookStates, SpiritBookSummary,
+    SpiritInfo, SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -42,6 +43,10 @@ impl MockStdLib {
 }
 
 impl RocoRuntimeStdLib for MockStdLib {
+    fn query_server_time(&mut self) -> Result<i64> {
+        Ok(1234567890)
+    }
+
     fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
         Ok(vec![SceneRoleInfo {
             uin: 470926678,
@@ -141,6 +146,19 @@ impl RocoSpiritStdLib for MockStdLib {
         ])
     }
 
+    fn list_abandoned_storage_spirits(&mut self) -> Result<Vec<StorageSpiritInfo>> {
+        Ok(vec![StorageSpiritInfo {
+            spirit_id: 2,
+            catch_time: 50,
+            storage_time: 500,
+            level: 1,
+            sex: 0,
+            skin_flag: 0,
+            talent_type: 0,
+            talent_level: 0,
+        }])
+    }
+
     fn get_storage_spirit_detail(&mut self, spirit_id: i64, catch_time: i64) -> Result<SpiritInfo> {
         let skill_id = if catch_time == 30 { 203 } else { 105 };
         Ok(SpiritInfo {
@@ -161,6 +179,46 @@ impl RocoSpiritStdLib for MockStdLib {
 }
 
 impl RocoLookupStdLib for MockStdLib {
+    fn list_spirit_book_summaries(&mut self) -> Result<Vec<SpiritBookSummary>> {
+        Ok(vec![SpiritBookSummary {
+            id: 10,
+            name: "All Spirits".to_string(),
+            is_new: false,
+            has_cover: true,
+            background: "book-bg".to_string(),
+            page_idx: 0,
+            spirit_count: 2,
+        }])
+    }
+
+    fn get_spirit_book(&mut self, book_id: i64) -> Result<SpiritBookInfo> {
+        Ok(SpiritBookInfo {
+            id: book_id,
+            name: "All Spirits".to_string(),
+            is_new: false,
+            has_cover: true,
+            background: "book-bg".to_string(),
+            page_idx: 0,
+            groups: vec![SpiritBookGroup {
+                template_id: 1,
+                spirits: vec![
+                    SpiritBookEntry {
+                        id: 1,
+                        starred: true,
+                        unknown: false,
+                        newed: false,
+                    },
+                    SpiritBookEntry {
+                        id: 2,
+                        starred: false,
+                        unknown: false,
+                        newed: true,
+                    },
+                ],
+            }],
+        })
+    }
+
     fn lookup_skills_info(&mut self, skill_ids: Vec<i64>) -> Result<Vec<StaticSkillInfo>> {
         Ok(skill_ids
             .into_iter()
@@ -182,6 +240,91 @@ impl RocoLookupStdLib for MockStdLib {
             })
             .collect())
     }
+}
+
+impl RocoSpiritBookStdLib for MockStdLib {
+    fn get_my_spirit_book_states(&mut self) -> Result<SpiritBookStates> {
+        Ok(SpiritBookStates {
+            uin: 470926678,
+            count: 3,
+            states: vec![1, 2, 3],
+        })
+    }
+
+    fn get_role_spirit_book_states(&mut self, uin: i64) -> Result<SpiritBookStates> {
+        Ok(SpiritBookStates {
+            uin,
+            count: 2,
+            states: vec![0, 3],
+        })
+    }
+}
+
+#[test]
+fn server_time_is_profile_api_not_scene_api() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib.clone());
+
+    let _ = engine
+        .eval(
+            r#"
+                let stamp = profile::query_server_time();
+                system::assert(stamp == 1234567890, "server time mismatch");
+
+                let result = profile::try_query_server_time();
+                system::assert(result.ok, result.message);
+                system::assert(result.message == "1234567890", result.message);
+            "#,
+        )
+        .expect("server time should be exposed under profile");
+
+    let error = engine
+        .eval("scene::query_server_time();")
+        .expect_err("server time should not be exposed under scene");
+    assert!(
+        error.to_string().contains("query_server_time"),
+        "unexpected error: {error}"
+    );
+}
+
+#[test]
+fn spirit_book_apis_are_available_to_scripts() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                let summaries = lookup::list_spirit_book_summaries();
+                system::assert(len(summaries) == 1, "summary count mismatch");
+                system::assert(summaries[0].id == 10, "summary id mismatch");
+                system::assert(summaries[0].spirit_count == 2, "summary count field mismatch");
+
+                let book = lookup::get_spirit_book(10);
+                system::assert(book.name == "All Spirits", book.name);
+                system::assert(len(book.groups) == 1, "group count mismatch");
+                system::assert(book.groups[0].template_id == 1, "template id mismatch");
+
+                let entries = lookup::list_spirit_book_entries(10);
+                system::assert(len(entries) == 2, "entry count mismatch");
+                system::assert(entries[0].id == 1, "entry id mismatch");
+                system::assert(entries[0].starred, "entry starred mismatch");
+                system::assert(entries[1].newed, "entry newed mismatch");
+
+                let states = spirit_book::get_my_states();
+                system::assert(states.uin == 470926678, "state uin mismatch");
+                system::assert(states.count == 3, "state count mismatch");
+                system::assert(states.states[1] == spirit_book_state::CAUGHT, "state value mismatch");
+
+                let my_state = spirit_book::get_my_spirit_state(2);
+                system::assert(my_state.spirit_id == 2, "spirit state id mismatch");
+                system::assert(my_state.state == spirit_book_state::CAUGHT, "my state mismatch");
+
+                let role_state = spirit_book::get_role_spirit_state(123, 2);
+                system::assert(role_state.state == spirit_book_state::RELEASED, "role state mismatch");
+            "#,
+        )
+        .expect("spirit book APIs should be exposed to scripts");
 }
 
 #[test]

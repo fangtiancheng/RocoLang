@@ -4,6 +4,7 @@ mod lookup;
 mod prelude;
 mod runtime;
 mod spirit;
+mod spirit_book;
 mod system;
 
 use super::unsupported;
@@ -16,4 +17,5 @@ pub use lookup::*;
 pub use prelude::*;
 pub use runtime::*;
 pub use spirit::*;
+pub use spirit_book::*;
 pub use system::*;

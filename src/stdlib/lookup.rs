@@ -179,4 +179,29 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_spirit_book_summaries", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_spirit_book_summaries()
+                .map(|summaries| to_array(&summaries))
+                .map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("get_spirit_book", move |book_id: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.get_spirit_book(book_id).map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_spirit_book_entries", move |book_id: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_spirit_book_entries(book_id)
+                .map(|entries| to_array(&entries))
+                .map_err(to_rhai_error)
+        });
+    }
 }

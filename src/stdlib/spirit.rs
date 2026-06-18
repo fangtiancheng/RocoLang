@@ -27,6 +27,15 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("list_abandoned_storage_spirits", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.list_abandoned_storage_spirits()
+                .map(|spirits| to_array(&spirits))
+                .map_err(to_rhai_error)
+        });
+    }
     register_stdlib_fn_2!(
         module,
         stdlib,

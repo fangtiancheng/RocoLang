@@ -72,4 +72,21 @@ pub trait RocoLookupStdLib: Send {
     fn lookup_spirits_info(&mut self, _spirit_ids: Vec<i64>) -> Result<Vec<StaticSpiritInfo>> {
         unsupported("lookup::lookup_spirits_info")
     }
+
+    fn list_spirit_book_summaries(&mut self) -> Result<Vec<SpiritBookSummary>> {
+        unsupported("lookup::list_spirit_book_summaries")
+    }
+
+    fn get_spirit_book(&mut self, _book_id: i64) -> Result<SpiritBookInfo> {
+        unsupported("lookup::get_spirit_book")
+    }
+
+    fn list_spirit_book_entries(&mut self, book_id: i64) -> Result<Vec<SpiritBookEntry>> {
+        let book = self.get_spirit_book(book_id)?;
+        Ok(book
+            .groups
+            .into_iter()
+            .flat_map(|group| group.spirits)
+            .collect())
+    }
 }

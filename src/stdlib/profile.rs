@@ -22,4 +22,26 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(|error| to_rhai_error_in_context(error, &context))
         });
     }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn(
+            "query_server_time",
+            move |context: rhai::NativeCallContext| {
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.query_server_time()
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn(
+            "try_query_server_time",
+            move |context: rhai::NativeCallContext| {
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.try_query_server_time()
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
+    }
 }

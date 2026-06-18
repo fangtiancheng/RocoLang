@@ -10,6 +10,10 @@ pub trait RocoSpiritStdLib: Send {
         unsupported("spirit::list_storage_spirits")
     }
 
+    fn list_abandoned_storage_spirits(&mut self) -> Result<Vec<StorageSpiritInfo>> {
+        unsupported("spirit::list_abandoned_storage_spirits")
+    }
+
     fn get_storage_spirit_detail(
         &mut self,
         _spirit_id: i64,

@@ -13,11 +13,12 @@ use crate::error::{
 };
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
-    dark_city, diamond_tear, four_seasons, game, gemini, ice_crystal, ladder, leo, libra, lookup,
-    magic_pioneer, manor, mountain_sea, multi_evolution, mystery_fusion, news, news_times,
-    personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
-    sentinel_intelligence, session, spirit, star_tower, summon, system, taurus, three_starters,
-    treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
+    dark_city, diamond_tear, evolution_edge_kind, four_seasons, game, gemini, ice_crystal, ladder,
+    leo, libra, lookup, magic_pioneer, manor, mountain_sea, multi_evolution, mystery_fusion, news,
+    news_times, personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
+    sentinel_intelligence, session, spirit, spirit_book, spirit_book_state, star_tower, summon,
+    system, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
+    RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -59,19 +60,21 @@ use crate::types::{
     ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
     SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
     SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
-    SpiritBagInfo, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
-    StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission,
-    StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo,
-    StaticPluginInfo, StaticSkillInfo, StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
-    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
-    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
-    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
-    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
-    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
-    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
-    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
-    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
+    SpiritBagInfo, SpiritBookEntry, SpiritBookGroup, SpiritBookInfo, SpiritBookSpiritState,
+    SpiritBookStates, SpiritBookSummary, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo,
+    SpiritSkillInfo, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
+    StarTowerTopMission, StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo,
+    StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritEvolutionEdge,
+    StaticSpiritInfo, StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo,
+    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
+    SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter,
+    TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
+    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
+    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
+    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
+    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
+    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
+    WeekTaskActivity, WeekTaskInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
@@ -191,6 +194,18 @@ impl RocoEngine {
         let mut spirit_module = rhai::Module::new();
         spirit::register(&mut spirit_module, stdlib.clone());
         engine.register_static_module("spirit", spirit_module.into());
+
+        let mut spirit_book_module = rhai::Module::new();
+        spirit_book::register(&mut spirit_book_module, stdlib.clone());
+        engine.register_static_module("spirit_book", spirit_book_module.into());
+
+        let mut spirit_book_state_module = rhai::Module::new();
+        spirit_book_state::register(&mut spirit_book_state_module);
+        engine.register_static_module("spirit_book_state", spirit_book_state_module.into());
+
+        let mut evolution_edge_kind_module = rhai::Module::new();
+        evolution_edge_kind::register(&mut evolution_edge_kind_module);
+        engine.register_static_module("evolution_edge_kind", evolution_edge_kind_module.into());
 
         let mut personality_module = rhai::Module::new();
         personality::register(&mut personality_module);
@@ -2711,6 +2726,42 @@ impl RocoEngine {
             super_form_id,
             super_form_src,
         );
+        register_getters!(SpiritBookEntry, id, starred, unknown, newed);
+        register_getters!(SpiritBookGroup, template_id);
+        engine.register_get("spirits", |value: &mut SpiritBookGroup| {
+            Self::to_array(&value.spirits)
+        });
+        register_getters!(
+            SpiritBookSummary,
+            id,
+            name,
+            is_new,
+            has_cover,
+            background,
+            page_idx,
+            spirit_count,
+        );
+        register_getters!(
+            SpiritBookInfo,
+            id,
+            name,
+            is_new,
+            has_cover,
+            background,
+            page_idx,
+        );
+        engine.register_get("groups", |value: &mut SpiritBookInfo| {
+            Self::to_array(&value.groups)
+        });
+        register_getters!(SpiritBookStates, uin, count);
+        engine.register_get("states", |value: &mut SpiritBookStates| {
+            Self::to_array(&value.states)
+        });
+        engine.register_fn(
+            "is_owned",
+            |value: &mut SpiritBookStates, spirit_id: i64| value.spirit_owned(spirit_id),
+        );
+        register_getters!(SpiritBookSpiritState, spirit_id, state, owned);
         register_getters!(
             StaticSpiritInfo,
             id,
@@ -2761,6 +2812,10 @@ impl RocoEngine {
         });
         engine.register_get("evolution_to_ids", |value: &mut StaticSpiritInfo| {
             Self::to_array(&value.evolution_to_ids)
+        });
+        register_getters!(StaticSpiritEvolutionEdge, target_id, kind);
+        engine.register_get("evolution_edges", |value: &mut StaticSpiritInfo| {
+            Self::to_array(&value.evolution_edges)
         });
     }
 }

@@ -5,9 +5,10 @@ use roco_lang::{
     RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
     RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
-    RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
-    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    RocoScorpioActivityStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, RoundResult, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo,
+    StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -192,6 +193,7 @@ impl RocoLookupStdLib for MockStdLib {
             reward: 0,
             evolution_form_id: 0,
             evolution_to_ids: Vec::new(),
+            evolution_edges: Vec::new(),
             get_form: String::new(),
             state: 0,
             start_time: String::new(),
@@ -469,3 +471,5 @@ impl RocoSagittariusActivityStdLib for MockStdLib {}
 impl RocoScorpioActivityStdLib for MockStdLib {}
 
 impl RocoAquariusActivityStdLib for MockStdLib {}
+
+impl RocoSpiritBookStdLib for MockStdLib {}

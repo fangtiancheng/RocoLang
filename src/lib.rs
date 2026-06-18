@@ -34,8 +34,9 @@ pub use stdlib::{
     RocoCombatStdLib, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoLeoActivityStdLib,
     RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
     RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritStdLib, RocoStdLib,
-    RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
-    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RocoZodiacActivityStdLib,
+    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
+    RocoSpiritStdLib, RocoStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
+    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
+    RocoZodiacActivityStdLib,
 };
 pub use types::*;

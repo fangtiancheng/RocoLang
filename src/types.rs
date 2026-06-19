@@ -122,6 +122,47 @@ pub struct UserInfo {
     pub trainer_exp: i64,
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ServerTimeInfo {
+    pub stamp: i64,
+    pub full_year: i64,
+    pub month: i64,
+    pub date: i64,
+    pub hours: i64,
+    pub minutes: i64,
+    pub seconds: i64,
+    pub day: i64,
+    pub day_of_year: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServerTimeResult {
+    pub ok: bool,
+    pub code: i64,
+    pub message: String,
+    pub result: ServerTimeInfo,
+}
+
+impl ServerTimeResult {
+    pub fn ok(result: ServerTimeInfo) -> Self {
+        Self {
+            ok: true,
+            code: 0,
+            message: String::new(),
+            result,
+        }
+    }
+
+    pub fn failed(message: impl Into<String>) -> Self {
+        Self {
+            ok: false,
+            code: 2,
+            message: message.into(),
+            result: ServerTimeInfo::default(),
+        }
+    }
+}
+
 /// 宠物背包信息
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritBagInfo {

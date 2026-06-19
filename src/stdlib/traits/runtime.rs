@@ -35,8 +35,15 @@ pub trait RocoRuntimeStdLib: Send {
         unsupported("role::get_cached_scene_roles")
     }
 
-    fn query_server_time(&mut self) -> Result<i64> {
+    fn query_server_time(&mut self) -> Result<ServerTimeInfo> {
         unsupported("profile::query_server_time")
+    }
+
+    fn try_query_server_time(&mut self) -> Result<ServerTimeResult> {
+        match self.query_server_time() {
+            Ok(result) => Ok(ServerTimeResult::ok(result)),
+            Err(error) => Ok(ServerTimeResult::failed(error.to_string())),
+        }
     }
 
     fn get_pause(&mut self) -> Result<bool> {
@@ -94,17 +101,6 @@ pub trait RocoRuntimeStdLib: Send {
         match self.set_pause(enabled) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("set_pause returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
-        }
-    }
-
-    fn try_query_server_time(&mut self) -> Result<ActionResult> {
-        match self.query_server_time() {
-            Ok(stamp) => Ok(ActionResult {
-                ok: true,
-                code: 0,
-                message: stamp.to_string(),
-            }),
             Err(error) => Ok(ActionResult::failed(error.to_string())),
         }
     }

@@ -59,22 +59,23 @@ use crate::types::{
     SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
     ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
     SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
-    SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo, SkillSwitchResult,
-    SpiritBagInfo, SpiritBookEntry, SpiritBookGroup, SpiritBookInfo, SpiritBookSpiritState,
-    SpiritBookStates, SpiritBookSummary, SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo,
-    SpiritSkillInfo, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
-    StarTowerTopMission, StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo,
-    StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritEvolutionEdge,
-    StaticSpiritInfo, StaticSpiritInfoLookupResult, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
-    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
-    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
-    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
-    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
-    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
-    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
-    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
-    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
+    ServerTimeInfo, ServerTimeResult, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
+    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
+    SpiritBookInfo, SpiritBookSpiritState, SpiritBookStates, SpiritBookSummary,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
+    StaticSkillInfo, StaticSpiritEvolutionEdge, StaticSpiritInfo, StaticSpiritInfoLookupResult,
+    StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, SummonExchangeGroup,
+    SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState, SummonRecord,
+    SummonRewardItem, TalentRefreshResult, TaurusBagCandidate, TaurusCounter, TaurusField,
+    TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate,
+    ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo,
+    TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser,
+    TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem,
+    UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter,
+    VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo,
+    WeekTaskActivity, WeekTaskInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
@@ -795,6 +796,22 @@ impl RocoEngine {
             trainer_level,
             trainer_exp,
         );
+        register_getters!(
+            ServerTimeInfo,
+            stamp,
+            full_year,
+            month,
+            date,
+            hours,
+            minutes,
+            seconds,
+            day,
+            day_of_year,
+        );
+        register_getters!(ServerTimeResult, ok, code, message);
+        engine.register_get("result", |value: &mut ServerTimeResult| {
+            value.result.clone()
+        });
         register_getters!(SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp);
         engine.register_get("skills", |value: &mut SpiritInfo| {
             Self::to_array(&value.skills)

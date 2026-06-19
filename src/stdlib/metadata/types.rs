@@ -284,6 +284,33 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 field("trainer_exp", "int", "训练师经验。"),
             ],
         ),
+        "ServerTimeInfo" => (
+            "服务器时间信息。",
+            vec![
+                field("stamp", "int", "服务器时间戳，单位秒。"),
+                field("full_year", "int", "四位年份。"),
+                field("month", "int", "月份，1-12。"),
+                field("date", "int", "日期，1-31。"),
+                field("hours", "int", "小时，0-23。"),
+                field("minutes", "int", "分钟，0-59。"),
+                field("seconds", "int", "秒，0-59。"),
+                field("day", "int", "星期字段，语义与服务器协议一致。"),
+                field(
+                    "day_of_year",
+                    "int",
+                    "一年中的第几天，语义与服务器协议一致。",
+                ),
+            ],
+        ),
+        "ServerTimeResult" => (
+            "不会因网络或业务失败抛错的服务器时间查询结果。",
+            vec![
+                field("ok", "bool", "是否成功查询。"),
+                field("code", "int", "结果码；0 表示成功，其它非 0 表示失败。"),
+                field("message", "string", "失败原因，成功时通常为空。"),
+                field("result", "ServerTimeInfo", "服务器时间；失败时为默认空值。"),
+            ],
+        ),
         "SceneSpiritInfo" => (
             "场景中的宠物刷新信息。",
             vec![

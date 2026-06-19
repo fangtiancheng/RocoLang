@@ -43,8 +43,18 @@ impl MockStdLib {
 }
 
 impl RocoRuntimeStdLib for MockStdLib {
-    fn query_server_time(&mut self) -> Result<i64> {
-        Ok(1234567890)
+    fn query_server_time(&mut self) -> Result<roco_lang::ServerTimeInfo> {
+        Ok(roco_lang::ServerTimeInfo {
+            stamp: 1234567890,
+            full_year: 2026,
+            month: 6,
+            date: 19,
+            hours: 12,
+            minutes: 34,
+            seconds: 56,
+            day: 5,
+            day_of_year: 170,
+        })
     }
 
     fn get_cached_scene_roles(&mut self) -> Result<Vec<SceneRoleInfo>> {
@@ -268,12 +278,15 @@ fn server_time_is_profile_api_not_scene_api() {
     let _ = engine
         .eval(
             r#"
-                let stamp = profile::query_server_time();
-                system::assert(stamp == 1234567890, "server time mismatch");
+                let server_time = profile::query_server_time();
+                system::assert(server_time.stamp == 1234567890, "server time mismatch");
+                system::assert(server_time.full_year == 2026, "server year mismatch");
+                system::assert(server_time.month == 6, "server month mismatch");
+                system::assert(server_time.date == 19, "server date mismatch");
 
                 let result = profile::try_query_server_time();
                 system::assert(result.ok, result.message);
-                system::assert(result.message == "1234567890", result.message);
+                system::assert(result.result.stamp == 1234567890, "try server time mismatch");
             "#,
         )
         .expect("server time should be exposed under profile");

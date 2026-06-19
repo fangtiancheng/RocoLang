@@ -23,20 +23,20 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "profile",
             "query_server_time",
-            "profile::query_server_time() -> int",
-            "查询服务器时间戳。",
+            "profile::query_server_time() -> ServerTimeInfo",
+            "查询服务器时间，返回结构化日期、时间和时间戳。",
             params: [],
-            returns: "服务器当前时间戳，单位毫秒。",
-            examples: ["let server_time = profile::query_server_time();"]
+            returns: "服务器当前时间。",
+            examples: ["let server_time = profile::query_server_time(); system::log(server_time.stamp);"]
         ),
         super::stdlib_doc!(
             "profile",
             "try_query_server_time",
-            "profile::try_query_server_time() -> ActionResult",
+            "profile::try_query_server_time() -> ServerTimeResult",
             "尝试查询服务器时间，失败时返回结构化结果而不是中止脚本。",
             params: [],
-            returns: "操作结果。",
-            examples: ["let result = profile::try_query_server_time();"]
+            returns: "服务器时间查询结果。",
+            examples: ["let result = profile::try_query_server_time(); if result.ok { system::log(result.result.stamp); }"]
         ),
     ]
 }

@@ -35,11 +35,12 @@ pub use stdlib::{
     RocoAriesActivityStdLib, RocoCancerActivityStdLib, RocoCombatStdLib,
     RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoLeoActivityStdLib,
     RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
-    RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
-    RocoZodiacActivityStdLib, StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey,
-    StdlibFunctionRegistration, StdlibParamDoc, StdlibReturnDoc,
+    RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoPetTrainingActivityStdLib,
+    RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoStdLib,
+    RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RocoZodiacActivityStdLib, StdlibFieldDoc,
+    StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration, StdlibParamDoc,
+    StdlibReturnDoc,
 };
 pub use types::*;

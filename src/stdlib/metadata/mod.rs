@@ -6,6 +6,7 @@ mod game;
 mod lookup;
 mod manor;
 mod news;
+mod pet_training;
 mod profile;
 mod registered;
 mod role;
@@ -157,6 +158,7 @@ fn detailed_stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     docs.extend(game::docs());
     docs.extend(role::docs());
     docs.extend(manor::docs());
+    docs.extend(pet_training::docs());
     docs.extend(news::docs());
     docs.extend(spirit::docs());
     docs.extend(combat::docs());

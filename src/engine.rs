@@ -15,9 +15,9 @@ use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
     dark_city, diamond_tear, evolution_edge_kind, four_seasons, game, gemini, ice_crystal, ladder,
     leo, libra, lookup, magic_pioneer, manor, mountain_sea, multi_evolution, mystery_fusion, news,
-    news_times, personality, pisces, play_guide, profile, role, sagittarius, scene, scorpio,
-    sentinel_intelligence, session, spirit, spirit_book, spirit_book_state, star_tower, summon,
-    system, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
+    news_times, personality, pet_training, pisces, play_guide, profile, role, sagittarius, scene,
+    scorpio, sentinel_intelligence, session, spirit, spirit_book, spirit_book_state, star_tower,
+    summon, system, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
     RocoStdLib,
 };
 use crate::types::{
@@ -52,18 +52,19 @@ use crate::types::{
     MountainSeaInfo, MountainSeaSoulInfo, MultiEvolutionCandidate, MultiEvolutionInfo,
     MultiEvolutionRewardItem, MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
     MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
-    NewsTimesReportsResult, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
-    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
-    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
-    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
-    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
-    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
-    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
-    ServerTimeInfo, ServerTimeResult, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
-    SpiritBookInfo, SpiritBookSpiritState, SpiritBookStates, SpiritBookSummary,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo,
-    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    NewsTimesReportsResult, PetTrainingResult, PetTrainingRewardItem, PiscesBagCandidate,
+    PiscesCounter, PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo,
+    PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo, SagittariusBagCandidate,
+    SagittariusCounter, SagittariusField, SagittariusFirstInfo, SagittariusRewardItem,
+    SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo,
+    SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter, ScorpioField,
+    ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo,
+    SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, ServerTimeInfo,
+    ServerTimeResult, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
+    SkillSwitchResult, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup, SpiritBookInfo,
+    SpiritBookSpiritState, SpiritBookStates, SpiritBookSummary, SpiritEquipmentBagInfo,
+    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
+    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritEvolutionEdge, StaticSpiritInfo, StaticSpiritInfoLookupResult,
     StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, SummonExchangeGroup,
@@ -227,6 +228,10 @@ impl RocoEngine {
         let mut manor_module = rhai::Module::new();
         manor::register(&mut manor_module, stdlib.clone());
         engine.register_static_module("manor", manor_module.into());
+
+        let mut pet_training_module = rhai::Module::new();
+        pet_training::register(&mut pet_training_module, stdlib.clone());
+        engine.register_static_module("pet_training", pet_training_module.into());
 
         let mut news_module = rhai::Module::new();
         news::register(&mut news_module, stdlib.clone());
@@ -2638,6 +2643,19 @@ impl RocoEngine {
         );
         engine.register_get("ground", |value: &mut ManorFertilizerResult| {
             value.ground.clone()
+        });
+        register_getters!(PetTrainingRewardItem, item_id, count);
+        register_getters!(
+            PetTrainingResult,
+            ok,
+            result_code,
+            message,
+            training_type,
+            pet_id,
+            raw_text,
+        );
+        engine.register_get("rewards", |value: &mut PetTrainingResult| {
+            Self::to_array(&value.rewards)
         });
         engine.register_get("spirits", |value: &mut SpiritBagInfo| {
             Self::to_array(&value.spirits)

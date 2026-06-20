@@ -5,12 +5,13 @@ use roco_lang::{
     RocoDebugHooks, RocoEngine, RocoError, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib,
     RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoPiscesActivityStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
-    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
-    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo,
-    SpiritBookEntry, SpiritBookGroup, SpiritBookInfo, SpiritBookStates, SpiritBookSummary,
-    SpiritInfo, SpiritSkillInfo, StaticSkillInfo, StorageSpiritInfo,
+    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
+    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoScriptErrorKind,
+    RocoScriptLocation, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
+    SpiritBookInfo, SpiritBookStates, SpiritBookSummary, SpiritInfo, SpiritSkillInfo,
+    StaticSkillInfo, StorageSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -836,6 +837,8 @@ impl RocoCombatStdLib for MockStdLib {}
 impl RocoSystemStdLib for MockStdLib {}
 
 impl RocoManorActivityStdLib for MockStdLib {}
+
+impl RocoPetTrainingActivityStdLib for MockStdLib {}
 
 impl RocoNewsActivityStdLib for MockStdLib {}
 

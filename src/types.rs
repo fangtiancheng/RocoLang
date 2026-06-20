@@ -163,7 +163,25 @@ impl ServerTimeResult {
     }
 }
 
-/// 宠物背包信息
+/// 家园锻炼奖励道具。
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PetTrainingRewardItem {
+    pub item_id: i64,
+    pub count: i64,
+}
+
+/// 家园锻炼 CGI 返回结果。
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PetTrainingResult {
+    pub ok: bool,
+    pub result_code: i64,
+    pub message: String,
+    pub training_type: i64,
+    pub pet_id: i64,
+    pub rewards: Vec<PetTrainingRewardItem>,
+    pub raw_text: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritBagInfo {
     pub spirits: Vec<SpiritInfo>,

@@ -30,6 +30,7 @@ pub mod mystery_fusion;
 pub mod news;
 pub mod news_times;
 pub mod personality;
+pub mod pet_training;
 pub mod pisces;
 pub mod play_guide;
 pub mod profile;

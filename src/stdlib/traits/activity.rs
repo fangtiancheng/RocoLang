@@ -10,6 +10,7 @@ mod libra;
 mod magic_pioneer;
 mod manor;
 mod news;
+mod pet_training;
 mod pisces;
 mod sagittarius;
 mod scorpio;
@@ -30,6 +31,7 @@ pub use libra::*;
 pub use magic_pioneer::*;
 pub use manor::*;
 pub use news::*;
+pub use pet_training::*;
 pub use pisces::*;
 pub use sagittarius::*;
 pub use scorpio::*;
@@ -75,6 +77,7 @@ impl<T> RocoZodiacActivityStdLib for T where
 /// Event and activity APIs.
 pub trait RocoActivityStdLib:
     RocoManorActivityStdLib
+    + RocoPetTrainingActivityStdLib
     + RocoNewsActivityStdLib
     + RocoTowerActivityStdLib
     + RocoAlchemyActivityStdLib
@@ -88,6 +91,7 @@ pub trait RocoActivityStdLib:
 
 impl<T> RocoActivityStdLib for T where
     T: RocoManorActivityStdLib
+        + RocoPetTrainingActivityStdLib
         + RocoNewsActivityStdLib
         + RocoTowerActivityStdLib
         + RocoAlchemyActivityStdLib

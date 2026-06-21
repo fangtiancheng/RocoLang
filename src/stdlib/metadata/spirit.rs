@@ -86,11 +86,11 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_talent_refresh_item",
-            "spirit::use_talent_refresh_item(spirit_id: int, position: int, item_id: int, count: int) -> TalentRefreshResult",
+            "spirit::use_talent_refresh_item(spirit_id: int, position: int, item_id: int) -> TalentRefreshResult",
             "对指定精灵使用天赋刷新道具。",
-            params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "item_id" => "道具 ID。", "count" => "使用数量。"],
+            params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "item_id" => "道具 ID。"],
             returns: "天赋刷新结果。",
-            examples: ["let result = spirit::use_talent_refresh_item(1, 1, 300000, 1);"]
+            examples: ["let result = spirit::use_talent_refresh_item(1, 1, 300000);"]
         ),
         super::stdlib_doc!(
             "spirit",

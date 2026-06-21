@@ -513,7 +513,7 @@ pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
     StdlibFunctionRegistration::new("spirit", "use_skill_stone_preview", "spirit::use_skill_stone_preview(position: int, item_id: int)"),
     StdlibFunctionRegistration::new("spirit", "use_skill_stone_replace", "spirit::use_skill_stone_replace(position: int, item_id: int, old_skill_id: int, new_skill_id: int)"),
     StdlibFunctionRegistration::new("spirit", "use_spirit_item", "spirit::use_spirit_item(spirit_id: int, position: int, item_id: int, count: int)"),
-    StdlibFunctionRegistration::new("spirit", "use_talent_refresh_item", "spirit::use_talent_refresh_item(spirit_id: int, position: int, item_id: int, count: int)"),
+    StdlibFunctionRegistration::new("spirit", "use_talent_refresh_item", "spirit::use_talent_refresh_item(spirit_id: int, position: int, item_id: int)"),
     StdlibFunctionRegistration::new("spirit_book", "get_my_spirit_state", "spirit_book::get_my_spirit_state(spirit_id: int)"),
     StdlibFunctionRegistration::new("spirit_book", "get_my_states", "spirit_book::get_my_states()"),
     StdlibFunctionRegistration::new("spirit_book", "get_role_spirit_state", "spirit_book::get_role_spirit_state(uin: int, spirit_id: int)"),

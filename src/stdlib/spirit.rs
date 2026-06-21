@@ -78,15 +78,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         spirit_id: i64,
         position: i64
     );
-    register_stdlib_fn_4!(
+    register_stdlib_fn_3!(
         module,
         stdlib,
         "use_talent_refresh_item",
         use_talent_refresh_item,
         spirit_id: i64,
         position: i64,
-        item_id: i64,
-        count: i64
+        item_id: i64
     );
     register_stdlib_fn_1!(
         module,

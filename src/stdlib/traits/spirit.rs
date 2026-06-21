@@ -155,7 +155,6 @@ pub trait RocoSpiritStdLib: Send {
         _spirit_id: i64,
         _position: i64,
         _item_id: i64,
-        _count: i64,
     ) -> Result<TalentRefreshResult> {
         unsupported("spirit::use_talent_refresh_item")
     }

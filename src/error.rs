@@ -870,9 +870,9 @@ pub enum ScriptPendingResponseError {
         phase: ScriptCombatPhase,
     },
     CombatActionAckMismatch {
-        expected_req_type: u8,
+        expected_action_kind: u8,
         expected_spirit_index: u8,
-        actual_req_type: u8,
+        actual_action_kind: u8,
         actual_spirit_index: u8,
     },
     SkillPoolIndexExceedsI64 {
@@ -907,13 +907,13 @@ impl fmt::Display for ScriptPendingResponseError {
                 phase.as_str()
             ),
             Self::CombatActionAckMismatch {
-                expected_req_type,
+                expected_action_kind,
                 expected_spirit_index,
-                actual_req_type,
+                actual_action_kind,
                 actual_spirit_index,
             } => write!(
                 f,
-                "combat action ack mismatch: expected req_type={expected_req_type} spirit_index={expected_spirit_index}, got req_type={actual_req_type} spirit_index={actual_spirit_index}"
+                "combat action ack mismatch: expected action_kind={expected_action_kind} spirit_index={expected_spirit_index}, got action_kind={actual_action_kind} spirit_index={actual_spirit_index}"
             ),
             Self::SkillPoolIndexExceedsI64 { index } => {
                 write!(f, "skill pool index exceeds i64 range: {index}")

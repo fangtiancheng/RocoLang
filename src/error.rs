@@ -665,7 +665,7 @@ pub enum ScriptRequestError {
         kind: ScriptRequestSystemFailureKind,
     },
     InvalidCombatIntent {
-        kind: String,
+        kind: ScriptCombatIntentKind,
         spirit_index: u8,
         value: u32,
         message: String,
@@ -681,6 +681,31 @@ pub enum ScriptRequestError {
         value: u8,
         message: String,
     },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScriptCombatIntentKind {
+    UseSkill,
+    ChangeSpirit,
+    UseItem,
+    Escape,
+}
+
+impl ScriptCombatIntentKind {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::UseSkill => "use_skill",
+            Self::ChangeSpirit => "change_spirit",
+            Self::UseItem => "use_item",
+            Self::Escape => "escape",
+        }
+    }
+}
+
+impl fmt::Display for ScriptCombatIntentKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

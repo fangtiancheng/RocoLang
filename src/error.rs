@@ -673,13 +673,11 @@ pub enum ScriptRequestError {
     InvalidCombatCommand {
         kind: ScriptCombatActionValidationKind,
     },
-    InvalidCombatServerType {
+    UnsupportedCombatServerType {
         value: u8,
-        message: String,
     },
-    InvalidCombatType {
+    UnsupportedCombatType {
         value: u8,
-        message: String,
     },
 }
 
@@ -771,11 +769,11 @@ impl fmt::Display for ScriptRequestError {
             Self::InvalidCombatCommand { kind } => {
                 write!(f, "invalid combat command: {kind}")
             }
-            Self::InvalidCombatServerType { value, message } => {
-                write!(f, "invalid combat server_type {value}: {message}")
+            Self::UnsupportedCombatServerType { value } => {
+                write!(f, "unsupported combat server_type: {value}")
             }
-            Self::InvalidCombatType { value, message } => {
-                write!(f, "invalid combat_type {value}: {message}")
+            Self::UnsupportedCombatType { value } => {
+                write!(f, "unsupported combat_type: {value}")
             }
         }
     }

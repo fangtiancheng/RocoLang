@@ -10,7 +10,7 @@ pub trait RocoRuntimeStdLib: Send {
         match self.get_current_scene() {
             Ok(current_scene) if current_scene == scene_id => return Ok(ActionResult::ok()),
             Ok(_) => {}
-            Err(error) => return Ok(ActionResult::failed(error.to_string())),
+            Err(error) => return Ok(ActionResult::failed_with_error(error)),
         }
 
         match self.move_to_scene(scene_id, timeout_ms) {
@@ -19,7 +19,7 @@ pub trait RocoRuntimeStdLib: Send {
                 "server confirmed scene {}, expected {}",
                 confirmed_scene, scene_id
             ))),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -42,7 +42,7 @@ pub trait RocoRuntimeStdLib: Send {
     fn try_query_server_time(&mut self) -> Result<ServerTimeResult> {
         match self.query_server_time() {
             Ok(result) => Ok(ServerTimeResult::ok(result)),
-            Err(error) => Ok(ServerTimeResult::failed(error.to_string())),
+            Err(error) => Ok(ServerTimeResult::failed_with_error(error)),
         }
     }
 
@@ -79,15 +79,16 @@ pub trait RocoRuntimeStdLib: Send {
                 ok: false,
                 code: result.code,
                 message: result.message.clone(),
+                error: None,
                 result,
             }),
-            Err(RocoError::NetworkError(error)) => {
-                Ok(MiniGameSubmitTryResult::network_error(error.message()))
-            }
-            Err(RocoError::TimeoutError(error)) => {
-                Ok(MiniGameSubmitTryResult::network_error(error.message()))
-            }
-            Err(error) => Ok(MiniGameSubmitTryResult::failed(error.to_string())),
+            Err(RocoError::NetworkError(error)) => Ok(
+                MiniGameSubmitTryResult::network_error_with_error(RocoError::NetworkError(error)),
+            ),
+            Err(RocoError::TimeoutError(error)) => Ok(
+                MiniGameSubmitTryResult::network_error_with_error(RocoError::TimeoutError(error)),
+            ),
+            Err(error) => Ok(MiniGameSubmitTryResult::failed_with_error(error)),
         }
     }
 
@@ -101,7 +102,7 @@ pub trait RocoRuntimeStdLib: Send {
         match self.set_pause(enabled) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("set_pause returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 

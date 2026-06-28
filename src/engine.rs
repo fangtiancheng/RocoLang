@@ -9,7 +9,8 @@ use crate::debugger::{
     RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
 use crate::error::{
-    Result, RocoError, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
+    Result, RocoError, RocoErrorInfo, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation,
+    RocoScriptPosition,
 };
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
@@ -729,12 +730,15 @@ impl RocoEngine {
         engine.register_get("actions", |value: &mut CombatActionSnapshot| {
             value.actions.clone()
         });
-        register_getters!(ActionResult, ok, code, message);
+        engine.register_type_with_name::<RocoErrorInfo>("RocoErrorInfo");
+        register_getters!(RocoErrorInfo, kind, code, message);
+        register_getters!(ActionResult, ok, code, message, error);
         register_getters!(
             CombatActionResult,
             ok,
             code,
             message,
+            error,
             ack_received,
             combat_finished,
             next_action_ready
@@ -756,7 +760,7 @@ impl RocoEngine {
         engine.register_get("extra_fields", |value: &mut MiniGameSubmitResult| {
             Self::to_array(&value.extra_fields)
         });
-        register_getters!(MiniGameSubmitTryResult, ok, code, message);
+        register_getters!(MiniGameSubmitTryResult, ok, code, message, error);
         engine.register_get("result", |value: &mut MiniGameSubmitTryResult| {
             value.result.clone()
         });
@@ -813,7 +817,7 @@ impl RocoEngine {
             day,
             day_of_year,
         );
-        register_getters!(ServerTimeResult, ok, code, message);
+        register_getters!(ServerTimeResult, ok, code, message, error);
         engine.register_get("result", |value: &mut ServerTimeResult| {
             value.result.clone()
         });
@@ -2488,7 +2492,7 @@ impl RocoEngine {
         engine.register_get("captured_spirits", |value: &mut BattleResult| {
             Self::to_array(&value.captured_spirits)
         });
-        register_getters!(BattleResultQueryResult, ok, code, message);
+        register_getters!(BattleResultQueryResult, ok, code, message, error);
         engine.register_get("result", |value: &mut BattleResultQueryResult| {
             value.result.clone()
         });

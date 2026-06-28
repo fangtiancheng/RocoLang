@@ -52,7 +52,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.swap_spirits(first_position, second_position) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("swap_spirits returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -60,7 +60,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.store_spirit(position) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("store_spirit returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -84,7 +84,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.recover_all_spirits() {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("recover_all_spirits returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -104,7 +104,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.ladder_recover_spirits() {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("recover_spirits returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -124,7 +124,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.type_ladder_recover_spirits() {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("recover_spirits returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 
@@ -146,7 +146,7 @@ pub trait RocoSpiritStdLib: Send {
         match self.restore_spirit(spirit_id, position) {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("restore_spirit returned false")),
-            Err(error) => Ok(ActionResult::failed(error.to_string())),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
 

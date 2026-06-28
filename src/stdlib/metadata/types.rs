@@ -13,6 +13,11 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                     "string",
                     "失败原因或服务器返回信息，成功时通常为空。",
                 ),
+                field(
+                    "error",
+                    "RocoErrorInfo?",
+                    "结构化错误信息；成功或普通业务失败时为空。",
+                ),
             ],
         ),
         "CombatActionResult" => (
@@ -25,6 +30,11 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                     "结果码；0 表示成功，非 0 表示动作不可用或执行失败。",
                 ),
                 field("message", "string", "失败原因或服务器返回信息。"),
+                field(
+                    "error",
+                    "RocoErrorInfo?",
+                    "结构化错误信息；成功或普通业务失败时为空。",
+                ),
                 field("ack_received", "bool", "是否收到服务器对本次动作的 ACK。"),
                 field("combat_finished", "bool", "动作后战斗是否已经结束。"),
                 field(
@@ -229,6 +239,11 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 ),
                 field("message", "string", "失败原因，成功时通常为空。"),
                 field(
+                    "error",
+                    "RocoErrorInfo?",
+                    "结构化错误信息；成功或普通暂不可用时为空。",
+                ),
+                field(
                     "result",
                     "BattleResult",
                     "战斗结算结果；ok 为 false 时为默认空结果。",
@@ -263,10 +278,34 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 ),
                 field("message", "string", "失败原因，成功时通常为空。"),
                 field(
+                    "error",
+                    "RocoErrorInfo?",
+                    "结构化错误信息；成功或普通业务失败时为空。",
+                ),
+                field(
                     "result",
                     "MiniGameSubmitResult",
                     "小游戏提交结果；失败时为默认失败结果。",
                 ),
+            ],
+        ),
+        "PetTrainingRewardItem" => (
+            "家园锻炼奖励道具。",
+            vec![
+                field("item_id", "int", "奖励道具 ID。"),
+                field("count", "int", "奖励数量。"),
+            ],
+        ),
+        "PetTrainingResult" => (
+            "家园锻炼 CGI 返回结果。",
+            vec![
+                field("ok", "bool", "请求是否成功。"),
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("training_type", "int", "锻炼类型。"),
+                field("pet_id", "int", "锻炼宠物 ID；结算时传回服务器。"),
+                field("rewards", "PetTrainingRewardItem[]", "结算获得的奖励道具。"),
+                field("raw_text", "string", "原始 CGI 响应文本。"),
             ],
         ),
         "UserInfo" => (
@@ -308,6 +347,11 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 field("ok", "bool", "是否成功查询。"),
                 field("code", "int", "结果码；0 表示成功，其它非 0 表示失败。"),
                 field("message", "string", "失败原因，成功时通常为空。"),
+                field(
+                    "error",
+                    "RocoErrorInfo?",
+                    "结构化错误信息；成功或普通业务失败时为空。",
+                ),
                 field("result", "ServerTimeInfo", "服务器时间；失败时为默认空值。"),
             ],
         ),

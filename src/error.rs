@@ -1028,13 +1028,67 @@ impl fmt::Display for RocoInvalidParamError {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoNetworkError {
     ChannelClosed,
-    HttpRequestFailed { message: String },
-    NetResponseParseFailed { message: String },
+    HttpRequestFailed {
+        message: String,
+    },
+    HttpBridgeRequestFailed {
+        code: String,
+        message: String,
+    },
+    NetBridgeRequestFailed {
+        code: String,
+        message: String,
+    },
+    NetResponseParseFailed {
+        target: String,
+        source: RocoNetResponseParseSource,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoNetResponseParseSource {
+    Protocol { message: String },
+    UnexpectedCommand { cmd_id: u32 },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RocoErrorInfo {
+    pub kind: String,
+    pub code: String,
+    pub message: String,
 }
 
 impl RocoNetworkError {
+    pub fn kind(&self) -> &'static str {
+        match self {
+            Self::ChannelClosed => "channel_closed",
+            Self::HttpRequestFailed { .. } => "http_request_failed",
+            Self::HttpBridgeRequestFailed { .. } => "http_bridge_request_failed",
+            Self::NetBridgeRequestFailed { .. } => "net_bridge_request_failed",
+            Self::NetResponseParseFailed { .. } => "net_response_parse_failed",
+        }
+    }
+
+    pub fn code(&self) -> &str {
+        match self {
+            Self::ChannelClosed => "network.channel_closed",
+            Self::HttpRequestFailed { .. } => "network.http_request_failed",
+            Self::HttpBridgeRequestFailed { code, .. } => code.as_str(),
+            Self::NetBridgeRequestFailed { code, .. } => code.as_str(),
+            Self::NetResponseParseFailed { .. } => "network.net_response_parse_failed",
+        }
+    }
+
     pub fn message(&self) -> String {
         self.to_string()
+    }
+
+    pub fn info(&self) -> RocoErrorInfo {
+        RocoErrorInfo {
+            kind: self.kind().to_string(),
+            code: self.code().to_string(),
+            message: self.message(),
+        }
     }
 }
 
@@ -1043,8 +1097,25 @@ impl fmt::Display for RocoNetworkError {
         match self {
             Self::ChannelClosed => f.write_str("Channel closed"),
             Self::HttpRequestFailed { message } => write!(f, "HTTP request failed: {message}"),
-            Self::NetResponseParseFailed { message } => {
-                write!(f, "failed to parse network response: {message}")
+            Self::HttpBridgeRequestFailed { code, message } => {
+                write!(f, "HTTP bridge request failed [{code}]: {message}")
+            }
+            Self::NetBridgeRequestFailed { code, message } => {
+                write!(f, "Net bridge request failed [{code}]: {message}")
+            }
+            Self::NetResponseParseFailed { target, source } => {
+                write!(f, "failed to parse network response {target}: {source}")
+            }
+        }
+    }
+}
+
+impl fmt::Display for RocoNetResponseParseSource {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Protocol { message } => f.write_str(message),
+            Self::UnexpectedCommand { cmd_id } => {
+                write!(f, "unexpected command cmd_id=0x{cmd_id:x}")
             }
         }
     }
@@ -1145,6 +1216,46 @@ impl fmt::Display for RocoError {
 }
 
 impl std::error::Error for RocoError {}
+
+impl RocoError {
+    pub fn kind(&self) -> &'static str {
+        match self {
+            Self::ScriptError(_) => "script_error",
+            Self::StdLib(_) => "stdlib",
+            Self::InvalidParam(_) => "invalid_param",
+            Self::NetworkError(error) => error.kind(),
+            Self::TimeoutError(_) => "timeout",
+            Self::ServerRejected(_) => "server_rejected",
+            Self::AssertionError(_) => "assertion",
+            Self::Other(_) => "other",
+        }
+    }
+
+    pub fn code(&self) -> String {
+        match self {
+            Self::ScriptError(error) => format!("script.{}", error.kind.as_str()),
+            Self::StdLib(_) => "stdlib".to_string(),
+            Self::InvalidParam(_) => "invalid_param".to_string(),
+            Self::NetworkError(error) => error.code().to_string(),
+            Self::TimeoutError(_) => "timeout.waiting_for_response".to_string(),
+            Self::ServerRejected(_) => "server_rejected".to_string(),
+            Self::AssertionError(_) => "assertion".to_string(),
+            Self::Other(_) => "other".to_string(),
+        }
+    }
+
+    pub fn message(&self) -> String {
+        self.to_string()
+    }
+
+    pub fn info(&self) -> RocoErrorInfo {
+        RocoErrorInfo {
+            kind: self.kind().to_string(),
+            code: self.code(),
+            message: self.message(),
+        }
+    }
+}
 
 impl From<RocoStdLibError> for RocoError {
     fn from(error: RocoStdLibError) -> Self {

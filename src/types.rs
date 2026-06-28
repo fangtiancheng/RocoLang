@@ -1,5 +1,6 @@
 //! 共享类型定义
 
+use crate::{RocoError, RocoErrorInfo};
 use serde::{Deserialize, Serialize};
 
 /// 宠物信息
@@ -140,6 +141,7 @@ pub struct ServerTimeResult {
     pub ok: bool,
     pub code: i64,
     pub message: String,
+    pub error: Option<RocoErrorInfo>,
     pub result: ServerTimeInfo,
 }
 
@@ -149,6 +151,7 @@ impl ServerTimeResult {
             ok: true,
             code: 0,
             message: String::new(),
+            error: None,
             result,
         }
     }
@@ -158,6 +161,18 @@ impl ServerTimeResult {
             ok: false,
             code: 2,
             message: message.into(),
+            error: None,
+            result: ServerTimeInfo::default(),
+        }
+    }
+
+    pub fn failed_with_error(error: RocoError) -> Self {
+        let message = error.message();
+        Self {
+            ok: false,
+            code: 2,
+            message,
+            error: Some(error.info()),
             result: ServerTimeInfo::default(),
         }
     }
@@ -225,6 +240,7 @@ pub struct BattleResultQueryResult {
     pub ok: bool,
     pub code: i64,
     pub message: String,
+    pub error: Option<RocoErrorInfo>,
     pub result: Option<BattleResult>,
 }
 
@@ -234,6 +250,7 @@ impl BattleResultQueryResult {
             ok: true,
             code: 0,
             message: String::new(),
+            error: None,
             result: Some(result),
         }
     }
@@ -243,6 +260,17 @@ impl BattleResultQueryResult {
             ok: false,
             code: 1,
             message: message.into(),
+            error: None,
+            result: None,
+        }
+    }
+
+    pub fn unavailable_with_error(error: RocoError) -> Self {
+        Self {
+            ok: false,
+            code: 1,
+            message: error.message(),
+            error: Some(error.info()),
             result: None,
         }
     }
@@ -2292,6 +2320,7 @@ pub struct ActionResult {
     pub ok: bool,
     pub code: i64,
     pub message: String,
+    pub error: Option<RocoErrorInfo>,
 }
 
 impl ActionResult {
@@ -2300,6 +2329,7 @@ impl ActionResult {
             ok: true,
             code: 0,
             message: String::new(),
+            error: None,
         }
     }
 
@@ -2308,6 +2338,7 @@ impl ActionResult {
             ok: false,
             code: 1,
             message: message.into(),
+            error: None,
         }
     }
 
@@ -2316,6 +2347,16 @@ impl ActionResult {
             ok: false,
             code: 2,
             message: message.into(),
+            error: None,
+        }
+    }
+
+    pub fn failed_with_error(error: RocoError) -> Self {
+        Self {
+            ok: false,
+            code: 2,
+            message: error.message(),
+            error: Some(error.info()),
         }
     }
 }
@@ -2325,6 +2366,7 @@ pub struct CombatActionResult {
     pub ok: bool,
     pub code: i64,
     pub message: String,
+    pub error: Option<RocoErrorInfo>,
     pub ack_received: bool,
     pub combat_finished: bool,
     pub next_action_ready: bool,
@@ -2336,6 +2378,7 @@ impl CombatActionResult {
             ok: true,
             code: 0,
             message: String::new(),
+            error: None,
             ack_received: true,
             combat_finished,
             next_action_ready,
@@ -2347,6 +2390,7 @@ impl CombatActionResult {
             ok: false,
             code: 1,
             message: message.into(),
+            error: None,
             ack_received: false,
             combat_finished: false,
             next_action_ready: false,
@@ -2358,6 +2402,19 @@ impl CombatActionResult {
             ok: false,
             code: 2,
             message: message.into(),
+            error: None,
+            ack_received: false,
+            combat_finished: false,
+            next_action_ready: false,
+        }
+    }
+
+    pub fn from_action_result(action: ActionResult) -> Self {
+        Self {
+            ok: false,
+            code: action.code,
+            message: action.message,
+            error: action.error,
             ack_received: false,
             combat_finished: false,
             next_action_ready: false,
@@ -2410,6 +2467,7 @@ pub struct MiniGameSubmitTryResult {
     pub ok: bool,
     pub code: i64,
     pub message: String,
+    pub error: Option<RocoErrorInfo>,
     pub result: MiniGameSubmitResult,
 }
 
@@ -2421,6 +2479,7 @@ impl MiniGameSubmitTryResult {
             ok: true,
             code: 0,
             message: String::new(),
+            error: None,
             result,
         }
     }
@@ -2433,11 +2492,30 @@ impl MiniGameSubmitTryResult {
         Self::failed_with_code(Self::CODE_NETWORK_ERROR, message)
     }
 
+    pub fn network_error_with_error(error: RocoError) -> Self {
+        let message = error.message();
+        Self::failed_with_code_and_error(Self::CODE_NETWORK_ERROR, message, Some(error.info()))
+    }
+
+    pub fn failed_with_error(error: RocoError) -> Self {
+        let message = error.message();
+        Self::failed_with_code_and_error(2, message, Some(error.info()))
+    }
+
     fn failed_with_code(code: i64, message: impl Into<String>) -> Self {
+        Self::failed_with_code_and_error(code, message, None)
+    }
+
+    fn failed_with_code_and_error(
+        code: i64,
+        message: impl Into<String>,
+        error: Option<RocoErrorInfo>,
+    ) -> Self {
         let message = message.into();
         Self {
             ok: false,
             code,
+            error,
             result: MiniGameSubmitResult::failed(message.clone()),
             message,
         }

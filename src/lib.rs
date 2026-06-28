@@ -17,9 +17,10 @@ pub use debugger::{
 };
 pub use engine::RocoEngine;
 pub use error::{
-    Result, RocoError, RocoGeneralError, RocoInvalidParamError, RocoNetworkError, RocoParamRange,
-    RocoScriptError, RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition,
-    RocoServerRejectedError, RocoStdLibError, RocoTimeoutError, ScriptActivityOperationError,
+    Result, RocoError, RocoErrorInfo, RocoGeneralError, RocoInvalidParamError,
+    RocoNetResponseParseSource, RocoNetworkError, RocoParamRange, RocoScriptError,
+    RocoScriptErrorKind, RocoScriptLocation, RocoScriptPosition, RocoServerRejectedError,
+    RocoStdLibError, RocoTimeoutError, ScriptActivityOperationError,
     ScriptBackendCombatRuntimeErrorKind, ScriptBridgeError, ScriptCombatActionError,
     ScriptCombatActionValidationKind, ScriptCombatPhase, ScriptCombatRuntimeError,
     ScriptCombatWaitError, ScriptFunctionContextError, ScriptLookupEntity, ScriptLookupError,

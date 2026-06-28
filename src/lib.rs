@@ -27,7 +27,7 @@ pub use error::{
     ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
     ScriptRequestSystemFailureKind, ScriptResponseError, ScriptSessionMemoryError,
     ScriptSessionValueKind, ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemError,
-    ScriptUnsupportedError,
+    ScriptUnsupportedError, ScriptWaitContext,
 };
 pub use stdlib::{
     documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,

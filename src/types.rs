@@ -3,12 +3,191 @@
 use crate::{RocoError, RocoErrorInfo};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RocoRequestContext {
+    pub raw: String,
+    pub domain: String,
+    pub action: String,
+}
+
+impl RocoRequestContext {
+    pub fn from_raw(raw: impl Into<String>) -> Self {
+        let raw = raw.into();
+        let (domain, action) = raw
+            .split_once('.')
+            .map(|(domain, action)| (domain.to_string(), action.to_string()))
+            .unwrap_or_else(|| (raw.clone(), String::new()));
+        Self {
+            raw,
+            domain,
+            action,
+        }
+    }
+}
+
+impl From<String> for RocoRequestContext {
+    fn from(raw: String) -> Self {
+        Self::from_raw(raw)
+    }
+}
+
+impl From<&str> for RocoRequestContext {
+    fn from(raw: &str) -> Self {
+        Self::from_raw(raw)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoRewardKind {
+    Item,
+    Money,
+    AssignableExp,
+    Furniture,
+    Spirit,
+    SpiritEquipment,
+    TimedDress,
+    Unmapped,
+}
+
+impl RocoRewardKind {
+    pub const fn code(self) -> &'static str {
+        match self {
+            Self::Item => "item",
+            Self::Money => "money",
+            Self::AssignableExp => "assignable_exp",
+            Self::Furniture => "furniture",
+            Self::Spirit => "spirit",
+            Self::SpiritEquipment => "spirit_equipment",
+            Self::TimedDress => "timed_dress",
+            Self::Unmapped => "unmapped",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoOptionalI64 {
+    Missing,
+    Present { value: i64 },
+}
+
+impl RocoOptionalI64 {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(value: i64) -> Self {
+        Self::Present { value }
+    }
+
+    pub const fn is_present(self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub const fn value_or(self, default: i64) -> i64 {
+        match self {
+            Self::Missing => default,
+            Self::Present { value } => value,
+        }
+    }
+}
+
+impl From<Option<i64>> for RocoOptionalI64 {
+    fn from(value: Option<i64>) -> Self {
+        value.map(Self::present).unwrap_or(Self::Missing)
+    }
+}
+
+impl From<Option<u32>> for RocoOptionalI64 {
+    fn from(value: Option<u32>) -> Self {
+        value
+            .map(|value| Self::present(i64::from(value)))
+            .unwrap_or(Self::Missing)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RocoDisplayItem {
+    pub item_id: i64,
+    pub item_count: i64,
+    pub item_type: i64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RocoOptionalDisplayItem {
+    Missing,
+    Present { item: RocoDisplayItem },
+}
+
+impl RocoOptionalDisplayItem {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(item: RocoDisplayItem) -> Self {
+        Self::Present { item }
+    }
+
+    pub const fn is_present(self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub const fn item_or_default(self) -> RocoDisplayItem {
+        match self {
+            Self::Missing => RocoDisplayItem {
+                item_id: 0,
+                item_count: 0,
+                item_type: 0,
+            },
+            Self::Present { item } => item,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn request_context_splits_domain_and_action() {
+        let context = RocoRequestContext::from_raw("virgo.query_status");
+        assert_eq!(context.raw, "virgo.query_status");
+        assert_eq!(context.domain, "virgo");
+        assert_eq!(context.action, "query_status");
+    }
+
+    #[test]
+    fn request_context_preserves_unknown_single_segment() {
+        let context = RocoRequestContext::from_raw("legacy");
+        assert_eq!(context.raw, "legacy");
+        assert_eq!(context.domain, "legacy");
+        assert_eq!(context.action, "");
+    }
+
+    #[test]
+    fn reward_kind_has_stable_script_code() {
+        assert_eq!(RocoRewardKind::Item.code(), "item");
+        assert_eq!(RocoRewardKind::AssignableExp.code(), "assignable_exp");
+        assert_eq!(RocoRewardKind::SpiritEquipment.code(), "spirit_equipment");
+        assert_eq!(RocoRewardKind::TimedDress.code(), "timed_dress");
+    }
+
+    #[test]
+    fn optional_i64_tracks_presence_without_sentinel() {
+        let missing = RocoOptionalI64::from(None::<u32>);
+        let present = RocoOptionalI64::from(Some(7_u32));
+        assert!(!missing.is_present());
+        assert_eq!(missing.value_or(42), 42);
+        assert!(present.is_present());
+        assert_eq!(present.value_or(42), 7);
+    }
+}
+
 /// 宠物信息
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpiritInfo {
     pub spirit_id: i64,
     pub position: i64,
-    pub catch_time: i64,
+    pub catch_time: RocoOptionalI64,
     pub name: String,
     pub level: i64,
     pub hp: i64,
@@ -341,8 +520,17 @@ pub struct StarTowerInfo {
     pub money: i64,
     pub clips: Vec<i64>,
     pub storeys: Vec<StarTowerStorey>,
-    pub has_top: bool,
-    pub top: StarTowerTop,
+    pub top: RocoOptionalStarTowerTop,
+}
+
+impl StarTowerInfo {
+    pub fn has_top(&self) -> bool {
+        self.top.is_present()
+    }
+
+    pub fn top_or_default(&self) -> StarTowerTop {
+        self.top.top_or_default()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -351,6 +539,7 @@ pub struct StarTowerStorey {
     pub first: i64,
     pub can_quick_fight: bool,
     pub nodes: Vec<StarTowerNode>,
+    pub exchange_items: Vec<StarTowerExchangeItem>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -364,6 +553,17 @@ pub struct StarTowerNode {
     pub equip_id: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StarTowerExchangeItem {
+    pub index: i64,
+    pub item_id: i64,
+    pub item_name: String,
+    pub spirit_id: RocoOptionalI64,
+    pub spirit_name: String,
+    pub owned: i64,
+    pub required: i64,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct StarTowerTop {
     pub star: i64,
@@ -375,6 +575,33 @@ pub struct StarTowerTop {
     pub exchanges: Vec<i64>,
     pub missions: Vec<StarTowerTopMission>,
     pub rewards: Vec<StarTowerTopReward>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum RocoOptionalStarTowerTop {
+    Missing,
+    Present { top: StarTowerTop },
+}
+
+impl RocoOptionalStarTowerTop {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(top: StarTowerTop) -> Self {
+        Self::Present { top }
+    }
+
+    pub const fn is_present(&self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub fn top_or_default(&self) -> StarTowerTop {
+        match self {
+            Self::Missing => StarTowerTop::default(),
+            Self::Present { top } => top.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -731,8 +958,34 @@ pub struct CapricornInviteListInfo {
 pub struct CapricornTeamOperationInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_team: bool,
-    pub team: CapricornTeamSnapshot,
+    pub team: RocoOptionalCapricornTeamSnapshot,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum RocoOptionalCapricornTeamSnapshot {
+    Missing,
+    Present { team: CapricornTeamSnapshot },
+}
+
+impl RocoOptionalCapricornTeamSnapshot {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(team: CapricornTeamSnapshot) -> Self {
+        Self::Present { team }
+    }
+
+    pub const fn is_present(&self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub fn team_or_default(&self) -> CapricornTeamSnapshot {
+        match self {
+            Self::Missing => CapricornTeamSnapshot::default(),
+            Self::Present { team } => team.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -745,39 +998,58 @@ pub struct CapricornSecondTask {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum RocoOptionalCapricornSecondTask {
+    Missing,
+    Present { task: CapricornSecondTask },
+}
+
+impl RocoOptionalCapricornSecondTask {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(task: CapricornSecondTask) -> Self {
+        Self::Present { task }
+    }
+
+    pub const fn is_present(&self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub fn task_or_default(&self) -> CapricornSecondTask {
+        match self {
+            Self::Missing => CapricornSecondTask::default(),
+            Self::Present { task } => task.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapricornBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapricornStarPalaceInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapricornSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_finish: bool,
-    pub finish: i64,
-    pub has_current: bool,
-    pub current: i64,
-    pub has_position: bool,
-    pub position: i64,
-    pub has_second_task: bool,
-    pub second_task: CapricornSecondTask,
+    pub request_context: RocoRequestContext,
+    pub finish: RocoOptionalI64,
+    pub current: RocoOptionalI64,
+    pub position: RocoOptionalI64,
+    pub second_task: RocoOptionalCapricornSecondTask,
     pub bag_candidates: Vec<CapricornBagCandidate>,
 }
 
@@ -785,23 +1057,15 @@ pub struct CapricornSecondInfo {
 pub struct CapricornThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_finish: bool,
-    pub finish: i64,
-    pub has_current: bool,
-    pub current: i64,
-    pub has_remain: bool,
-    pub remain: i64,
-    pub has_price: bool,
-    pub price: i64,
-    pub has_limit: bool,
-    pub limit: i64,
-    pub has_progress_percent: bool,
-    pub progress_percent: i64,
-    pub has_reward_num: bool,
-    pub reward_num: i64,
-    pub has_tips: bool,
-    pub tips: i64,
+    pub request_context: RocoRequestContext,
+    pub finish: RocoOptionalI64,
+    pub current: RocoOptionalI64,
+    pub remain: RocoOptionalI64,
+    pub price: RocoOptionalI64,
+    pub limit: RocoOptionalI64,
+    pub progress_percent: RocoOptionalI64,
+    pub reward_num: RocoOptionalI64,
+    pub tips: RocoOptionalI64,
     pub bag_candidates: Vec<CapricornBagCandidate>,
 }
 
@@ -824,7 +1088,7 @@ pub struct CancerPetInfo {
 pub struct CancerSharpScorpionInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub light_num: i64,
     pub tail_num: i64,
     pub boss_left_hp: i64,
@@ -834,15 +1098,14 @@ pub struct CancerSharpScorpionInfo {
     pub today_sum_hit: i64,
     pub exchange_count0: i64,
     pub exchange_count1: i64,
-    pub has_display_item: bool,
-    pub display_item: CancerItemInfo,
+    pub display_item: RocoOptionalDisplayItem,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CancerMendShapeInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub left_times: i64,
     pub step: i64,
     pub complete: i64,
@@ -852,7 +1115,7 @@ pub struct CancerMendShapeInfo {
 pub struct CancerMendShapeBagInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub pets: Vec<CancerPetInfo>,
 }
 
@@ -860,7 +1123,7 @@ pub struct CancerMendShapeBagInfo {
 pub struct CancerUnsealMemoriesInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub advance: i64,
     pub level: i64,
     pub power: i64,
@@ -874,7 +1137,7 @@ pub struct CancerUnsealMemoriesInfo {
 pub struct CancerUnsealMemoriesBagInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub pets: Vec<CancerPetInfo>,
 }
 
@@ -894,10 +1157,10 @@ pub struct VirgoCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VirgoPetInfo {
     pub candidate_index: i64,
-    pub spirit_id: i64,
+    pub spirit_id: RocoOptionalI64,
     pub has_bag_index: bool,
     pub bag_index: i64,
-    pub catch_time: i64,
+    pub catch_time: RocoOptionalI64,
     pub has_level: bool,
     pub level: i64,
     pub has_need_money: bool,
@@ -908,7 +1171,7 @@ pub struct VirgoPetInfo {
 pub struct VirgoServeGodInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<VirgoField>,
     pub counters: Vec<VirgoCounter>,
     pub states: Vec<i64>,
@@ -919,7 +1182,7 @@ pub struct VirgoServeGodInfo {
 pub struct VirgoFindHalidomInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<VirgoField>,
     pub counters: Vec<VirgoCounter>,
     pub states: Vec<i64>,
@@ -930,7 +1193,7 @@ pub struct VirgoFindHalidomInfo {
 pub struct VirgoBellFoxInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<VirgoField>,
     pub counters: Vec<VirgoCounter>,
     pub states: Vec<i64>,
@@ -956,10 +1219,7 @@ pub struct VirgoBellFoxStatusInfo {
 pub struct VirgoBellFoxExchangeInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_item: bool,
-    pub item_id: i64,
-    pub item_count: i64,
-    pub item_type: i64,
+    pub item: RocoOptionalDisplayItem,
     pub light_num: i64,
     pub tail_num: i64,
     pub exchange_count0: i64,
@@ -982,22 +1242,18 @@ pub struct PiscesCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PiscesBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PiscesFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<PiscesField>,
     pub counters: Vec<PiscesCounter>,
     pub lights: Vec<i64>,
@@ -1011,7 +1267,7 @@ pub struct PiscesFirstInfo {
 pub struct PiscesSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<PiscesField>,
     pub counters: Vec<PiscesCounter>,
     pub lights: Vec<i64>,
@@ -1025,7 +1281,7 @@ pub struct PiscesSecondInfo {
 pub struct PiscesThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<PiscesField>,
     pub counters: Vec<PiscesCounter>,
     pub lights: Vec<i64>,
@@ -1051,22 +1307,18 @@ pub struct TaurusCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaurusBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaurusFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<TaurusField>,
     pub counters: Vec<TaurusCounter>,
     pub item_counts: Vec<i64>,
@@ -1078,7 +1330,7 @@ pub struct TaurusFirstInfo {
 pub struct TaurusSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<TaurusField>,
     pub counters: Vec<TaurusCounter>,
     pub item_counts: Vec<i64>,
@@ -1090,7 +1342,7 @@ pub struct TaurusSecondInfo {
 pub struct TaurusThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<TaurusField>,
     pub counters: Vec<TaurusCounter>,
     pub item_counts: Vec<i64>,
@@ -1114,7 +1366,7 @@ pub struct ThreeStartersCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThreeStartersRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1122,15 +1374,11 @@ pub struct ThreeStartersRewardItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThreeStartersBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1142,7 +1390,7 @@ pub struct MagicPioneerField {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MagicPioneerRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1153,7 +1401,7 @@ pub struct MagicPioneerInfo {
     pub cmd: String,
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<MagicPioneerField>,
     pub rewards: Vec<MagicPioneerRewardItem>,
 }
@@ -1161,7 +1409,7 @@ pub struct MagicPioneerInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlchemyFurnaceRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1169,31 +1417,23 @@ pub struct AlchemyFurnaceRewardItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlchemyFurnaceBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonkeyCultivationInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub pill_counts: Vec<i64>,
-    pub has_daytimes: bool,
-    pub daytimes: i64,
-    pub has_finish: bool,
-    pub finish: i64,
-    pub has_progress: bool,
-    pub progress: i64,
-    pub has_add_progress: bool,
-    pub add_progress: i64,
+    pub daytimes: RocoOptionalI64,
+    pub finish: RocoOptionalI64,
+    pub progress: RocoOptionalI64,
+    pub add_progress: RocoOptionalI64,
     pub rewards: Vec<AlchemyFurnaceRewardItem>,
 }
 
@@ -1201,16 +1441,12 @@ pub struct MonkeyCultivationInfo {
 pub struct MonkeyEvoInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub pill_counts: Vec<i64>,
-    pub has_branch_type: bool,
-    pub branch_type: i64,
-    pub has_done: bool,
-    pub done: i64,
-    pub has_schedule: bool,
-    pub schedule: i64,
-    pub has_add_progress: bool,
-    pub add_progress: i64,
+    pub branch_type: RocoOptionalI64,
+    pub done: RocoOptionalI64,
+    pub schedule: RocoOptionalI64,
+    pub add_progress: RocoOptionalI64,
     pub bag_candidates: Vec<AlchemyFurnaceBagCandidate>,
     pub rewards: Vec<AlchemyFurnaceRewardItem>,
 }
@@ -1219,19 +1455,14 @@ pub struct MonkeyEvoInfo {
 pub struct RagingFireInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_vip: bool,
-    pub vip: i64,
-    pub has_daytimes: bool,
-    pub daytimes: i64,
+    pub request_context: RocoRequestContext,
+    pub vip: RocoOptionalI64,
+    pub daytimes: RocoOptionalI64,
     pub required_stone_indexes: Vec<i64>,
     pub progress: Vec<i64>,
-    pub has_finish: bool,
-    pub finish: i64,
-    pub has_fusion: bool,
-    pub fusion: i64,
-    pub has_add_progress: bool,
-    pub add_progress: i64,
+    pub finish: RocoOptionalI64,
+    pub fusion: RocoOptionalI64,
+    pub add_progress: RocoOptionalI64,
     pub bag_candidates: Vec<AlchemyFurnaceBagCandidate>,
     pub rewards: Vec<AlchemyFurnaceRewardItem>,
 }
@@ -1239,7 +1470,7 @@ pub struct RagingFireInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnicornRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1247,52 +1478,38 @@ pub struct UnicornRewardItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnicornBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnicornBossInfo {
     pub slot: i64,
     pub npc_index: i64,
-    pub has_spirit_id: bool,
-    pub spirit_id: i64,
-    pub has_fight_id: bool,
-    pub fight_id: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub fight_id: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnicornInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub bosses: Vec<UnicornBossInfo>,
-    pub has_finish: bool,
-    pub finish: i64,
-    pub has_start: bool,
-    pub start: i64,
-    pub has_total: bool,
-    pub total: i64,
-    pub has_book: bool,
-    pub book: i64,
+    pub finish: RocoOptionalI64,
+    pub start: RocoOptionalI64,
+    pub total: RocoOptionalI64,
+    pub book: RocoOptionalI64,
     pub cultivation_times: Vec<i64>,
     pub evolution_energy_costs: Vec<i64>,
     pub one_key_diamond_costs: Vec<i64>,
-    pub has_purple_vine_count: bool,
-    pub purple_vine_count: i64,
-    pub has_energy: bool,
-    pub energy: i64,
-    pub has_fruit_count: bool,
-    pub fruit_count: i64,
-    pub has_increase: bool,
-    pub increase: i64,
+    pub purple_vine_count: RocoOptionalI64,
+    pub energy: RocoOptionalI64,
+    pub fruit_count: RocoOptionalI64,
+    pub increase: RocoOptionalI64,
     pub bag_candidates: Vec<UnicornBagCandidate>,
     pub rewards: Vec<UnicornRewardItem>,
 }
@@ -1300,7 +1517,7 @@ pub struct UnicornInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FourSeasonsRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1324,25 +1541,16 @@ pub struct FourSeasonsMonthlySpiritRewardInfo {
 pub struct FourSeasonsInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_month: bool,
-    pub month: i64,
-    pub has_map: bool,
-    pub map: i64,
-    pub has_position_1based: bool,
-    pub position_1based: i64,
-    pub has_times: bool,
-    pub times: i64,
-    pub has_ticket: bool,
-    pub ticket: i64,
-    pub has_used_tool_index: bool,
-    pub used_tool_index: i64,
-    pub has_need_item_index: bool,
-    pub need_item_index: i64,
-    pub has_add: bool,
-    pub add: i64,
-    pub has_point: bool,
-    pub point: i64,
+    pub request_context: RocoRequestContext,
+    pub month: RocoOptionalI64,
+    pub map: RocoOptionalI64,
+    pub position_1based: RocoOptionalI64,
+    pub times: RocoOptionalI64,
+    pub ticket: RocoOptionalI64,
+    pub used_tool_index: RocoOptionalI64,
+    pub need_item_index: RocoOptionalI64,
+    pub add: RocoOptionalI64,
+    pub point: RocoOptionalI64,
     pub boxes: Vec<i64>,
     pub tools: Vec<i64>,
     pub tool_shop_indexes: Vec<i64>,
@@ -1358,7 +1566,7 @@ pub struct FourSeasonsInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiamondTearRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1367,15 +1575,11 @@ pub struct DiamondTearRewardItem {
 pub struct DiamondTearInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_buy: bool,
-    pub buy: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_count_down: bool,
-    pub count_down: i64,
-    pub has_tear_state: bool,
-    pub tear_state: i64,
+    pub request_context: RocoRequestContext,
+    pub buy: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub count_down: RocoOptionalI64,
+    pub tear_state: RocoOptionalI64,
     pub rewards: Vec<DiamondTearRewardItem>,
 }
 
@@ -1386,23 +1590,49 @@ pub struct IceCrystalBattleInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum RocoOptionalIceCrystalBattleInfo {
+    Missing,
+    Present { battle: IceCrystalBattleInfo },
+}
+
+impl RocoOptionalIceCrystalBattleInfo {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(battle: IceCrystalBattleInfo) -> Self {
+        Self::Present { battle }
+    }
+
+    pub const fn is_present(&self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub fn battle_or_default(&self) -> IceCrystalBattleInfo {
+        match self {
+            Self::Missing => IceCrystalBattleInfo {
+                battle_index: 0,
+                fight_id: 0,
+            },
+            Self::Present { battle } => battle.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IceCrystalBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IceCrystalRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1411,23 +1641,17 @@ pub struct IceCrystalRewardItem {
 pub struct IceCrystalInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
-    pub has_progress: bool,
-    pub progress: i64,
-    pub has_battle_times: bool,
-    pub battle_times: i64,
-    pub has_battle_index: bool,
-    pub battle_index: i64,
-    pub has_get_times: bool,
-    pub get_times: i64,
-    pub has_add: bool,
-    pub add: i64,
+    pub request_context: RocoRequestContext,
+    pub progress: RocoOptionalI64,
+    pub battle_times: RocoOptionalI64,
+    pub battle_index: RocoOptionalI64,
+    pub get_times: RocoOptionalI64,
+    pub add: RocoOptionalI64,
     pub item_counts: Vec<i64>,
     pub crystal_counts: Vec<i64>,
     pub item_costs: Vec<i64>,
     pub one_key_diamond_costs: Vec<i64>,
-    pub has_current_battle: bool,
-    pub current_battle: IceCrystalBattleInfo,
+    pub current_battle: RocoOptionalIceCrystalBattleInfo,
     pub bag_candidates: Vec<IceCrystalBagCandidate>,
     pub rewards: Vec<IceCrystalRewardItem>,
 }
@@ -1444,7 +1668,7 @@ pub struct MultiEvolutionCandidate {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MultiEvolutionRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1453,15 +1677,12 @@ pub struct MultiEvolutionRewardItem {
 pub struct MultiEvolutionInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub candidates: Vec<MultiEvolutionCandidate>,
     pub rewards: Vec<MultiEvolutionRewardItem>,
-    pub has_pet_id: bool,
-    pub pet_id: i64,
-    pub has_result_side: bool,
-    pub result_side: i64,
-    pub has_item_id: bool,
-    pub item_id: i64,
+    pub pet_id: RocoOptionalI64,
+    pub result_side: RocoOptionalI64,
+    pub item_id: RocoOptionalI64,
     pub count: i64,
     pub available: bool,
 }
@@ -1470,19 +1691,15 @@ pub struct MultiEvolutionInfo {
 pub struct WaterSourceInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ThreeStartersField>,
     pub counters: Vec<ThreeStartersCounter>,
     pub rewards: Vec<ThreeStartersRewardItem>,
     pub bag_candidates: Vec<ThreeStartersBagCandidate>,
-    pub has_battle: bool,
-    pub battle: i64,
-    pub has_schedule: bool,
-    pub schedule: i64,
-    pub has_time: bool,
-    pub time: i64,
-    pub has_increase: bool,
-    pub increase: i64,
+    pub battle: RocoOptionalI64,
+    pub schedule: RocoOptionalI64,
+    pub time: RocoOptionalI64,
+    pub increase: RocoOptionalI64,
     pub water: Vec<i64>,
 }
 
@@ -1490,15 +1707,13 @@ pub struct WaterSourceInfo {
 pub struct FiresWillInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ThreeStartersField>,
     pub counters: Vec<ThreeStartersCounter>,
     pub rewards: Vec<ThreeStartersRewardItem>,
     pub bag_candidates: Vec<ThreeStartersBagCandidate>,
-    pub has_schedule: bool,
-    pub schedule: i64,
-    pub has_num: bool,
-    pub num: i64,
+    pub schedule: RocoOptionalI64,
+    pub num: RocoOptionalI64,
     pub fire: Vec<i64>,
 }
 
@@ -1506,27 +1721,19 @@ pub struct FiresWillInfo {
 pub struct BatheSunInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ThreeStartersField>,
     pub counters: Vec<ThreeStartersCounter>,
     pub rewards: Vec<ThreeStartersRewardItem>,
     pub bag_candidates: Vec<ThreeStartersBagCandidate>,
-    pub has_battle: bool,
-    pub battle: i64,
-    pub has_schedule: bool,
-    pub schedule: i64,
-    pub has_time: bool,
-    pub time: i64,
-    pub has_num: bool,
-    pub num: i64,
-    pub has_act: bool,
-    pub act: i64,
-    pub has_times: bool,
-    pub times: i64,
-    pub has_sun: bool,
-    pub sun: i64,
-    pub has_add: bool,
-    pub add: i64,
+    pub battle: RocoOptionalI64,
+    pub schedule: RocoOptionalI64,
+    pub time: RocoOptionalI64,
+    pub num: RocoOptionalI64,
+    pub act: RocoOptionalI64,
+    pub times: RocoOptionalI64,
+    pub sun: RocoOptionalI64,
+    pub add: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1545,7 +1752,7 @@ pub struct GeminiCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GeminiRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1553,22 +1760,18 @@ pub struct GeminiRewardItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GeminiBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GeminiFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<GeminiField>,
     pub counters: Vec<GeminiCounter>,
     pub scores: Vec<i64>,
@@ -1582,7 +1785,7 @@ pub struct GeminiFirstInfo {
 pub struct GeminiSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<GeminiField>,
     pub counters: Vec<GeminiCounter>,
     pub scores: Vec<i64>,
@@ -1596,7 +1799,7 @@ pub struct GeminiSecondInfo {
 pub struct GeminiThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<GeminiField>,
     pub counters: Vec<GeminiCounter>,
     pub scores: Vec<i64>,
@@ -1637,7 +1840,7 @@ pub struct SagittariusStarPicture {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SagittariusRewardItem {
     pub reward_id: i64,
-    pub reward_kind: String,
+    pub reward_kind: RocoRewardKind,
     pub raw_reward_type: i64,
     pub count: i64,
 }
@@ -1645,22 +1848,18 @@ pub struct SagittariusRewardItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SagittariusBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SagittariusFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<SagittariusField>,
     pub counters: Vec<SagittariusCounter>,
     pub scores: Vec<SagittariusScore>,
@@ -1673,7 +1872,7 @@ pub struct SagittariusFirstInfo {
 pub struct SagittariusSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<SagittariusField>,
     pub counters: Vec<SagittariusCounter>,
     pub scores: Vec<SagittariusScore>,
@@ -1686,7 +1885,7 @@ pub struct SagittariusSecondInfo {
 pub struct SagittariusThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<SagittariusField>,
     pub counters: Vec<SagittariusCounter>,
     pub scores: Vec<SagittariusScore>,
@@ -1718,22 +1917,18 @@ pub struct ScorpioReward {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScorpioBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScorpioFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ScorpioField>,
     pub counters: Vec<ScorpioCounter>,
     pub counts: Vec<i64>,
@@ -1745,7 +1940,7 @@ pub struct ScorpioFirstInfo {
 pub struct ScorpioSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ScorpioField>,
     pub counters: Vec<ScorpioCounter>,
     pub counts: Vec<i64>,
@@ -1757,7 +1952,7 @@ pub struct ScorpioSecondInfo {
 pub struct ScorpioThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<ScorpioField>,
     pub counters: Vec<ScorpioCounter>,
     pub counts: Vec<i64>,
@@ -1788,22 +1983,18 @@ pub struct AriesReward {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AriesBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AriesFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AriesField>,
     pub counters: Vec<AriesCounter>,
     pub rewards: Vec<AriesReward>,
@@ -1814,7 +2005,7 @@ pub struct AriesFirstInfo {
 pub struct AriesSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AriesField>,
     pub counters: Vec<AriesCounter>,
     pub rewards: Vec<AriesReward>,
@@ -1825,7 +2016,7 @@ pub struct AriesSecondInfo {
 pub struct AriesThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AriesField>,
     pub counters: Vec<AriesCounter>,
     pub rewards: Vec<AriesReward>,
@@ -1848,10 +2039,7 @@ pub struct AriesThirdStatusInfo {
 pub struct AriesThirdExchangeInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_item: bool,
-    pub item_id: i64,
-    pub item_count: i64,
-    pub item_type: i64,
+    pub item: RocoOptionalDisplayItem,
     pub light_num: i64,
     pub tail_num: i64,
     pub exchange_count0: i64,
@@ -1874,22 +2062,18 @@ pub struct LibraCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LibraBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LibraFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LibraField>,
     pub counters: Vec<LibraCounter>,
     pub bag_candidates: Vec<LibraBagCandidate>,
@@ -1899,7 +2083,7 @@ pub struct LibraFirstInfo {
 pub struct LibraSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LibraField>,
     pub counters: Vec<LibraCounter>,
     pub bag_candidates: Vec<LibraBagCandidate>,
@@ -1909,7 +2093,7 @@ pub struct LibraSecondInfo {
 pub struct LibraThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LibraField>,
     pub counters: Vec<LibraCounter>,
     pub bag_candidates: Vec<LibraBagCandidate>,
@@ -1931,10 +2115,7 @@ pub struct LibraThirdStatusInfo {
 pub struct LibraThirdExchangeInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_item: bool,
-    pub item_id: i64,
-    pub item_count: i64,
-    pub item_type: i64,
+    pub item: RocoOptionalDisplayItem,
     pub light_num: i64,
     pub tail_num: i64,
     pub exchange_count0: i64,
@@ -1957,22 +2138,18 @@ pub struct LeoCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LeoBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LeoFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LeoField>,
     pub counters: Vec<LeoCounter>,
     pub bag_candidates: Vec<LeoBagCandidate>,
@@ -1982,7 +2159,7 @@ pub struct LeoFirstInfo {
 pub struct LeoSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LeoField>,
     pub counters: Vec<LeoCounter>,
     pub bag_candidates: Vec<LeoBagCandidate>,
@@ -1992,7 +2169,7 @@ pub struct LeoSecondInfo {
 pub struct LeoThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<LeoField>,
     pub counters: Vec<LeoCounter>,
     pub bag_candidates: Vec<LeoBagCandidate>,
@@ -2014,10 +2191,7 @@ pub struct LeoFirstStatusInfo {
 pub struct LeoFirstExchangeInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_item: bool,
-    pub item_id: i64,
-    pub item_count: i64,
-    pub item_type: i64,
+    pub item: RocoOptionalDisplayItem,
     pub light_num: i64,
     pub tail_num: i64,
     pub exchange_count0: i64,
@@ -2040,15 +2214,11 @@ pub struct AquariusCounter {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AquariusBagCandidate {
     pub candidate_index: i64,
-    pub spirit_id: i64,
-    pub has_bag_index: bool,
-    pub bag_index: i64,
-    pub has_catch_time: bool,
-    pub catch_time: i64,
-    pub has_level: bool,
-    pub level: i64,
-    pub has_need_money: bool,
-    pub need_money: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub bag_index: RocoOptionalI64,
+    pub catch_time: RocoOptionalI64,
+    pub level: RocoOptionalI64,
+    pub need_money: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -2056,15 +2226,14 @@ pub struct AquariusRewardItem {
     pub item_index: i64,
     pub item_id: i64,
     pub count: i64,
-    pub has_item_type: bool,
-    pub item_type: i64,
+    pub item_type: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AquariusFirstInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AquariusField>,
     pub counters: Vec<AquariusCounter>,
     pub item_counts: Vec<i64>,
@@ -2077,7 +2246,7 @@ pub struct AquariusFirstInfo {
 pub struct AquariusSecondInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AquariusField>,
     pub counters: Vec<AquariusCounter>,
     pub item_counts: Vec<i64>,
@@ -2090,7 +2259,7 @@ pub struct AquariusSecondInfo {
 pub struct AquariusThirdInfo {
     pub result_code: i64,
     pub message: String,
-    pub request_context: String,
+    pub request_context: RocoRequestContext,
     pub fields: Vec<AquariusField>,
     pub counters: Vec<AquariusCounter>,
     pub item_counts: Vec<i64>,
@@ -2118,10 +2287,7 @@ pub struct AquariusSecondStatusInfo {
 pub struct AquariusSecondExchangeInfo {
     pub result_code: i64,
     pub message: String,
-    pub has_item: bool,
-    pub item_id: i64,
-    pub item_count: i64,
-    pub item_type: i64,
+    pub item: RocoOptionalDisplayItem,
     pub light_num: i64,
     pub tail_num: i64,
     pub exchange_count0: i64,
@@ -2260,8 +2426,41 @@ pub struct TypeLadderRankUser {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum RocoOptionalTypeLadderRankUser {
+    Missing,
+    Present { user: TypeLadderRankUser },
+}
+
+impl RocoOptionalTypeLadderRankUser {
+    pub const fn missing() -> Self {
+        Self::Missing
+    }
+
+    pub const fn present(user: TypeLadderRankUser) -> Self {
+        Self::Present { user }
+    }
+
+    pub const fn is_present(&self) -> bool {
+        matches!(self, Self::Present { .. })
+    }
+
+    pub fn user_or_default(&self) -> TypeLadderRankUser {
+        match self {
+            Self::Missing => TypeLadderRankUser::default(),
+            Self::Present { user } => user.clone(),
+        }
+    }
+}
+
+impl From<Option<TypeLadderRankUser>> for RocoOptionalTypeLadderRankUser {
+    fn from(value: Option<TypeLadderRankUser>) -> Self {
+        value.map(Self::present).unwrap_or(Self::Missing)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TypeLadderRankInfo {
-    pub my_info: Option<TypeLadderRankUser>,
+    pub my_info: RocoOptionalTypeLadderRankUser,
     pub users: Vec<TypeLadderRankUser>,
 }
 
@@ -2397,12 +2596,38 @@ impl CombatActionResult {
         }
     }
 
+    pub fn unavailable_error(error: impl Into<RocoError>) -> Self {
+        let error = error.into();
+        Self {
+            ok: false,
+            code: 1,
+            message: error.message(),
+            error: Some(error.info()),
+            ack_received: false,
+            combat_finished: false,
+            next_action_ready: false,
+        }
+    }
+
     pub fn failed(message: impl Into<String>) -> Self {
         Self {
             ok: false,
             code: 2,
             message: message.into(),
             error: None,
+            ack_received: false,
+            combat_finished: false,
+            next_action_ready: false,
+        }
+    }
+
+    pub fn failed_error(error: impl Into<RocoError>) -> Self {
+        let error = error.into();
+        Self {
+            ok: false,
+            code: 2,
+            message: error.message(),
+            error: Some(error.info()),
             ack_received: false,
             combat_finished: false,
             next_action_ready: false,
@@ -2486,10 +2711,6 @@ impl MiniGameSubmitTryResult {
 
     pub fn failed(message: impl Into<String>) -> Self {
         Self::failed_with_code(2, message)
-    }
-
-    pub fn network_error(message: impl Into<String>) -> Self {
-        Self::failed_with_code(Self::CODE_NETWORK_ERROR, message)
     }
 
     pub fn network_error_with_error(error: RocoError) -> Self {
@@ -2606,8 +2827,8 @@ pub struct SpiritEquipmentInfo {
     pub base_value: i64,
     pub special_attr: i64,
     pub special_value: i64,
-    pub spirit_id: i64,
-    pub spirit_catch_time: i64,
+    pub spirit_id: RocoOptionalI64,
+    pub spirit_catch_time: RocoOptionalI64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,17 +1,34 @@
 use roco_lang::{
-    ActionResult, Result, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
+    ActionResult, AquariusBagCandidate, AquariusFirstInfo, AquariusRewardItem,
+    AquariusSecondExchangeInfo, CapricornSecondInfo, CapricornSecondTask,
+    CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo,
+    DiamondTearInfo, FourSeasonsInfo, IceCrystalBattleInfo, IceCrystalInfo, MultiEvolutionInfo,
+    MultiEvolutionRewardItem, Result, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
     RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
     RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoEngine, RocoError, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib,
-    RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
-    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoScriptErrorKind,
-    RocoScriptLocation, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib,
-    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
-    RocoVirgoActivityStdLib, SceneRoleInfo, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
+    RocoDebugHooks, RocoDisplayItem, RocoEngine, RocoError, RocoErrorDetail, RocoErrorInfo,
+    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoHttpBridgeErrorKind,
+    RocoHttpBusinessRejection, RocoInvalidParamError, RocoLeoActivityStdLib,
+    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
+    RocoManorActivityStdLib, RocoNetResponseParseSource, RocoNetResponseParseTarget,
+    RocoNetworkError, RocoNewsActivityStdLib, RocoPetTrainingActivityStdLib,
+    RocoPiscesActivityStdLib, RocoProtocolParseErrorType, RocoProtocolParseFailureKind,
+    RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection, RocoRewardKind,
+    RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
+    RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError, RocoSpiritBookStdLib,
+    RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, ScriptActivityName,
+    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBridgeError,
+    ScriptBridgeFailure, ScriptCombatActionError, ScriptCombatCommandFailureKind,
+    ScriptCombatIntentKind, ScriptCombatPhase, ScriptCombatProtocolError, ScriptCombatRuntimeError,
+    ScriptCombatWaitError, ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity,
+    ScriptLookupError, ScriptModuleName, ScriptPendingResponseError, ScriptQueryError,
+    ScriptRequestError, ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
+    ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
+    ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
+    ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
     SpiritBookInfo, SpiritBookStates, SpiritBookSummary, SpiritInfo, SpiritSkillInfo,
-    StaticSkillInfo, StorageSpiritInfo,
+    StarTowerInfo, StarTowerTop, StaticSkillInfo, StorageSpiritInfo, UnicornBossInfo, UnicornInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -22,6 +39,7 @@ struct MockStdLib {
     stored_positions: Vec<i64>,
     restored_positions: Vec<i64>,
     swapped_positions: Vec<(i64, i64)>,
+    fail_server_time: bool,
 }
 
 impl MockStdLib {
@@ -31,7 +49,7 @@ impl MockStdLib {
                 .map(|position| SpiritInfo {
                     spirit_id: position,
                     position,
-                    catch_time: position,
+                    catch_time: roco_lang::RocoOptionalI64::present(position),
                     name: format!("Spirit {position}"),
                     level: 1,
                     hp: 0,
@@ -45,6 +63,18 @@ impl MockStdLib {
 
 impl RocoRuntimeStdLib for MockStdLib {
     fn query_server_time(&mut self) -> Result<roco_lang::ServerTimeInfo> {
+        if self.fail_server_time {
+            return Err(RocoError::NetworkError(
+                roco_lang::RocoNetworkError::HttpBridgeRequestFailed {
+                    bridge: roco_lang::RocoBridgeErrorInfo::http(
+                        RocoHttpBridgeErrorKind::Timeout,
+                        "query_server_time",
+                        "bridge timed out",
+                    ),
+                },
+            ));
+        }
+
         Ok(roco_lang::ServerTimeInfo {
             stamp: 1234567890,
             full_year: 2026,
@@ -175,7 +205,7 @@ impl RocoSpiritStdLib for MockStdLib {
         Ok(SpiritInfo {
             spirit_id,
             position: 0,
-            catch_time,
+            catch_time: roco_lang::RocoOptionalI64::present(catch_time),
             name: format!("Storage Spirit {spirit_id}"),
             level: 100,
             hp: 100,
@@ -302,6 +332,39 @@ fn server_time_is_profile_api_not_scene_api() {
 }
 
 #[test]
+fn try_result_exposes_structured_error_kind_to_scripts() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib {
+        fail_server_time: true,
+        ..Default::default()
+    }));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                let result = profile::try_query_server_time();
+                system::assert(!result.ok, "try call should fail");
+                system::assert(result.error_kind_code == "network.http_bridge_request_failed", result.error_kind_code);
+                system::assert(result.error_network_kind_code == "http_bridge_request_failed", result.error_network_kind_code);
+                system::assert(result.error.kind_code == result.error_kind_code, result.error.kind_code);
+                system::assert(result.error_detail_kind_code == "bridge", result.error_detail_kind_code);
+                system::assert(result.error.detail_kind_code == "bridge", result.error.detail_kind_code);
+                system::assert(result.error.detail.kind_code == "bridge", result.error.detail.kind_code);
+                system::assert(result.error.network_kind_code == result.error_network_kind_code, result.error.network_kind_code);
+                system::assert(result.error_code == "network.http_bridge_request_failed", result.error_code);
+                system::assert(result.error_detail.kind_code == "bridge", result.error_detail.kind_code);
+                system::assert(result.error_detail.bridge_channel_code == "http", result.error_detail.bridge_channel_code);
+                system::assert(result.error_detail.bridge_operation_code == "query_server_time", result.error_detail.bridge_operation_code);
+                system::assert(result.error.detail.bridge_channel_code == "http", result.error.detail.bridge_channel_code);
+                system::assert(result.error.detail.bridge_operation_code == "query_server_time", result.error.detail.bridge_operation_code);
+                system::assert(result.error.detail.bridge_message != "", "detail bridge message should be exposed");
+                system::assert(result.error_message != "", "error message should be exposed");
+            "#,
+        )
+        .expect("script should inspect structured error kind");
+}
+
+#[test]
 fn spirit_book_apis_are_available_to_scripts() {
     let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
     let mut engine = RocoEngine::new(stdlib);
@@ -417,6 +480,111 @@ fn imports_built_in_role_cache_helpers() {
 }
 
 #[test]
+fn optional_i64_is_script_readable_without_has_value_pair() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                let info = aquarius::first_query();
+                let present_reward = info.reward_items[0];
+                let missing_reward = info.reward_items[1];
+                let candidate = info.bag_candidates[0];
+
+                system::assert(present_reward.item_type.present, "item_type should be present");
+                system::assert(present_reward.item_type.value == 7, "present value mismatch");
+                system::assert(present_reward.item_type.value_or_missing == 7, "present missing fallback mismatch");
+                system::assert(!missing_reward.item_type.present, "item_type should be missing");
+                system::assert(missing_reward.item_type.value == 0, "missing default value mismatch");
+                system::assert(missing_reward.item_type.value_or_missing == -1, "missing sentinel value mismatch");
+                system::assert(candidate.bag_index.present, "bag_index should be present");
+                system::assert(candidate.bag_index.value == 3, "bag_index value mismatch");
+                system::assert(candidate.catch_time.present, "catch_time should be present");
+                system::assert(candidate.catch_time.value == 99, "catch_time value mismatch");
+                system::assert(!candidate.level.present, "level should be missing");
+                system::assert(candidate.level.value_or_missing == -1, "level missing sentinel mismatch");
+                system::assert(candidate.need_money.present, "need_money should be present");
+                system::assert(candidate.need_money.value == 1200, "need_money value mismatch");
+
+                let exchange = aquarius::second_exchange_item(1);
+                system::assert(exchange.item.present, "display item should be present");
+                system::assert(exchange.item.item.item_id == 2001, "display item id mismatch");
+                system::assert(exchange.item.item.item_count == 4, "display item count mismatch");
+                system::assert(exchange.item.item.item_type == 8, "display item type mismatch");
+
+                let evolved = multi_evolution::fire_evolve(1, 3092, 99, 3, 10);
+                system::assert(evolved.pet_id.present, "multi evolution pet_id should be present");
+                system::assert(evolved.pet_id.value == 3092, "multi evolution pet_id mismatch");
+                system::assert(!evolved.result_side.present, "multi evolution result_side should be missing");
+                system::assert(evolved.result_side.value_or_missing == -1, "multi evolution result_side sentinel mismatch");
+                system::assert(!evolved.item_id.present, "multi evolution item_id should be missing");
+
+                let ice = ice_crystal::query();
+                system::assert(ice.progress.present, "ice crystal progress should be present");
+                system::assert(ice.progress.value == 12, "ice crystal progress mismatch");
+                system::assert(!ice.battle_times.present, "ice crystal battle_times should be missing");
+                system::assert(ice.battle_index.value == 2, "ice crystal battle_index mismatch");
+                system::assert(ice.current_battle.present, "ice crystal current battle should be present");
+                system::assert(ice.current_battle.battle.battle_index == 2, "ice crystal current battle index mismatch");
+                system::assert(ice.current_battle.battle.fight_id == 9001, "ice crystal fight id mismatch");
+
+                let cap2 = capricorn::second_query();
+                system::assert(cap2.finish.present, "capricorn second finish should be present");
+                system::assert(cap2.finish.value == 1, "capricorn second finish mismatch");
+                system::assert(!cap2.current.present, "capricorn second current should be missing");
+                system::assert(cap2.position.value == 4, "capricorn second position mismatch");
+                system::assert(cap2.second_task.present, "capricorn second task should be present");
+                system::assert(cap2.second_task.task.task_type == 2, "capricorn second task type mismatch");
+                system::assert(cap2.second_task.task.data1 == 11, "capricorn second task data1 mismatch");
+
+                let cap3 = capricorn::third_query();
+                system::assert(!cap3.finish.present, "capricorn third finish should be missing");
+                system::assert(cap3.current.value == 5, "capricorn third current mismatch");
+                system::assert(cap3.progress_percent.value == 80, "capricorn third progress mismatch");
+                system::assert(!cap3.reward_num.present, "capricorn third reward_num should be missing");
+
+                let seasons = four_seasons::query();
+                system::assert(seasons.month.present, "four seasons month should be present");
+                system::assert(seasons.month.value == 6, "four seasons month mismatch");
+                system::assert(!seasons.map.present, "four seasons map should be missing");
+                system::assert(seasons.position_1based.value == 3, "four seasons position mismatch");
+                system::assert(!seasons.ticket.present, "four seasons ticket should be missing");
+                system::assert(seasons.point.value == 99, "four seasons point mismatch");
+
+                let tear = diamond_tear::query();
+                system::assert(tear.buy.value == 1, "diamond tear buy mismatch");
+                system::assert(!tear.level.present, "diamond tear level should be missing");
+                system::assert(tear.count_down.value == 30, "diamond tear count_down mismatch");
+                system::assert(tear.tear_state.value == 2, "diamond tear state mismatch");
+
+                let unicorn = unicorn::query();
+                system::assert(unicorn.finish.value == 1, "unicorn finish mismatch");
+                system::assert(!unicorn.start.present, "unicorn start should be missing");
+                system::assert(unicorn.total.value == 8, "unicorn total mismatch");
+                system::assert(unicorn.purple_vine_count.value == 6, "unicorn purple vine mismatch");
+                system::assert(!unicorn.energy.present, "unicorn energy should be missing");
+                system::assert(unicorn.fruit_count.value == 7, "unicorn fruit count mismatch");
+                system::assert(unicorn.bosses[0].spirit_id.value == 3001, "unicorn boss spirit mismatch");
+                system::assert(!unicorn.bosses[0].fight_id.present, "unicorn boss fight should be missing");
+                system::assert(!unicorn.bosses[1].spirit_id.present, "unicorn second boss spirit should be missing");
+                system::assert(unicorn.bosses[1].fight_id.value == 9002, "unicorn second boss fight mismatch");
+
+                let tower = star_tower::query();
+                system::assert(tower.top.present, "star tower top should be present");
+                system::assert(tower.top.top.star == 5, "star tower top star mismatch");
+                system::assert(tower.top.top.fight_id == 7001, "star tower top fight mismatch");
+
+                let team_op = capricorn::invite_player(470926678);
+                system::assert(team_op.team.present, "capricorn team should be present");
+                system::assert(team_op.team.team.ticks == 123, "capricorn team ticks mismatch");
+                system::assert(team_op.team.team.players[0].uin == 470926678, "capricorn team player mismatch");
+            "#,
+        )
+        .expect("structured optional int should be readable from script");
+}
+
+#[test]
 fn stdlib_runtime_error_reports_call_location() {
     let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
     let mut engine = RocoEngine::new(stdlib);
@@ -439,6 +607,549 @@ fn stdlib_runtime_error_reports_call_location() {
     };
     assert_eq!(position.line(), 3);
     assert!(position.column().is_some());
+}
+
+#[test]
+fn unsupported_stdlib_error_exposes_structured_function_name() {
+    let mut stdlib = MockStdLib::default();
+    let error = stdlib
+        .get_user_info()
+        .expect_err("default stdlib implementation should be unsupported");
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.unsupported.function");
+    let RocoErrorDetail::UnsupportedFunction(function) = info.detail else {
+        panic!("unsupported function should be structured in detail");
+    };
+    assert_eq!(function.module, ScriptModuleName::Profile);
+    assert_eq!(function.module_code(), "profile");
+    assert_eq!(function.function, "get_user_info");
+    assert_eq!(function.qualified_name(), "profile::get_user_info");
+}
+
+#[test]
+fn stdlib_bridge_error_exposes_structured_failure() {
+    let error = RocoError::from(ScriptBridgeError::SendRequestFailed {
+        failure: ScriptBridgeFailure::send_request(
+            roco_lang::ScriptBridgeFailureReason::RequestChannelClosed,
+        ),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.bridge");
+    let RocoErrorDetail::StdlibBridge(failure) = info.detail else {
+        panic!("stdlib bridge failure should be structured in detail");
+    };
+    assert_eq!(failure.operation_code(), "send_request");
+    assert_eq!(failure.reason_code(), "request_channel_closed");
+    assert_eq!(failure.message(), "request channel closed");
+}
+
+#[test]
+fn system_error_exposes_structured_failure() {
+    let error = RocoError::from(ScriptSystemError::ParseTimeFormatFailed {
+        failure: ScriptSystemFailure::new(
+            ScriptSystemOperation::ParseTimeFormat,
+            ScriptSystemFailureSource::TimeFormatDescription {
+                message: "invalid format".to_string(),
+            },
+        ),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.system");
+    let RocoErrorDetail::SystemFailure(failure) = info.detail else {
+        panic!("system failure should be structured in detail");
+    };
+    assert_eq!(failure.operation_code(), "parse_time_format");
+    assert_eq!(failure.source_code(), "time_format_description");
+    assert_eq!(failure.message(), "invalid format");
+
+    let info = error.info();
+    assert_eq!(info.detail.system_operation_code(), "parse_time_format");
+    assert_eq!(info.detail.system_source_code(), "time_format_description");
+}
+
+#[test]
+fn combat_runtime_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptCombatRuntimeError::MarkFrontendLoadedFailed {
+        kind: ScriptCombatCommandFailureKind::LineupSkill,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.combat_runtime");
+    let RocoErrorDetail::CombatRuntime(runtime) = info.detail else {
+        panic!("combat runtime error should be structured in detail");
+    };
+    assert_eq!(runtime.command_failure_kind_code(), "lineup_skill");
+    assert!(runtime.to_string().contains("lineup skill"));
+}
+
+#[test]
+fn invalid_timestamp_exposes_structured_param_info() {
+    let error = RocoError::InvalidParam(RocoInvalidParamError::InvalidTimestamp {
+        value: -1,
+        failure: ScriptSystemFailure::new(
+            ScriptSystemOperation::FormatTimestamp,
+            ScriptSystemFailureSource::TimeFormat {
+                message: "out of range".to_string(),
+            },
+        ),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "invalid_param");
+    let RocoErrorDetail::InvalidParam(invalid) = info.detail else {
+        panic!("invalid param info should be structured in detail");
+    };
+    assert_eq!(invalid.detail_kind_code(), "system_failure");
+    assert_eq!(invalid.kind_code(), "invalid_timestamp");
+    assert_eq!(invalid.kind.code(), "invalid_timestamp");
+    assert_eq!(invalid.system_operation_code(), "format_timestamp");
+    assert_eq!(invalid.system_source_code(), "time_format");
+    assert_eq!(invalid.detail.system_operation_code(), "format_timestamp");
+    assert_eq!(invalid.detail.system_source_code(), "time_format");
+    assert_eq!(invalid.detail.system_message(), "out of range");
+}
+
+#[test]
+fn rejected_invalid_param_exposes_structured_source() {
+    let error = RocoError::InvalidParam(RocoInvalidParamError::Rejected {
+        name: "activity option".to_string(),
+        source_code: "http_protocol.validation".to_string(),
+        message: "field rejected".to_string(),
+    });
+    let info = error.info();
+
+    let RocoErrorDetail::InvalidParam(invalid) = info.detail else {
+        panic!("invalid param info should be structured in detail");
+    };
+    assert_eq!(invalid.kind_code(), "rejected");
+    assert_eq!(invalid.detail_kind_code(), "rejected");
+    assert_eq!(invalid.rejected_source_code(), "http_protocol.validation");
+    assert_eq!(
+        invalid.detail.rejected_source_code(),
+        "http_protocol.validation"
+    );
+}
+
+#[test]
+fn error_info_exposes_summary_and_detail_without_flattening_detail_fields() {
+    let info = RocoErrorInfo {
+        kind: roco_lang::RocoErrorKind::Network {
+            kind: roco_lang::RocoNetworkErrorKind::HttpBridgeRequestFailed,
+        },
+        code: "network.test".to_string(),
+        message: "test".to_string(),
+        detail: RocoErrorDetail::None,
+    };
+
+    assert_eq!(info.detail_kind_code(), "");
+    assert_eq!(info.network_kind_code(), "http_bridge_request_failed");
+}
+
+#[test]
+fn net_response_parse_error_exposes_structured_failure() {
+    let protocol = RocoError::NetworkError(RocoNetworkError::NetResponseParseFailed {
+        target: RocoNetResponseParseTarget::QuerySpiritBag,
+        source: RocoNetResponseParseSource::Protocol {
+            kind: RocoProtocolParseFailureKind::Decode,
+            layer: RocoProtocolParseErrorType::SpiritBag.layer(),
+            error_type: RocoProtocolParseErrorType::SpiritBag,
+            reason: roco_lang::RocoProtocolParseReason::ByteArrayReadOverflow {
+                offset: 0,
+                bytes_needed: 1,
+                bytes_available: 0,
+            },
+        },
+    });
+    let info = protocol.info();
+
+    assert_eq!(info.kind_code(), "network.net_response_parse_failed");
+    assert_eq!(info.network_kind_code(), "net_response_parse_failed");
+    let RocoErrorDetail::NetResponseParse(failure) = info.detail else {
+        panic!("parse failure should be structured in detail");
+    };
+    assert_eq!(failure.target, RocoNetResponseParseTarget::QuerySpiritBag);
+    assert_eq!(failure.source_kind_code(), "protocol");
+    assert_eq!(failure.protocol_error_type_code(), "spirit_bag");
+    assert_eq!(failure.protocol_layer_code(), "domain_response");
+
+    let unexpected = RocoError::NetworkError(RocoNetworkError::NetResponseParseFailed {
+        target: RocoNetResponseParseTarget::CombatStartPacket,
+        source: RocoNetResponseParseSource::UnexpectedCommand { cmd_id: 0x1234 },
+    });
+    let info = unexpected.info();
+
+    let RocoErrorDetail::NetResponseParse(failure) = info.detail else {
+        panic!("unexpected command should be structured in detail");
+    };
+    assert_eq!(
+        failure.target,
+        RocoNetResponseParseTarget::CombatStartPacket
+    );
+    assert_eq!(failure.source_kind_code(), "unexpected_command");
+    assert_eq!(failure.unexpected_cmd_id(), 0x1234);
+    assert_eq!(failure.protocol_message(), "");
+}
+
+#[test]
+fn server_return_code_rejection_exposes_structured_fields() {
+    let error = RocoError::ServerRejected(RocoServerRejectedError::ReturnCode {
+        rejection: RocoReturnCodeRejection {
+            kind: RocoReturnCodeKind::SafeCodeRequired,
+            message: "need safe code".to_string(),
+        },
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "server_rejected");
+    assert_eq!(info.code, "server_rejected.return_code");
+    let RocoErrorDetail::ReturnCode(rejection) = info.detail else {
+        panic!("return code rejection should be structured in detail");
+    };
+    assert_eq!(rejection.kind_code(), "safe_code_required");
+    assert_eq!(rejection.code(), -4);
+    assert_eq!(rejection.message, "need safe code");
+}
+
+#[test]
+fn server_http_business_rejection_exposes_structured_fields() {
+    let error = RocoError::ServerRejected(RocoServerRejectedError::HttpBusiness {
+        rejection: RocoHttpBusinessRejection {
+            result_code: -9,
+            message: "not enough item".to_string(),
+            request_context: Some(RocoRequestContext::from_raw("aquarius.first")),
+        },
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "server_rejected");
+    assert_eq!(info.code, "server_rejected.http_business");
+    let RocoErrorDetail::HttpBusiness(rejection) = info.detail else {
+        panic!("http business rejection should be structured in detail");
+    };
+    assert_eq!(rejection.result_code(), -9);
+    assert_eq!(rejection.request_context(), "aquarius.first");
+    assert_eq!(rejection.message, "not enough item");
+    let context = rejection
+        .request_context
+        .expect("http business request context should be structured");
+    assert_eq!(context.raw, "aquarius.first");
+    assert_eq!(context.domain, "aquarius");
+    assert_eq!(context.action, "first");
+}
+
+#[test]
+fn unexpected_http_response_error_exposes_structured_names() {
+    let error = ScriptPendingResponseError::UnexpectedHttpResponse {
+        pending: ScriptHttpResponseName::new("star_tower.query"),
+        expected: ScriptHttpResponseName::new("star_tower"),
+        actual: ScriptHttpResponseName::new("blood_gift"),
+    };
+
+    assert_eq!(
+        error.to_string(),
+        "unexpected script http response for star_tower.query: expected star_tower, got blood_gift"
+    );
+    let ScriptPendingResponseError::UnexpectedHttpResponse {
+        pending,
+        expected,
+        actual,
+    } = error
+    else {
+        unreachable!("constructed unexpected http response error");
+    };
+    assert_eq!(pending.code, "star_tower.query");
+    assert_eq!(expected.code, "star_tower");
+    assert_eq!(actual.code, "blood_gift");
+}
+
+#[test]
+fn pending_response_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptPendingResponseError::UnexpectedHttpResponse {
+        pending: ScriptHttpResponseName::new("star_tower.query"),
+        expected: ScriptHttpResponseName::new("star_tower"),
+        actual: ScriptHttpResponseName::new("blood_gift"),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.pending_response");
+    let RocoErrorDetail::PendingResponse(pending) = info.detail else {
+        panic!("pending response error should be structured in detail");
+    };
+    assert_eq!(pending.kind_code(), "unexpected_http_response");
+    assert_eq!(pending.pending_http_response_code(), "star_tower.query");
+    assert_eq!(pending.expected_http_response_code(), "star_tower");
+    assert_eq!(pending.actual_http_response_code(), "blood_gift");
+
+    let error = RocoError::from(ScriptPendingResponseError::MissingNetResponsePayload {
+        target: RocoNetResponseParseTarget::WakeupSkills,
+    });
+    let info = error.info();
+    let RocoErrorDetail::PendingResponse(pending) = info.detail else {
+        panic!("missing net response payload should be structured in detail");
+    };
+    assert_eq!(pending.kind_code(), "missing_net_response_payload");
+    assert_eq!(pending.net_response_parse_target_code(), "wakeup_skills");
+}
+
+#[test]
+fn script_response_type_mismatch_exposes_structured_names() {
+    let error = ScriptResponseError::TypeMismatch {
+        expected: ScriptResponseName::new("bool"),
+        actual: ScriptResponseName::new("string"),
+    };
+
+    assert_eq!(error.to_string(), "Expected bool response, got string");
+    let ScriptResponseError::TypeMismatch { expected, actual } = error;
+    assert_eq!(expected.code, "bool");
+    assert_eq!(actual.code, "string");
+}
+
+#[test]
+fn script_response_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptResponseError::TypeMismatch {
+        expected: ScriptResponseName::new("bool"),
+        actual: ScriptResponseName::new("string"),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.response");
+    let RocoErrorDetail::Response(response) = info.detail else {
+        panic!("script response error should be structured in detail");
+    };
+    assert_eq!(response.kind_code(), "type_mismatch");
+    assert_eq!(response.expected_response_code(), "bool");
+    assert_eq!(response.actual_response_code(), "string");
+}
+
+#[test]
+fn request_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptRequestError::WaitStateRejected {
+        context: ScriptWaitContext::TalentRefresh,
+        kind: ScriptRequestSystemFailureKind::NoRunningScript,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.request");
+    let RocoErrorDetail::Request(request) = info.detail else {
+        panic!("request error should be structured in detail");
+    };
+    assert_eq!(request.kind_code(), "wait_state_rejected");
+    assert_eq!(request.wait_context_code(), "talent_refresh");
+    assert_eq!(request.system_failure_kind_code(), "no_running_script");
+    assert_eq!(request.combat_intent_kind_code(), "");
+    assert_eq!(request.spirit_index(), -1);
+    assert_eq!(request.value(), -1);
+}
+
+#[test]
+fn request_combat_protocol_error_exposes_structured_detail_fields() {
+    let error = RocoError::from(ScriptRequestError::InvalidCombatIntent {
+        kind: ScriptCombatIntentKind::ChangeSpirit,
+        spirit_index: 2,
+        value: 8,
+        error: ScriptCombatProtocolError::TargetSpiritPositionOutOfRange { value: 8 },
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.request");
+    let RocoErrorDetail::Request(request) = info.detail else {
+        panic!("request error should be structured in detail");
+    };
+    assert_eq!(request.kind_code(), "invalid_combat_intent");
+    assert_eq!(request.combat_intent_kind_code(), "change_spirit");
+    assert_eq!(
+        request.combat_protocol_error_kind_code(),
+        "target_spirit_position_out_of_range"
+    );
+    assert_eq!(request.combat_protocol_error_value(), 8);
+    assert_eq!(request.spirit_index(), 2);
+    assert_eq!(request.value(), 8);
+}
+
+#[test]
+fn session_memory_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptSessionMemoryError::TypeMismatch {
+        key: "talent.target".to_string(),
+        expected: ScriptSessionValueKind::Integer,
+        actual: ScriptSessionValueKind::String,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.session_memory");
+    let RocoErrorDetail::SessionMemory(memory) = info.detail else {
+        panic!("session memory error should be structured in detail");
+    };
+    assert_eq!(memory.kind_code(), "type_mismatch");
+    assert_eq!(memory.key(), "talent.target");
+    assert_eq!(memory.expected_kind_code(), "integer");
+    assert_eq!(memory.actual_kind_code(), "string");
+}
+
+#[test]
+fn lookup_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptLookupError::NotFound {
+        entity: ScriptLookupEntity::ItemInfo,
+        key: "17367045".to_string(),
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.lookup");
+    let RocoErrorDetail::Lookup(lookup) = info.detail else {
+        panic!("lookup error should be structured in detail");
+    };
+    assert_eq!(lookup.kind_code(), "not_found");
+    assert_eq!(lookup.entity_code(), "item_info");
+    assert_eq!(lookup.key(), "17367045");
+}
+
+#[test]
+fn function_context_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptFunctionContextError::CannotWaitForCombat {
+        phase: ScriptCombatPhase::WaitingPlayerAction,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.function_context");
+    let RocoErrorDetail::FunctionContext(context) = info.detail else {
+        panic!("function context error should be structured in detail");
+    };
+    assert_eq!(context.kind_code(), "cannot_wait_for_combat");
+    assert_eq!(context.combat_phase_code(), "waiting_player_action");
+}
+
+#[test]
+fn query_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptQueryError::NoSkillAtIndex { index: 2 });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.query");
+    let RocoErrorDetail::Query(query) = info.detail else {
+        panic!("query error should be structured in detail");
+    };
+    assert_eq!(query.kind_code(), "no_skill_at_index");
+    assert_eq!(query.skill_index(), 2);
+}
+
+#[test]
+fn static_data_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptStaticDataError::BagSpiritNotFound { position: 4 });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.static_data");
+    let RocoErrorDetail::StaticData(static_data) = info.detail else {
+        panic!("static data error should be structured in detail");
+    };
+    assert_eq!(static_data.kind_code(), "bag_spirit_not_found");
+    assert_eq!(static_data.position(), 4);
+    assert_eq!(static_data.function_name(), "");
+    assert_eq!(static_data.message(), "");
+    assert_eq!(static_data.active_config_source_code(), "");
+
+    let error = RocoError::from(ScriptStaticDataError::ActiveConfigNotAvailable {
+        source: roco_lang::ScriptActiveConfigUnavailableSource::Download,
+        message: "download failed".to_string(),
+    });
+    let info = error.info();
+    let RocoErrorDetail::StaticData(static_data) = info.detail else {
+        panic!("static data error should be structured in detail");
+    };
+    assert_eq!(static_data.kind_code(), "active_config_not_available");
+    assert_eq!(
+        static_data.active_config_source_code(),
+        "static_data.download"
+    );
+    assert_eq!(static_data.message(), "download failed");
+}
+
+#[test]
+fn activity_operation_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptActivityOperationError::InvalidOption {
+        activity: ScriptActivityName::Gemini,
+        field: ScriptActivityOptionField::Side,
+        value: 99,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.activity_operation");
+    let RocoErrorDetail::ActivityOperation(operation) = info.detail else {
+        panic!("activity operation error should be structured in detail");
+    };
+    assert_eq!(operation.kind_code(), "invalid_option");
+    assert_eq!(operation.activity_code(), "gemini");
+    assert_eq!(operation.field_code(), "side");
+    assert_eq!(operation.value(), 99);
+    assert_eq!(operation.count(), -1);
+    assert_eq!(operation.limit(), -1);
+}
+
+#[test]
+fn combat_action_error_exposes_structured_detail() {
+    let error =
+        RocoError::from(ScriptCombatActionError::CombatItemUnavailable { item_id: 17367045 });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.combat_action");
+    let RocoErrorDetail::CombatAction(action) = info.detail else {
+        panic!("combat action error should be structured in detail");
+    };
+    assert_eq!(action.kind_code(), "combat_item_unavailable");
+    assert_eq!(action.item_id(), 17367045);
+    assert_eq!(action.position(), -1);
+    assert_eq!(action.skill_id(), -1);
+}
+
+#[test]
+fn combat_wait_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptCombatWaitError::TimeoutWaitingCombatAction {
+        phase: ScriptCombatPhase::WaitingPlayerAction,
+        elapsed_ms: 12_345,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.combat_wait");
+    let RocoErrorDetail::CombatWait(wait) = info.detail else {
+        panic!("combat wait error should be structured in detail");
+    };
+    assert_eq!(wait.kind_code(), "timeout_waiting_combat_action");
+    assert_eq!(wait.combat_phase_code(), "waiting_player_action");
+    assert_eq!(wait.elapsed_ms(), 12_345);
+}
+
+#[test]
+fn spirit_operation_error_exposes_structured_detail() {
+    let error = RocoError::from(ScriptSpiritOperationError::StorageSpiritNotFound {
+        spirit_id: 3092,
+        catch_time: 123456,
+    });
+    let info = error.info();
+
+    assert_eq!(info.kind_code(), "stdlib");
+    assert_eq!(info.code, "stdlib.spirit_operation");
+    let RocoErrorDetail::SpiritOperation(operation) = info.detail else {
+        panic!("spirit operation error should be structured in detail");
+    };
+    assert_eq!(operation.kind_code(), "storage_spirit_not_found");
+    assert_eq!(operation.spirit_id(), 3092);
+    assert_eq!(operation.catch_time(), 123456);
 }
 
 #[test]
@@ -842,15 +1553,217 @@ impl RocoPetTrainingActivityStdLib for MockStdLib {}
 
 impl RocoNewsActivityStdLib for MockStdLib {}
 
-impl RocoTowerActivityStdLib for MockStdLib {}
+impl RocoTowerActivityStdLib for MockStdLib {
+    fn star_tower_query(&mut self) -> Result<StarTowerInfo> {
+        Ok(StarTowerInfo {
+            result_code: 0,
+            message: String::new(),
+            mop: 1,
+            boss_id: 2,
+            countdown: 3,
+            auto_sell: true,
+            money: 4,
+            clips: Vec::new(),
+            storeys: Vec::new(),
+            top: roco_lang::RocoOptionalStarTowerTop::present(StarTowerTop {
+                star: 5,
+                refresh: 6,
+                fight_desc: "fight".to_string(),
+                task_desc: "task".to_string(),
+                fight_id: 7001,
+                tokens: Vec::new(),
+                exchanges: Vec::new(),
+                missions: Vec::new(),
+                rewards: Vec::new(),
+            }),
+        })
+    }
+}
 
 impl RocoAlchemyActivityStdLib for MockStdLib {}
 
-impl RocoEvolutionActivityStdLib for MockStdLib {}
+impl RocoEvolutionActivityStdLib for MockStdLib {
+    fn unicorn_query(&mut self) -> Result<UnicornInfo> {
+        Ok(UnicornInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("unicorn.query"),
+            bosses: vec![
+                UnicornBossInfo {
+                    slot: 1,
+                    npc_index: 10,
+                    spirit_id: roco_lang::RocoOptionalI64::present(3001),
+                    fight_id: roco_lang::RocoOptionalI64::missing(),
+                },
+                UnicornBossInfo {
+                    slot: 2,
+                    npc_index: 20,
+                    spirit_id: roco_lang::RocoOptionalI64::missing(),
+                    fight_id: roco_lang::RocoOptionalI64::present(9002),
+                },
+            ],
+            finish: roco_lang::RocoOptionalI64::present(1),
+            start: roco_lang::RocoOptionalI64::missing(),
+            total: roco_lang::RocoOptionalI64::present(8),
+            book: roco_lang::RocoOptionalI64::missing(),
+            cultivation_times: Vec::new(),
+            evolution_energy_costs: Vec::new(),
+            one_key_diamond_costs: Vec::new(),
+            purple_vine_count: roco_lang::RocoOptionalI64::present(6),
+            energy: roco_lang::RocoOptionalI64::missing(),
+            fruit_count: roco_lang::RocoOptionalI64::present(7),
+            increase: roco_lang::RocoOptionalI64::present(2),
+            bag_candidates: Vec::new(),
+            rewards: Vec::new(),
+        })
+    }
+
+    fn four_seasons_query(&mut self) -> Result<FourSeasonsInfo> {
+        Ok(FourSeasonsInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("four_seasons.query"),
+            month: roco_lang::RocoOptionalI64::present(6),
+            map: roco_lang::RocoOptionalI64::missing(),
+            position_1based: roco_lang::RocoOptionalI64::present(3),
+            times: roco_lang::RocoOptionalI64::present(2),
+            ticket: roco_lang::RocoOptionalI64::missing(),
+            used_tool_index: roco_lang::RocoOptionalI64::present(4),
+            need_item_index: roco_lang::RocoOptionalI64::missing(),
+            add: roco_lang::RocoOptionalI64::present(5),
+            point: roco_lang::RocoOptionalI64::present(99),
+            boxes: Vec::new(),
+            tools: Vec::new(),
+            tool_shop_indexes: Vec::new(),
+            tool_shop_flags: Vec::new(),
+            pass_boxes: Vec::new(),
+            tool_costs: Vec::new(),
+            event_item_counts: Vec::new(),
+            shop_rewards: Vec::new(),
+            monthly_spirit_rewards: Vec::new(),
+            rewards: Vec::new(),
+        })
+    }
+
+    fn diamond_tear_query(&mut self) -> Result<DiamondTearInfo> {
+        Ok(DiamondTearInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("diamond_tear.query"),
+            buy: roco_lang::RocoOptionalI64::present(1),
+            level: roco_lang::RocoOptionalI64::missing(),
+            count_down: roco_lang::RocoOptionalI64::present(30),
+            tear_state: roco_lang::RocoOptionalI64::present(2),
+            rewards: Vec::new(),
+        })
+    }
+
+    fn ice_crystal_query(&mut self) -> Result<IceCrystalInfo> {
+        Ok(IceCrystalInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("ice_crystal.query"),
+            progress: roco_lang::RocoOptionalI64::present(12),
+            battle_times: roco_lang::RocoOptionalI64::missing(),
+            battle_index: roco_lang::RocoOptionalI64::present(2),
+            get_times: roco_lang::RocoOptionalI64::missing(),
+            add: roco_lang::RocoOptionalI64::present(3),
+            item_counts: Vec::new(),
+            crystal_counts: Vec::new(),
+            item_costs: Vec::new(),
+            one_key_diamond_costs: Vec::new(),
+            current_battle: roco_lang::RocoOptionalIceCrystalBattleInfo::present(
+                IceCrystalBattleInfo {
+                    battle_index: 2,
+                    fight_id: 9001,
+                },
+            ),
+            bag_candidates: Vec::new(),
+            rewards: Vec::new(),
+        })
+    }
+
+    fn multi_evolution_fire_evolve(
+        &mut self,
+        _slot: i64,
+        _spirit_id: i64,
+        _catch_time: i64,
+        _item_count: i64,
+        _fire_score: i64,
+    ) -> Result<MultiEvolutionInfo> {
+        Ok(MultiEvolutionInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("multi_evolution.fire_evolve"),
+            candidates: Vec::new(),
+            rewards: vec![MultiEvolutionRewardItem {
+                reward_id: 1,
+                reward_kind: RocoRewardKind::Item,
+                raw_reward_type: 0,
+                count: 2,
+            }],
+            pet_id: roco_lang::RocoOptionalI64::present(3092),
+            result_side: roco_lang::RocoOptionalI64::missing(),
+            item_id: roco_lang::RocoOptionalI64::missing(),
+            count: 0,
+            available: false,
+        })
+    }
+}
 
 impl RocoMagicPioneerActivityStdLib for MockStdLib {}
 
-impl RocoAdventureActivityStdLib for MockStdLib {}
+impl RocoAdventureActivityStdLib for MockStdLib {
+    fn capricorn_invite_player(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
+        Ok(CapricornTeamOperationInfo {
+            result_code: 0,
+            message: String::new(),
+            team: roco_lang::RocoOptionalCapricornTeamSnapshot::present(CapricornTeamSnapshot {
+                players: vec![CapricornTeamPlayer {
+                    uin: 470926678,
+                    nick: "Target".to_string(),
+                }],
+                ticks: 123,
+            }),
+        })
+    }
+
+    fn capricorn_second_query(&mut self) -> Result<CapricornSecondInfo> {
+        Ok(CapricornSecondInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("capricorn.second_query"),
+            finish: roco_lang::RocoOptionalI64::present(1),
+            current: roco_lang::RocoOptionalI64::missing(),
+            position: roco_lang::RocoOptionalI64::present(4),
+            second_task: roco_lang::RocoOptionalCapricornSecondTask::present(CapricornSecondTask {
+                task_type: 2,
+                data1: 11,
+                data2: 12,
+                step: 3,
+                current: 1,
+            }),
+            bag_candidates: Vec::new(),
+        })
+    }
+
+    fn capricorn_third_query(&mut self) -> Result<CapricornThirdInfo> {
+        Ok(CapricornThirdInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("capricorn.third_query"),
+            finish: roco_lang::RocoOptionalI64::missing(),
+            current: roco_lang::RocoOptionalI64::present(5),
+            remain: roco_lang::RocoOptionalI64::present(6),
+            price: roco_lang::RocoOptionalI64::missing(),
+            limit: roco_lang::RocoOptionalI64::present(7),
+            progress_percent: roco_lang::RocoOptionalI64::present(80),
+            reward_num: roco_lang::RocoOptionalI64::missing(),
+            tips: roco_lang::RocoOptionalI64::present(9),
+            bag_candidates: Vec::new(),
+        })
+    }
+}
 
 impl RocoAriesActivityStdLib for MockStdLib {}
 
@@ -874,4 +1787,57 @@ impl RocoSagittariusActivityStdLib for MockStdLib {}
 
 impl RocoScorpioActivityStdLib for MockStdLib {}
 
-impl RocoAquariusActivityStdLib for MockStdLib {}
+impl RocoAquariusActivityStdLib for MockStdLib {
+    fn aquarius_first_query(&mut self) -> Result<AquariusFirstInfo> {
+        Ok(AquariusFirstInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("aquarius.first_query"),
+            fields: Vec::new(),
+            counters: Vec::new(),
+            item_counts: Vec::new(),
+            states: Vec::new(),
+            bag_candidates: vec![AquariusBagCandidate {
+                candidate_index: 0,
+                spirit_id: roco_lang::RocoOptionalI64::present(3092),
+                bag_index: roco_lang::RocoOptionalI64::present(3),
+                catch_time: roco_lang::RocoOptionalI64::present(99),
+                level: roco_lang::RocoOptionalI64::missing(),
+                need_money: roco_lang::RocoOptionalI64::present(1200),
+            }],
+            reward_items: vec![
+                AquariusRewardItem {
+                    item_index: 1,
+                    item_id: 1001,
+                    count: 2,
+                    item_type: roco_lang::RocoOptionalI64::present(7),
+                },
+                AquariusRewardItem {
+                    item_index: 2,
+                    item_id: 1002,
+                    count: 3,
+                    item_type: roco_lang::RocoOptionalI64::missing(),
+                },
+            ],
+        })
+    }
+
+    fn aquarius_second_exchange_item(
+        &mut self,
+        _exchange_position: i64,
+    ) -> Result<AquariusSecondExchangeInfo> {
+        Ok(AquariusSecondExchangeInfo {
+            result_code: 0,
+            message: String::new(),
+            item: roco_lang::RocoOptionalDisplayItem::present(RocoDisplayItem {
+                item_id: 2001,
+                item_count: 4,
+                item_type: 8,
+            }),
+            light_num: 1,
+            tail_num: 2,
+            exchange_count0: 3,
+            exchange_count1: 4,
+        })
+    }
+}

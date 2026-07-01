@@ -9,8 +9,24 @@ use crate::debugger::{
     RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
 use crate::error::{
-    Result, RocoError, RocoErrorInfo, RocoScriptError, RocoScriptErrorKind, RocoScriptLocation,
-    RocoScriptPosition,
+    Result, RocoBridgeErrorChannel, RocoBridgeErrorInfo, RocoBridgeErrorKind, RocoError,
+    RocoErrorDetail, RocoErrorInfo, RocoErrorKind, RocoGeneralLockTarget, RocoHttpBridgeErrorKind,
+    RocoHttpBusinessRejection, RocoInvalidParamDetail, RocoInvalidParamInfo, RocoInvalidParamKind,
+    RocoJsonErrorCategory, RocoNetBridgeErrorKind, RocoNetResponseParseFailure,
+    RocoNetResponseParseSource, RocoNetResponseParseTarget, RocoNetworkErrorKind, RocoParamRange,
+    RocoProtocolFieldName, RocoProtocolParseContext, RocoProtocolParseErrorType,
+    RocoProtocolParseFailureKind, RocoProtocolParseLayer, RocoProtocolParseReason,
+    RocoReturnCodeKind, RocoReturnCodeRejection, RocoScriptError, RocoScriptErrorKind,
+    RocoScriptErrorSource, RocoScriptEvalErrorSource, RocoScriptLocation,
+    RocoScriptParseErrorSource, RocoScriptPosition, RocoScriptRuntimeErrorValue,
+    RocoSpiritStorageProtoContext, RocoSpiritStorageProtoField, ScriptActivityName,
+    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBackendCombatRuntimeErrorKind,
+    ScriptBridgeFailure, ScriptBridgeFailureReason, ScriptBridgeOperation, ScriptCombatActionError,
+    ScriptCombatCommandFailureKind, ScriptCombatPhase, ScriptCombatRuntimeError,
+    ScriptCombatWaitError, ScriptFunctionContextError, ScriptFunctionName, ScriptHttpResponseName,
+    ScriptModuleName, ScriptQueryError, ScriptRequestError, ScriptResponseName,
+    ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemFailure,
+    ScriptSystemFailureSource, ScriptSystemOperation,
 };
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
@@ -55,7 +71,10 @@ use crate::types::{
     MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, NewsActiveItem, NewsTimesReport,
     NewsTimesReportsResult, PetTrainingResult, PetTrainingRewardItem, PiscesBagCandidate,
     PiscesCounter, PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo,
-    PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo, SagittariusBagCandidate,
+    PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo, RocoDisplayItem,
+    RocoOptionalCapricornSecondTask, RocoOptionalCapricornTeamSnapshot, RocoOptionalDisplayItem,
+    RocoOptionalI64, RocoOptionalIceCrystalBattleInfo, RocoOptionalStarTowerTop,
+    RocoOptionalTypeLadderRankUser, RocoRequestContext, RocoRewardKind, SagittariusBagCandidate,
     SagittariusCounter, SagittariusField, SagittariusFirstInfo, SagittariusRewardItem,
     SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo,
     SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter, ScorpioField,
@@ -64,8 +83,8 @@ use crate::types::{
     ServerTimeResult, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult, SkillStoneSkillInfo,
     SkillSwitchResult, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup, SpiritBookInfo,
     SpiritBookSpiritState, SpiritBookStates, SpiritBookSummary, SpiritEquipmentBagInfo,
-    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerNode,
-    StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
+    SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo, StarTowerExchangeItem, StarTowerInfo,
+    StarTowerNode, StarTowerStorey, StarTowerTop, StarTowerTopMission, StarTowerTopReward,
     StaticGuardianPetPropertyInfo, StaticItemInfo, StaticMagicInfo, StaticPluginInfo,
     StaticSkillInfo, StaticSpiritEvolutionEdge, StaticSpiritInfo, StaticSpiritInfoLookupResult,
     StaticStriveItemInfo, StaticTitleInfo, StorageSpiritInfo, SummonExchangeGroup,
@@ -402,6 +421,317 @@ impl RocoEngine {
         }
     }
 
+    fn script_parse_error_source(error: &rhai::ParseErrorType) -> RocoScriptParseErrorSource {
+        match error {
+            rhai::ParseErrorType::UnexpectedEOF => RocoScriptParseErrorSource::UnexpectedEof,
+            rhai::ParseErrorType::BadInput(_) => RocoScriptParseErrorSource::BadInput,
+            rhai::ParseErrorType::UnknownOperator(operator) => {
+                RocoScriptParseErrorSource::UnknownOperator {
+                    operator: operator.clone(),
+                }
+            }
+            rhai::ParseErrorType::MissingToken(token, description) => {
+                RocoScriptParseErrorSource::MissingToken {
+                    token: token.clone(),
+                    description: description.clone(),
+                }
+            }
+            rhai::ParseErrorType::MissingSymbol(description) => {
+                RocoScriptParseErrorSource::MissingSymbol {
+                    description: description.clone(),
+                }
+            }
+            #[allow(deprecated)]
+            rhai::ParseErrorType::MalformedCallExpr(description) => {
+                RocoScriptParseErrorSource::DeprecatedMalformedCallExpr {
+                    description: description.clone(),
+                }
+            }
+            rhai::ParseErrorType::MalformedIndexExpr(description) => {
+                RocoScriptParseErrorSource::MalformedIndexExpr {
+                    description: description.clone(),
+                }
+            }
+            #[allow(deprecated)]
+            rhai::ParseErrorType::MalformedInExpr(description) => {
+                RocoScriptParseErrorSource::DeprecatedMalformedInExpr {
+                    description: description.clone(),
+                }
+            }
+            rhai::ParseErrorType::MalformedCapture(description) => {
+                RocoScriptParseErrorSource::MalformedCapture {
+                    description: description.clone(),
+                }
+            }
+            rhai::ParseErrorType::DuplicatedProperty(property) => {
+                RocoScriptParseErrorSource::DuplicatedProperty {
+                    property: property.clone(),
+                }
+            }
+            #[allow(deprecated)]
+            rhai::ParseErrorType::DuplicatedSwitchCase => {
+                RocoScriptParseErrorSource::DeprecatedDuplicatedSwitchCase
+            }
+            rhai::ParseErrorType::DuplicatedVariable(variable) => {
+                RocoScriptParseErrorSource::DuplicatedVariable {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::ParseErrorType::WrongSwitchIntegerCase => {
+                RocoScriptParseErrorSource::WrongSwitchIntegerCase
+            }
+            rhai::ParseErrorType::WrongSwitchDefaultCase => {
+                RocoScriptParseErrorSource::WrongSwitchDefaultCase
+            }
+            rhai::ParseErrorType::WrongSwitchCaseCondition => {
+                RocoScriptParseErrorSource::WrongSwitchCaseCondition
+            }
+            rhai::ParseErrorType::PropertyExpected => RocoScriptParseErrorSource::PropertyExpected,
+            rhai::ParseErrorType::VariableExpected => RocoScriptParseErrorSource::VariableExpected,
+            rhai::ParseErrorType::ForbiddenVariable(variable) => {
+                RocoScriptParseErrorSource::ForbiddenVariable {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::ParseErrorType::Reserved(symbol) => RocoScriptParseErrorSource::Reserved {
+                symbol: symbol.clone(),
+            },
+            rhai::ParseErrorType::MismatchedType(expected, actual) => {
+                RocoScriptParseErrorSource::MismatchedType {
+                    expected: expected.clone(),
+                    actual: actual.clone(),
+                }
+            }
+            rhai::ParseErrorType::ExprExpected(expression) => {
+                RocoScriptParseErrorSource::ExprExpected {
+                    expression: expression.clone(),
+                }
+            }
+            rhai::ParseErrorType::WrongDocComment => RocoScriptParseErrorSource::WrongDocComment,
+            rhai::ParseErrorType::WrongFnDefinition => {
+                RocoScriptParseErrorSource::WrongFunctionDefinition
+            }
+            rhai::ParseErrorType::FnDuplicatedDefinition(function, params) => {
+                RocoScriptParseErrorSource::FunctionDuplicatedDefinition {
+                    function: function.clone(),
+                    params: *params,
+                }
+            }
+            rhai::ParseErrorType::FnMissingName => RocoScriptParseErrorSource::FunctionMissingName,
+            rhai::ParseErrorType::FnMissingParams(function) => {
+                RocoScriptParseErrorSource::FunctionMissingParams {
+                    function: function.clone(),
+                }
+            }
+            rhai::ParseErrorType::FnDuplicatedParam(function, parameter) => {
+                RocoScriptParseErrorSource::FunctionDuplicatedParam {
+                    function: function.clone(),
+                    parameter: parameter.clone(),
+                }
+            }
+            rhai::ParseErrorType::FnMissingBody(function) => {
+                RocoScriptParseErrorSource::FunctionMissingBody {
+                    function: function.clone(),
+                }
+            }
+            rhai::ParseErrorType::WrongExport => RocoScriptParseErrorSource::WrongExport,
+            rhai::ParseErrorType::AssignmentToConstant(variable) => {
+                RocoScriptParseErrorSource::AssignmentToConstant {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::ParseErrorType::AssignmentToInvalidLHS(description) => {
+                RocoScriptParseErrorSource::AssignmentToInvalidLhs {
+                    description: description.clone(),
+                }
+            }
+            rhai::ParseErrorType::VariableExists(variable) => {
+                RocoScriptParseErrorSource::VariableExists {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::ParseErrorType::VariableUndefined(variable) => {
+                RocoScriptParseErrorSource::VariableUndefined {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::ParseErrorType::ModuleUndefined(module) => {
+                RocoScriptParseErrorSource::ModuleUndefined {
+                    module: module.clone(),
+                }
+            }
+            rhai::ParseErrorType::ExprTooDeep => RocoScriptParseErrorSource::ExprTooDeep,
+            rhai::ParseErrorType::TooManyFunctions => RocoScriptParseErrorSource::TooManyFunctions,
+            rhai::ParseErrorType::LiteralTooLarge(type_name, max_size) => {
+                RocoScriptParseErrorSource::LiteralTooLarge {
+                    type_name: type_name.clone(),
+                    max_size: *max_size,
+                }
+            }
+            rhai::ParseErrorType::LoopBreak => RocoScriptParseErrorSource::LoopBreak,
+            _ => RocoScriptParseErrorSource::UnclassifiedParse,
+        }
+    }
+
+    fn script_eval_error_source(error: &rhai::EvalAltResult) -> RocoScriptEvalErrorSource {
+        match error {
+            rhai::EvalAltResult::ErrorSystem(message, _) => RocoScriptEvalErrorSource::System {
+                message: message.clone(),
+            },
+            rhai::EvalAltResult::ErrorParsing(source, _) => RocoScriptEvalErrorSource::Parsing {
+                source: Self::script_parse_error_source(source),
+            },
+            rhai::EvalAltResult::ErrorVariableExists(variable, _) => {
+                RocoScriptEvalErrorSource::VariableExists {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorForbiddenVariable(variable, _) => {
+                RocoScriptEvalErrorSource::ForbiddenVariable {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorVariableNotFound(variable, _) => {
+                RocoScriptEvalErrorSource::VariableNotFound {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorPropertyNotFound(property, _) => {
+                RocoScriptEvalErrorSource::PropertyNotFound {
+                    property: property.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorIndexNotFound(_, _) => {
+                RocoScriptEvalErrorSource::IndexNotFound
+            }
+            rhai::EvalAltResult::ErrorFunctionNotFound(signature, _) => {
+                RocoScriptEvalErrorSource::FunctionNotFound {
+                    signature: signature.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorModuleNotFound(module, _) => {
+                RocoScriptEvalErrorSource::ModuleNotFound {
+                    module: module.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorInFunctionCall(function, source, cause, _) => {
+                RocoScriptEvalErrorSource::FunctionCall {
+                    function: function.clone(),
+                    source: source.clone(),
+                    cause: Box::new(Self::script_eval_error_source(cause)),
+                }
+            }
+            rhai::EvalAltResult::ErrorInModule(module, cause, _) => {
+                RocoScriptEvalErrorSource::Module {
+                    module: module.clone(),
+                    cause: Box::new(Self::script_eval_error_source(cause)),
+                }
+            }
+            rhai::EvalAltResult::ErrorUnboundThis(_) => RocoScriptEvalErrorSource::UnboundThis,
+            rhai::EvalAltResult::ErrorMismatchDataType(expected, actual, _) => {
+                RocoScriptEvalErrorSource::MismatchDataType {
+                    expected: expected.clone(),
+                    actual: actual.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorMismatchOutputType(expected, actual, _) => {
+                RocoScriptEvalErrorSource::MismatchOutputType {
+                    expected: expected.clone(),
+                    actual: actual.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorIndexingType(type_name, _) => {
+                RocoScriptEvalErrorSource::IndexingType {
+                    type_name: type_name.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorArrayBounds(len, index, _) => {
+                RocoScriptEvalErrorSource::ArrayBounds {
+                    len: *len,
+                    index: *index,
+                }
+            }
+            rhai::EvalAltResult::ErrorStringBounds(len, index, _) => {
+                RocoScriptEvalErrorSource::StringBounds {
+                    len: *len,
+                    index: *index,
+                }
+            }
+            rhai::EvalAltResult::ErrorBitFieldBounds(len, index, _) => {
+                RocoScriptEvalErrorSource::BitFieldBounds {
+                    len: *len,
+                    index: *index,
+                }
+            }
+            rhai::EvalAltResult::ErrorFor(_) => RocoScriptEvalErrorSource::ForLoopNonIterable,
+            rhai::EvalAltResult::ErrorDataRace(variable, _) => {
+                RocoScriptEvalErrorSource::DataRace {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorNonPureMethodCallOnConstant(method, _) => {
+                RocoScriptEvalErrorSource::NonPureMethodCallOnConstant {
+                    method: method.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorAssignmentToConstant(variable, _) => {
+                RocoScriptEvalErrorSource::AssignmentToConstant {
+                    variable: variable.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorDotExpr(expression, _) => {
+                RocoScriptEvalErrorSource::DotExpr {
+                    expression: expression.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorArithmetic(message, _) => {
+                RocoScriptEvalErrorSource::Arithmetic {
+                    message: message.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorTooManyOperations(_) => {
+                RocoScriptEvalErrorSource::TooManyOperations
+            }
+            rhai::EvalAltResult::ErrorTooManyVariables(_) => {
+                RocoScriptEvalErrorSource::TooManyVariables
+            }
+            rhai::EvalAltResult::ErrorTooManyModules(_) => {
+                RocoScriptEvalErrorSource::TooManyModules
+            }
+            rhai::EvalAltResult::ErrorStackOverflow(_) => RocoScriptEvalErrorSource::StackOverflow,
+            rhai::EvalAltResult::ErrorDataTooLarge(type_name, _) => {
+                RocoScriptEvalErrorSource::DataTooLarge {
+                    type_name: type_name.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorTerminated(_, _) => RocoScriptEvalErrorSource::Terminated,
+            rhai::EvalAltResult::ErrorCustomSyntax(message, symbols, _) => {
+                RocoScriptEvalErrorSource::CustomSyntax {
+                    message: message.clone(),
+                    symbols: symbols.clone(),
+                }
+            }
+            rhai::EvalAltResult::ErrorRuntime(value, _) => RocoScriptEvalErrorSource::Runtime {
+                value: Self::script_runtime_error_value(value),
+            },
+            rhai::EvalAltResult::LoopBreak(is_break, _, _) => {
+                RocoScriptEvalErrorSource::LoopBreak {
+                    is_break: *is_break,
+                }
+            }
+            rhai::EvalAltResult::Return(_, _) => RocoScriptEvalErrorSource::Return,
+            rhai::EvalAltResult::Exit(_, _) => RocoScriptEvalErrorSource::Exit,
+            _ => RocoScriptEvalErrorSource::UnclassifiedEval,
+        }
+    }
+
+    fn script_runtime_error_value(value: &Dynamic) -> RocoScriptRuntimeErrorValue {
+        value
+            .clone()
+            .try_cast::<RocoScriptRuntimeErrorValue>()
+            .unwrap_or_else(|| RocoScriptRuntimeErrorValue::message(value.to_string()))
+    }
+
     fn map_eval_error(error: Box<rhai::EvalAltResult>) -> RocoError {
         let position = error.position();
         let kind = match error.as_ref() {
@@ -412,16 +742,18 @@ impl RocoEngine {
             rhai::EvalAltResult::ErrorInModule(..) => RocoScriptErrorKind::Module,
             _ => RocoScriptErrorKind::Eval,
         };
-        let source = match error.as_ref() {
+        let location_source = match error.as_ref() {
             rhai::EvalAltResult::ErrorInFunctionCall(_, source, ..) if !source.is_empty() => {
                 Some(source.clone())
             }
             _ => None,
         };
+        let error_source = RocoScriptErrorSource::Eval(Self::script_eval_error_source(&error));
         RocoError::ScriptError(RocoScriptError {
             kind,
-            message: error.to_string(),
-            location: Self::script_location(source, position),
+            message: error_source.message(),
+            location: Self::script_location(location_source, position),
+            source: error_source,
         })
     }
 
@@ -594,10 +926,13 @@ impl RocoEngine {
 
     fn map_parse_error(error: rhai::ParseError, source: Option<String>) -> RocoError {
         let position = error.position();
+        let error_source =
+            RocoScriptErrorSource::Parse(Self::script_parse_error_source(error.err_type()));
         RocoError::ScriptError(RocoScriptError {
             kind: RocoScriptErrorKind::Parse,
-            message: error.to_string(),
+            message: error_source.message(),
             location: Self::script_location(source, position),
+            source: error_source,
         })
     }
 
@@ -627,7 +962,11 @@ impl RocoEngine {
                     |value: &mut $type| -> std::result::Result<String, Box<rhai::EvalAltResult>> {
                         serde_json::to_string_pretty(value).map_err(|error| {
                             Box::<rhai::EvalAltResult>::from(rhai::EvalAltResult::ErrorRuntime(
-                                error.to_string().into(),
+                                Dynamic::from(
+                                    RocoScriptRuntimeErrorValue::roco_type_json_serialize::<$type>(
+                                        &error,
+                                    ),
+                                ),
                                 rhai::Position::NONE,
                             ))
                         })
@@ -636,6 +975,80 @@ impl RocoEngine {
             };
         }
         for_each_roco_type!(register_roco_type_basics);
+        register_getters!(RocoRequestContext, raw, domain, action);
+        engine.register_get("code", |value: &mut RocoRewardKind| {
+            value.code().to_string()
+        });
+        engine.register_get("present", |value: &mut RocoOptionalI64| value.is_present());
+        engine.register_get("value", |value: &mut RocoOptionalI64| value.value_or(0));
+        engine.register_get("value_or_missing", |value: &mut RocoOptionalI64| {
+            value.value_or(-1)
+        });
+        register_getters!(RocoDisplayItem, item_id, item_count, item_type);
+        engine.register_get("present", |value: &mut RocoOptionalDisplayItem| {
+            value.is_present()
+        });
+        engine.register_get("item", |value: &mut RocoOptionalDisplayItem| {
+            value.item_or_default()
+        });
+        engine.register_get("present", |value: &mut RocoOptionalIceCrystalBattleInfo| {
+            value.is_present()
+        });
+        engine.register_get("battle", |value: &mut RocoOptionalIceCrystalBattleInfo| {
+            value.battle_or_default()
+        });
+        engine.register_get("present", |value: &mut RocoOptionalCapricornSecondTask| {
+            value.is_present()
+        });
+        engine.register_get("task", |value: &mut RocoOptionalCapricornSecondTask| {
+            value.task_or_default()
+        });
+        engine.register_get("present", |value: &mut RocoOptionalStarTowerTop| {
+            value.is_present()
+        });
+        engine.register_get("top", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default()
+        });
+        engine.register_get("star", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default().star
+        });
+        engine.register_get("refresh", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default().refresh
+        });
+        engine.register_get("fight_desc", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default().fight_desc
+        });
+        engine.register_get("task_desc", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default().task_desc
+        });
+        engine.register_get("fight_id", |value: &mut RocoOptionalStarTowerTop| {
+            value.top_or_default().fight_id
+        });
+        engine.register_get("tokens", |value: &mut RocoOptionalStarTowerTop| {
+            Self::to_array(&value.top_or_default().tokens)
+        });
+        engine.register_get("exchanges", |value: &mut RocoOptionalStarTowerTop| {
+            Self::to_array(&value.top_or_default().exchanges)
+        });
+        engine.register_get("missions", |value: &mut RocoOptionalStarTowerTop| {
+            Self::to_array(&value.top_or_default().missions)
+        });
+        engine.register_get("rewards", |value: &mut RocoOptionalStarTowerTop| {
+            Self::to_array(&value.top_or_default().rewards)
+        });
+        engine.register_get(
+            "present",
+            |value: &mut RocoOptionalCapricornTeamSnapshot| value.is_present(),
+        );
+        engine.register_get("team", |value: &mut RocoOptionalCapricornTeamSnapshot| {
+            value.team_or_default()
+        });
+        engine.register_get("present", |value: &mut RocoOptionalTypeLadderRankUser| {
+            value.is_present()
+        });
+        engine.register_get("user", |value: &mut RocoOptionalTypeLadderRankUser| {
+            value.user_or_default()
+        });
 
         macro_rules! register_virgo_cgi_info {
             ($type:ty, $name:literal) => {
@@ -730,9 +1143,1064 @@ impl RocoEngine {
         engine.register_get("actions", |value: &mut CombatActionSnapshot| {
             value.actions.clone()
         });
+        engine.register_type_with_name::<RocoScriptErrorSource>("RocoScriptErrorSource");
+        engine.register_type_with_name::<RocoScriptParseErrorSource>("RocoScriptParseErrorSource");
+        engine.register_type_with_name::<RocoScriptEvalErrorSource>("RocoScriptEvalErrorSource");
+        engine
+            .register_type_with_name::<RocoScriptRuntimeErrorValue>("RocoScriptRuntimeErrorValue");
+        engine.register_type_with_name::<RocoJsonErrorCategory>("RocoJsonErrorCategory");
+        engine.register_get("code", |value: &mut RocoScriptErrorSource| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoScriptParseErrorSource| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoScriptEvalErrorSource| {
+            value.code().to_string()
+        });
+        engine.register_get(
+            "runtime_value",
+            |value: &mut RocoScriptEvalErrorSource| match value {
+                RocoScriptEvalErrorSource::Runtime { value } => Some(value.clone()),
+                _ => None,
+            },
+        );
+        engine.register_get("code", |value: &mut RocoScriptRuntimeErrorValue| {
+            value.code().to_string()
+        });
+        engine.register_get("message", |value: &mut RocoScriptRuntimeErrorValue| {
+            value.message_text()
+        });
+        engine.register_get(
+            "roco_type_name",
+            |value: &mut RocoScriptRuntimeErrorValue| value.roco_type_name(),
+        );
+        engine.register_get(
+            "json_error_category_code",
+            |value: &mut RocoScriptRuntimeErrorValue| value.json_error_category_code(),
+        );
+        engine.register_get("code", |value: &mut RocoJsonErrorCategory| {
+            value.code().to_string()
+        });
         engine.register_type_with_name::<RocoErrorInfo>("RocoErrorInfo");
-        register_getters!(RocoErrorInfo, kind, code, message);
+        engine.register_type_with_name::<RocoErrorDetail>("RocoErrorDetail");
+        engine.register_type_with_name::<RocoErrorKind>("RocoErrorKind");
+        engine.register_type_with_name::<RocoGeneralLockTarget>("RocoGeneralLockTarget");
+        engine.register_type_with_name::<RocoInvalidParamInfo>("RocoInvalidParamInfo");
+        engine.register_type_with_name::<RocoInvalidParamDetail>("RocoInvalidParamDetail");
+        engine.register_type_with_name::<RocoInvalidParamKind>("RocoInvalidParamKind");
+        engine.register_type_with_name::<RocoProtocolFieldName>("RocoProtocolFieldName");
+        engine.register_type_with_name::<RocoParamRange>("RocoParamRange");
+        engine.register_type_with_name::<RocoNetworkErrorKind>("RocoNetworkErrorKind");
+        engine.register_type_with_name::<RocoBridgeErrorChannel>("RocoBridgeErrorChannel");
+        engine.register_type_with_name::<RocoBridgeErrorInfo>("RocoBridgeErrorInfo");
+        engine
+            .register_type_with_name::<RocoNetResponseParseFailure>("RocoNetResponseParseFailure");
+        engine.register_type_with_name::<RocoNetResponseParseSource>("RocoNetResponseParseSource");
+        engine.register_type_with_name::<RocoNetResponseParseTarget>("RocoNetResponseParseTarget");
+        engine.register_type_with_name::<RocoProtocolParseReason>("RocoProtocolParseReason");
+        engine.register_type_with_name::<RocoProtocolParseContext>("RocoProtocolParseContext");
+        engine.register_type_with_name::<RocoSpiritStorageProtoContext>(
+            "RocoSpiritStorageProtoContext",
+        );
+        engine
+            .register_type_with_name::<RocoSpiritStorageProtoField>("RocoSpiritStorageProtoField");
+        engine.register_type_with_name::<RocoProtocolParseFailureKind>(
+            "RocoProtocolParseFailureKind",
+        );
+        engine.register_type_with_name::<RocoProtocolParseErrorType>("RocoProtocolParseErrorType");
+        engine.register_type_with_name::<RocoProtocolParseLayer>("RocoProtocolParseLayer");
+        engine.register_type_with_name::<ScriptBridgeOperation>("ScriptBridgeOperation");
+        engine.register_type_with_name::<ScriptBridgeFailure>("ScriptBridgeFailure");
+        engine.register_type_with_name::<ScriptSystemOperation>("ScriptSystemOperation");
+        engine.register_type_with_name::<ScriptSystemFailure>("ScriptSystemFailure");
+        engine.register_type_with_name::<ScriptSystemFailureSource>("ScriptSystemFailureSource");
+        engine.register_type_with_name::<ScriptCombatCommandFailureKind>(
+            "ScriptCombatCommandFailureKind",
+        );
+        engine.register_type_with_name::<ScriptBackendCombatRuntimeErrorKind>(
+            "ScriptBackendCombatRuntimeErrorKind",
+        );
+        engine.register_type_with_name::<ScriptCombatPhase>("ScriptCombatPhase");
+        engine.register_type_with_name::<ScriptFunctionContextError>("ScriptFunctionContextError");
+        engine.register_type_with_name::<ScriptQueryError>("ScriptQueryError");
+        engine.register_get("code", |value: &mut ScriptCombatPhase| {
+            value.code().to_string()
+        });
+        engine.register_get("kind_code", |value: &mut ScriptFunctionContextError| {
+            value.kind_code()
+        });
+        engine.register_get(
+            "combat_phase_code",
+            |value: &mut ScriptFunctionContextError| value.combat_phase_code(),
+        );
+        engine.register_get("kind_code", |value: &mut ScriptQueryError| {
+            value.kind_code()
+        });
+        engine.register_get("skill_index", |value: &mut ScriptQueryError| {
+            value.skill_index()
+        });
+        engine.register_type_with_name::<ScriptStaticDataError>("ScriptStaticDataError");
+        engine.register_get("kind_code", |value: &mut ScriptStaticDataError| {
+            value.kind_code()
+        });
+        engine.register_get("position", |value: &mut ScriptStaticDataError| {
+            value.position()
+        });
+        engine.register_get("function_name", |value: &mut ScriptStaticDataError| {
+            value.function_name()
+        });
+        engine.register_get("message", |value: &mut ScriptStaticDataError| {
+            value.message()
+        });
+        engine.register_type_with_name::<ScriptActivityName>("ScriptActivityName");
+        engine.register_type_with_name::<ScriptActivityOptionField>("ScriptActivityOptionField");
+        engine.register_type_with_name::<ScriptActivityOperationError>(
+            "ScriptActivityOperationError",
+        );
+        engine.register_get("code", |value: &mut ScriptActivityName| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut ScriptActivityOptionField| {
+            value.code().to_string()
+        });
+        engine.register_get("kind_code", |value: &mut ScriptActivityOperationError| {
+            value.kind_code()
+        });
+        engine.register_get(
+            "activity_code",
+            |value: &mut ScriptActivityOperationError| value.activity_code(),
+        );
+        engine.register_get("field_code", |value: &mut ScriptActivityOperationError| {
+            value.field_code()
+        });
+        engine.register_get("count", |value: &mut ScriptActivityOperationError| {
+            value.count()
+        });
+        engine.register_get("limit", |value: &mut ScriptActivityOperationError| {
+            value.limit()
+        });
+        engine.register_get("value", |value: &mut ScriptActivityOperationError| {
+            value.value()
+        });
+        engine.register_type_with_name::<ScriptCombatActionError>("ScriptCombatActionError");
+        engine.register_get("kind_code", |value: &mut ScriptCombatActionError| {
+            value.kind_code()
+        });
+        engine.register_get("position", |value: &mut ScriptCombatActionError| {
+            value.position()
+        });
+        engine.register_get("skill_id", |value: &mut ScriptCombatActionError| {
+            value.skill_id()
+        });
+        engine.register_get("item_id", |value: &mut ScriptCombatActionError| {
+            value.item_id()
+        });
+        engine.register_type_with_name::<ScriptCombatWaitError>("ScriptCombatWaitError");
+        engine.register_get("kind_code", |value: &mut ScriptCombatWaitError| {
+            value.kind_code()
+        });
+        engine.register_get("combat_phase_code", |value: &mut ScriptCombatWaitError| {
+            value.combat_phase_code()
+        });
+        engine.register_get("elapsed_ms", |value: &mut ScriptCombatWaitError| {
+            value.elapsed_ms()
+        });
+        engine.register_type_with_name::<ScriptRequestError>("ScriptRequestError");
+        engine.register_get("kind_code", |value: &mut ScriptRequestError| {
+            value.kind_code()
+        });
+        engine.register_get("wait_context_code", |value: &mut ScriptRequestError| {
+            value.wait_context_code()
+        });
+        engine.register_get(
+            "system_failure_kind_code",
+            |value: &mut ScriptRequestError| value.system_failure_kind_code(),
+        );
+        engine.register_get(
+            "combat_intent_kind_code",
+            |value: &mut ScriptRequestError| value.combat_intent_kind_code(),
+        );
+        engine.register_get(
+            "combat_validation_kind_code",
+            |value: &mut ScriptRequestError| value.combat_validation_kind_code(),
+        );
+        engine.register_get("spirit_index", |value: &mut ScriptRequestError| {
+            value.spirit_index()
+        });
+        engine.register_get("value", |value: &mut ScriptRequestError| value.value());
+        engine.register_type_with_name::<ScriptSpiritOperationError>("ScriptSpiritOperationError");
+        engine.register_get("kind_code", |value: &mut ScriptSpiritOperationError| {
+            value.kind_code()
+        });
+        engine.register_get("spirit_id", |value: &mut ScriptSpiritOperationError| {
+            value.spirit_id()
+        });
+        engine.register_get("catch_time", |value: &mut ScriptSpiritOperationError| {
+            value.catch_time()
+        });
+        engine.register_type_with_name::<ScriptCombatRuntimeError>("ScriptCombatRuntimeError");
+        engine.register_type_with_name::<RocoReturnCodeKind>("RocoReturnCodeKind");
+        engine.register_type_with_name::<RocoReturnCodeRejection>("RocoReturnCodeRejection");
+        engine.register_type_with_name::<RocoHttpBusinessRejection>("RocoHttpBusinessRejection");
+        engine.register_type_with_name::<ScriptModuleName>("ScriptModuleName");
+        engine.register_type_with_name::<ScriptFunctionName>("ScriptFunctionName");
+        engine.register_type_with_name::<ScriptHttpResponseName>("ScriptHttpResponseName");
+        register_getters!(ScriptHttpResponseName, code);
+        engine.register_type_with_name::<ScriptResponseName>("ScriptResponseName");
+        register_getters!(ScriptResponseName, code);
+        register_getters!(RocoHttpBusinessRejection, message);
+        engine.register_get("result_code", |value: &mut RocoHttpBusinessRejection| {
+            value.result_code()
+        });
+        engine.register_get(
+            "request_context",
+            |value: &mut RocoHttpBusinessRejection| value.request_context.clone(),
+        );
+        engine.register_get(
+            "request_context_raw",
+            |value: &mut RocoHttpBusinessRejection| value.request_context(),
+        );
+        engine.register_get("description", |value: &mut RocoHttpBusinessRejection| {
+            value.description()
+        });
+        register_getters!(RocoReturnCodeRejection, kind, message);
+        engine.register_get("code", |value: &mut RocoReturnCodeRejection| {
+            i64::from(value.code())
+        });
+        engine.register_get("kind_code", |value: &mut RocoReturnCodeRejection| {
+            value.kind_code()
+        });
+        engine.register_get("description", |value: &mut RocoReturnCodeRejection| {
+            value.description()
+        });
+        engine.register_get("code", |value: &mut RocoReturnCodeKind| {
+            i64::from(value.code())
+        });
+        engine.register_get("kind_code", |value: &mut RocoReturnCodeKind| {
+            value.kind_code()
+        });
+        engine.register_get("code", |value: &mut ScriptModuleName| {
+            value.code().to_string()
+        });
+        register_getters!(ScriptFunctionName, module, function);
+        engine.register_get("module_code", |value: &mut ScriptFunctionName| {
+            value.module_code()
+        });
+        engine.register_get("qualified_name", |value: &mut ScriptFunctionName| {
+            value.qualified_name()
+        });
+        register_getters!(RocoErrorInfo, kind, code, message, detail);
+        engine.register_get("kind_code", |value: &mut RocoErrorInfo| {
+            value.kind.kind_code()
+        });
+        engine.register_get("detail_kind_code", |value: &mut RocoErrorInfo| {
+            value.detail_kind_code()
+        });
+        engine.register_get("kind_code", |value: &mut RocoErrorDetail| value.kind_code());
+        engine.register_get("general_lock_target", |value: &mut RocoErrorDetail| {
+            value.general_lock_target()
+        });
+        engine.register_get("general_lock_target_code", |value: &mut RocoErrorDetail| {
+            value.general_lock_target_code()
+        });
+        engine.register_get("invalid_param_kind_code", |value: &mut RocoErrorDetail| {
+            value.invalid_param_kind_code()
+        });
+        engine.register_get("invalid_param_name", |value: &mut RocoErrorDetail| {
+            value.invalid_param_name()
+        });
+        engine.register_get("invalid_param_value", |value: &mut RocoErrorDetail| {
+            value.invalid_param_value()
+        });
+        engine.register_get("invalid_param_message", |value: &mut RocoErrorDetail| {
+            value.invalid_param_message()
+        });
+        engine.register_get("invalid_param_expected", |value: &mut RocoErrorDetail| {
+            value.invalid_param_expected()
+        });
+        engine.register_get(
+            "invalid_param_protocol_field",
+            |value: &mut RocoErrorDetail| value.invalid_param_protocol_field(),
+        );
+        engine.register_get(
+            "invalid_param_rejected_source_code",
+            |value: &mut RocoErrorDetail| value.invalid_param_rejected_source_code(),
+        );
+        engine.register_get("bridge_channel_code", |value: &mut RocoErrorDetail| {
+            value.bridge_channel_code()
+        });
+        engine.register_get("bridge_operation_code", |value: &mut RocoErrorDetail| {
+            value.bridge_operation_code()
+        });
+        engine.register_get("bridge_message", |value: &mut RocoErrorDetail| {
+            value.bridge_message()
+        });
+        engine.register_get(
+            "net_response_parse_target",
+            |value: &mut RocoErrorDetail| value.net_response_parse_target(),
+        );
+        engine.register_get(
+            "net_response_parse_source_kind_code",
+            |value: &mut RocoErrorDetail| value.net_response_parse_source_kind_code(),
+        );
+        engine.register_get(
+            "net_response_parse_protocol_message",
+            |value: &mut RocoErrorDetail| value.net_response_parse_protocol_message(),
+        );
+        engine.register_get(
+            "net_response_parse_protocol_error_type",
+            |value: &mut RocoErrorDetail| value.net_response_parse_protocol_error_type(),
+        );
+        engine.register_get(
+            "net_response_parse_unexpected_cmd_id",
+            |value: &mut RocoErrorDetail| value.net_response_parse_unexpected_cmd_id(),
+        );
+        engine.register_get("unsupported_module", |value: &mut RocoErrorDetail| {
+            value.unsupported_module()
+        });
+        engine.register_get(
+            "unsupported_function_name",
+            |value: &mut RocoErrorDetail| value.unsupported_function_name(),
+        );
+        engine.register_get(
+            "function_context_kind_code",
+            |value: &mut RocoErrorDetail| value.function_context_kind_code(),
+        );
+        engine.register_get(
+            "function_context_combat_phase_code",
+            |value: &mut RocoErrorDetail| value.function_context_combat_phase_code(),
+        );
+        engine.register_get("query_kind_code", |value: &mut RocoErrorDetail| {
+            value.query_kind_code()
+        });
+        engine.register_get("query_skill_index", |value: &mut RocoErrorDetail| {
+            value.query_skill_index()
+        });
+        engine.register_get("static_data_kind_code", |value: &mut RocoErrorDetail| {
+            value.static_data_kind_code()
+        });
+        engine.register_get("static_data_position", |value: &mut RocoErrorDetail| {
+            value.static_data_position()
+        });
+        engine.register_get(
+            "static_data_function_name",
+            |value: &mut RocoErrorDetail| value.static_data_function_name(),
+        );
+        engine.register_get("static_data_message", |value: &mut RocoErrorDetail| {
+            value.static_data_message()
+        });
+        engine.register_get(
+            "static_data_active_config_source_code",
+            |value: &mut RocoErrorDetail| value.static_data_active_config_source_code(),
+        );
+        engine.register_get("system_operation_code", |value: &mut RocoErrorDetail| {
+            value.system_operation_code()
+        });
+        engine.register_get("system_source_code", |value: &mut RocoErrorDetail| {
+            value.system_source_code()
+        });
+        engine.register_get("system_message", |value: &mut RocoErrorDetail| {
+            value.system_message()
+        });
+        engine.register_get(
+            "stdlib_bridge_operation_code",
+            |value: &mut RocoErrorDetail| value.stdlib_bridge_operation_code(),
+        );
+        engine.register_get("stdlib_bridge_message", |value: &mut RocoErrorDetail| {
+            value.stdlib_bridge_message()
+        });
+        engine.register_get(
+            "activity_operation_kind_code",
+            |value: &mut RocoErrorDetail| value.activity_operation_kind_code(),
+        );
+        engine.register_get(
+            "activity_operation_activity_code",
+            |value: &mut RocoErrorDetail| value.activity_operation_activity_code(),
+        );
+        engine.register_get(
+            "activity_operation_field_code",
+            |value: &mut RocoErrorDetail| value.activity_operation_field_code(),
+        );
+        engine.register_get("activity_operation_count", |value: &mut RocoErrorDetail| {
+            value.activity_operation_count()
+        });
+        engine.register_get("activity_operation_limit", |value: &mut RocoErrorDetail| {
+            value.activity_operation_limit()
+        });
+        engine.register_get("activity_operation_value", |value: &mut RocoErrorDetail| {
+            value.activity_operation_value()
+        });
+        engine.register_get("combat_action_kind_code", |value: &mut RocoErrorDetail| {
+            value.combat_action_kind_code()
+        });
+        engine.register_get("combat_action_position", |value: &mut RocoErrorDetail| {
+            value.combat_action_position()
+        });
+        engine.register_get("combat_action_skill_id", |value: &mut RocoErrorDetail| {
+            value.combat_action_skill_id()
+        });
+        engine.register_get("combat_action_item_id", |value: &mut RocoErrorDetail| {
+            value.combat_action_item_id()
+        });
+        engine.register_get("combat_wait_kind_code", |value: &mut RocoErrorDetail| {
+            value.combat_wait_kind_code()
+        });
+        engine.register_get(
+            "combat_wait_combat_phase_code",
+            |value: &mut RocoErrorDetail| value.combat_wait_combat_phase_code(),
+        );
+        engine.register_get("combat_wait_elapsed_ms", |value: &mut RocoErrorDetail| {
+            value.combat_wait_elapsed_ms()
+        });
+        engine.register_get("combat_runtime_message", |value: &mut RocoErrorDetail| {
+            value.combat_runtime_message()
+        });
+        engine.register_get(
+            "combat_command_failure_kind",
+            |value: &mut RocoErrorDetail| value.combat_command_failure_kind(),
+        );
+        engine.register_get(
+            "combat_command_failure_kind_code",
+            |value: &mut RocoErrorDetail| value.combat_command_failure_kind_code(),
+        );
+        engine.register_get(
+            "pending_response_kind_code",
+            |value: &mut RocoErrorDetail| value.pending_response_kind_code(),
+        );
+        engine.register_get(
+            "pending_http_response_code",
+            |value: &mut RocoErrorDetail| value.pending_http_response_code(),
+        );
+        engine.register_get(
+            "expected_http_response_code",
+            |value: &mut RocoErrorDetail| value.expected_http_response_code(),
+        );
+        engine.register_get(
+            "actual_http_response_code",
+            |value: &mut RocoErrorDetail| value.actual_http_response_code(),
+        );
+        engine.register_get(
+            "pending_response_combat_phase_code",
+            |value: &mut RocoErrorDetail| value.pending_response_combat_phase_code(),
+        );
+        engine.register_get(
+            "pending_response_net_target_code",
+            |value: &mut RocoErrorDetail| value.pending_response_net_target_code(),
+        );
+        engine.register_get(
+            "pending_response_expected_action_kind",
+            |value: &mut RocoErrorDetail| value.pending_response_expected_action_kind(),
+        );
+        engine.register_get(
+            "pending_response_expected_spirit_index",
+            |value: &mut RocoErrorDetail| value.pending_response_expected_spirit_index(),
+        );
+        engine.register_get(
+            "pending_response_actual_action_kind",
+            |value: &mut RocoErrorDetail| value.pending_response_actual_action_kind(),
+        );
+        engine.register_get(
+            "pending_response_actual_spirit_index",
+            |value: &mut RocoErrorDetail| value.pending_response_actual_spirit_index(),
+        );
+        engine.register_get("response_kind_code", |value: &mut RocoErrorDetail| {
+            value.response_kind_code()
+        });
+        engine.register_get("expected_response_code", |value: &mut RocoErrorDetail| {
+            value.expected_response_code()
+        });
+        engine.register_get("actual_response_code", |value: &mut RocoErrorDetail| {
+            value.actual_response_code()
+        });
+        engine.register_get("request_kind_code", |value: &mut RocoErrorDetail| {
+            value.request_kind_code()
+        });
+        engine.register_get(
+            "request_wait_context_code",
+            |value: &mut RocoErrorDetail| value.request_wait_context_code(),
+        );
+        engine.register_get(
+            "request_system_failure_kind_code",
+            |value: &mut RocoErrorDetail| value.request_system_failure_kind_code(),
+        );
+        engine.register_get(
+            "request_combat_intent_kind_code",
+            |value: &mut RocoErrorDetail| value.request_combat_intent_kind_code(),
+        );
+        engine.register_get(
+            "request_combat_validation_kind_code",
+            |value: &mut RocoErrorDetail| value.request_combat_validation_kind_code(),
+        );
+        engine.register_get("request_spirit_index", |value: &mut RocoErrorDetail| {
+            value.request_spirit_index()
+        });
+        engine.register_get("request_value", |value: &mut RocoErrorDetail| {
+            value.request_value()
+        });
+        engine.register_get(
+            "request_combat_protocol_error_kind_code",
+            |value: &mut RocoErrorDetail| value.request_combat_protocol_error_kind_code(),
+        );
+        engine.register_get(
+            "request_combat_protocol_error_value",
+            |value: &mut RocoErrorDetail| value.request_combat_protocol_error_value(),
+        );
+        engine.register_get("session_memory_kind_code", |value: &mut RocoErrorDetail| {
+            value.session_memory_kind_code()
+        });
+        engine.register_get("session_memory_key", |value: &mut RocoErrorDetail| {
+            value.session_memory_key()
+        });
+        engine.register_get(
+            "session_memory_expected_kind_code",
+            |value: &mut RocoErrorDetail| value.session_memory_expected_kind_code(),
+        );
+        engine.register_get(
+            "session_memory_actual_kind_code",
+            |value: &mut RocoErrorDetail| value.session_memory_actual_kind_code(),
+        );
+        engine.register_get("lookup_kind_code", |value: &mut RocoErrorDetail| {
+            value.lookup_kind_code()
+        });
+        engine.register_get("lookup_entity_code", |value: &mut RocoErrorDetail| {
+            value.lookup_entity_code()
+        });
+        engine.register_get("lookup_key", |value: &mut RocoErrorDetail| {
+            value.lookup_key()
+        });
+        engine.register_get(
+            "spirit_operation_kind_code",
+            |value: &mut RocoErrorDetail| value.spirit_operation_kind_code(),
+        );
+        engine.register_get(
+            "spirit_operation_spirit_id",
+            |value: &mut RocoErrorDetail| value.spirit_operation_spirit_id(),
+        );
+        engine.register_get(
+            "spirit_operation_catch_time",
+            |value: &mut RocoErrorDetail| value.spirit_operation_catch_time(),
+        );
+        engine.register_get("return_code_kind_code", |value: &mut RocoErrorDetail| {
+            value.return_code_kind_code()
+        });
+        engine.register_get("return_code_value", |value: &mut RocoErrorDetail| {
+            value.return_code_value()
+        });
+        engine.register_get("return_code_message", |value: &mut RocoErrorDetail| {
+            value.return_code_message()
+        });
+        engine.register_get(
+            "http_business_result_code",
+            |value: &mut RocoErrorDetail| value.http_business_result_code(),
+        );
+        engine.register_get(
+            "http_business_request_context",
+            |value: &mut RocoErrorDetail| value.http_business_request_context(),
+        );
+        engine.register_get("http_business_message", |value: &mut RocoErrorDetail| {
+            value.http_business_message()
+        });
+        engine.register_get("network_kind_code", |value: &mut RocoErrorInfo| {
+            value.network_kind_code()
+        });
+        engine.register_get("kind_code", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(RocoErrorInfo::kind_code)
+                .unwrap_or_default()
+        });
+        engine.register_get("detail_kind_code", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(RocoErrorInfo::detail_kind_code)
+                .unwrap_or_default()
+        });
+        engine.register_get("detail", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(|info| info.detail.clone())
+                .unwrap_or(RocoErrorDetail::None)
+        });
+        engine.register_get("network_kind_code", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(RocoErrorInfo::network_kind_code)
+                .unwrap_or_default()
+        });
+        engine.register_get("code", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(|error| error.code.clone())
+                .unwrap_or_default()
+        });
+        engine.register_get("message", |value: &mut Option<RocoErrorInfo>| {
+            value
+                .as_ref()
+                .map(|error| error.message.clone())
+                .unwrap_or_default()
+        });
+        engine.register_get("code", |value: &mut RocoErrorKind| value.kind_code());
+        engine.register_get("family_code", |value: &mut RocoErrorKind| {
+            value.family_code().to_string()
+        });
+        engine.register_get("network_kind", |value: &mut RocoErrorKind| match value {
+            RocoErrorKind::Network { kind } => Some(kind.clone()),
+            _ => None,
+        });
+        engine.register_get("code", |value: &mut RocoGeneralLockTarget| {
+            value.code().to_string()
+        });
+        register_getters!(RocoInvalidParamInfo, kind, name, value, detail, message);
+        engine.register_get("kind_code", |value: &mut RocoInvalidParamInfo| {
+            value.kind_code()
+        });
+        engine.register_get("detail_kind_code", |value: &mut RocoInvalidParamInfo| {
+            value.detail_kind_code()
+        });
+        engine.register_get("expected_text", |value: &mut RocoInvalidParamInfo| {
+            value.expected_text()
+        });
+        engine.register_get("protocol_field", |value: &mut RocoInvalidParamInfo| {
+            value.protocol_field()
+        });
+        engine.register_get("protocol_field_name", |value: &mut RocoInvalidParamInfo| {
+            value.protocol_field_name()
+        });
+        engine.register_get(
+            "rejected_source_code",
+            |value: &mut RocoInvalidParamInfo| value.rejected_source_code(),
+        );
+        engine.register_get("code", |value: &mut RocoInvalidParamKind| {
+            value.code().to_string()
+        });
+        engine.register_get("kind_code", |value: &mut RocoInvalidParamDetail| {
+            value.kind_code()
+        });
+        engine.register_get("expected_text", |value: &mut RocoInvalidParamDetail| {
+            value.expected_text()
+        });
+        engine.register_get("protocol_field", |value: &mut RocoInvalidParamDetail| {
+            value.protocol_field()
+        });
+        engine.register_get(
+            "protocol_field_name",
+            |value: &mut RocoInvalidParamDetail| value.protocol_field_name(),
+        );
+        engine.register_get(
+            "rejected_source_code",
+            |value: &mut RocoInvalidParamDetail| value.rejected_source_code(),
+        );
+        engine.register_get("code", |value: &mut RocoProtocolFieldName| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut Option<RocoProtocolFieldName>| {
+            value
+                .as_ref()
+                .map(|field| field.code().to_string())
+                .unwrap_or_default()
+        });
+        engine.register_get(
+            "system_operation_code",
+            |value: &mut RocoInvalidParamDetail| value.system_operation_code(),
+        );
+        engine.register_get(
+            "system_source_code",
+            |value: &mut RocoInvalidParamDetail| value.system_source_code(),
+        );
+        engine.register_get("system_message", |value: &mut RocoInvalidParamDetail| {
+            value.system_message()
+        });
+        engine.register_get("kind_code", |value: &mut RocoParamRange| {
+            value.kind_code().to_string()
+        });
+        engine.register_get("min", |value: &mut RocoParamRange| value.min_value());
+        engine.register_get("max", |value: &mut RocoParamRange| value.max_value());
+        engine.register_get("type_name", |value: &mut RocoParamRange| value.type_name());
+        engine.register_get("text", |value: &mut RocoParamRange| value.to_string());
+        engine.register_get("kind_code", |value: &mut Option<RocoParamRange>| {
+            value
+                .as_ref()
+                .map(|range| range.kind_code().to_string())
+                .unwrap_or_default()
+        });
+        engine.register_get("min", |value: &mut Option<RocoParamRange>| {
+            value
+                .as_ref()
+                .map(RocoParamRange::min_value)
+                .unwrap_or_default()
+        });
+        engine.register_get("max", |value: &mut Option<RocoParamRange>| {
+            value
+                .as_ref()
+                .map(RocoParamRange::max_value)
+                .unwrap_or_default()
+        });
+        engine.register_get("type_name", |value: &mut Option<RocoParamRange>| {
+            value
+                .as_ref()
+                .map(RocoParamRange::type_name)
+                .unwrap_or_default()
+        });
+        engine.register_get("text", |value: &mut Option<RocoParamRange>| {
+            value.as_ref().map(ToString::to_string).unwrap_or_default()
+        });
+        engine.register_get(
+            "system_operation_code",
+            |value: &mut RocoInvalidParamInfo| value.system_operation_code(),
+        );
+        engine.register_get("system_source_code", |value: &mut RocoInvalidParamInfo| {
+            value.system_source_code()
+        });
+        engine.register_get("system_message", |value: &mut RocoInvalidParamInfo| {
+            value.detail.system_message()
+        });
+        engine.register_get("code", |value: &mut RocoNetworkErrorKind| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoBridgeErrorChannel| {
+            value.code().to_string()
+        });
+        engine.register_type_with_name::<RocoHttpBridgeErrorKind>("RocoHttpBridgeErrorKind");
+        engine.register_get("code", |value: &mut RocoHttpBridgeErrorKind| {
+            value.code().to_string()
+        });
+        engine.register_type_with_name::<RocoNetBridgeErrorKind>("RocoNetBridgeErrorKind");
+        engine.register_get("code", |value: &mut RocoNetBridgeErrorKind| {
+            value.code().to_string()
+        });
+        engine.register_type_with_name::<RocoBridgeErrorKind>("RocoBridgeErrorKind");
+        engine.register_get("code", |value: &mut RocoBridgeErrorKind| {
+            value.code().to_string()
+        });
+        register_getters!(RocoBridgeErrorInfo, channel, kind, operation_code, message);
+        engine.register_get("kind_code", |value: &mut RocoBridgeErrorInfo| {
+            value.kind_code()
+        });
+        engine.register_get("channel_code", |value: &mut RocoBridgeErrorInfo| {
+            value.channel_code()
+        });
+        engine.register_get("operation_code", |value: &mut RocoBridgeErrorInfo| {
+            value.operation_code()
+        });
+        engine.register_get("description", |value: &mut RocoBridgeErrorInfo| {
+            value.description()
+        });
+        register_getters!(RocoNetResponseParseFailure, target, source);
+        engine.register_get("target_code", |value: &mut RocoNetResponseParseFailure| {
+            value.target_code()
+        });
+        engine.register_get("target_label", |value: &mut RocoNetResponseParseFailure| {
+            value.target_label()
+        });
+        engine.register_get(
+            "source_kind_code",
+            |value: &mut RocoNetResponseParseFailure| value.source_kind_code(),
+        );
+        engine.register_get(
+            "protocol_message",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_message(),
+        );
+        engine.register_get(
+            "protocol_reason",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_reason(),
+        );
+        engine.register_get(
+            "protocol_reason_code",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_reason_code(),
+        );
+        engine.register_get(
+            "protocol_error_type",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_error_type_code(),
+        );
+        engine.register_get(
+            "protocol_layer",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_layer(),
+        );
+        engine.register_get(
+            "protocol_layer_code",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_layer_code(),
+        );
+        engine.register_get(
+            "protocol_kind_code",
+            |value: &mut RocoNetResponseParseFailure| value.protocol_kind_code(),
+        );
+        engine.register_get(
+            "unexpected_cmd_id",
+            |value: &mut RocoNetResponseParseFailure| value.unexpected_cmd_id(),
+        );
+        engine.register_get("description", |value: &mut RocoNetResponseParseFailure| {
+            value.description()
+        });
+        engine.register_get("kind_code", |value: &mut RocoNetResponseParseSource| {
+            value.kind_code().to_string()
+        });
+        engine.register_get(
+            "protocol_message",
+            |value: &mut RocoNetResponseParseSource| value.protocol_message(),
+        );
+        engine.register_get(
+            "protocol_reason",
+            |value: &mut RocoNetResponseParseSource| value.protocol_reason(),
+        );
+        engine.register_get(
+            "protocol_reason_code",
+            |value: &mut RocoNetResponseParseSource| value.protocol_reason_code(),
+        );
+        engine.register_get(
+            "protocol_error_type",
+            |value: &mut RocoNetResponseParseSource| value.protocol_error_type_code(),
+        );
+        engine.register_get(
+            "protocol_layer",
+            |value: &mut RocoNetResponseParseSource| value.protocol_layer(),
+        );
+        engine.register_get(
+            "protocol_layer_code",
+            |value: &mut RocoNetResponseParseSource| value.protocol_layer_code(),
+        );
+        engine.register_get(
+            "protocol_kind_code",
+            |value: &mut RocoNetResponseParseSource| value.protocol_kind_code(),
+        );
+        engine.register_get(
+            "unexpected_cmd_id",
+            |value: &mut RocoNetResponseParseSource| value.unexpected_cmd_id(),
+        );
+        engine.register_get("code", |value: &mut RocoNetResponseParseTarget| {
+            value.code().to_string()
+        });
+        engine.register_get("label", |value: &mut RocoNetResponseParseTarget| {
+            value.label().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoProtocolParseFailureKind| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoProtocolParseReason| {
+            value.code().to_string()
+        });
+        engine.register_get("message", |value: &mut RocoProtocolParseReason| {
+            value.message()
+        });
+        engine.register_get("context_code", |value: &mut RocoProtocolParseReason| {
+            value.context_code()
+        });
+        engine.register_get("field_name", |value: &mut RocoProtocolParseReason| {
+            value.field_name()
+        });
+        engine.register_get("field_code", |value: &mut RocoProtocolParseReason| {
+            value.field_code()
+        });
+        engine.register_get(
+            "spirit_storage_context_code",
+            |value: &mut RocoProtocolParseReason| value.spirit_storage_context_code(),
+        );
+        engine.register_get(
+            "spirit_storage_field",
+            |value: &mut RocoProtocolParseReason| value.spirit_storage_field(),
+        );
+        engine.register_get(
+            "spirit_storage_field_code",
+            |value: &mut RocoProtocolParseReason| value.spirit_storage_field_code(),
+        );
+        engine.register_get("code", |value: &mut Option<RocoProtocolParseReason>| {
+            value
+                .as_ref()
+                .map(RocoProtocolParseReason::code)
+                .unwrap_or_default()
+        });
+        engine.register_get("message", |value: &mut Option<RocoProtocolParseReason>| {
+            value
+                .as_ref()
+                .map(RocoProtocolParseReason::message)
+                .unwrap_or_default()
+        });
+        engine.register_get(
+            "context_code",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value
+                    .as_ref()
+                    .map(RocoProtocolParseReason::context_code)
+                    .unwrap_or_default()
+            },
+        );
+        engine.register_get(
+            "field_name",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value.as_ref().and_then(RocoProtocolParseReason::field_name)
+            },
+        );
+        engine.register_get(
+            "field_code",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value
+                    .as_ref()
+                    .map(RocoProtocolParseReason::field_code)
+                    .unwrap_or_default()
+            },
+        );
+        engine.register_get(
+            "spirit_storage_context_code",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value
+                    .as_ref()
+                    .map(RocoProtocolParseReason::spirit_storage_context_code)
+                    .unwrap_or_default()
+            },
+        );
+        engine.register_get(
+            "spirit_storage_field",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value
+                    .as_ref()
+                    .and_then(RocoProtocolParseReason::spirit_storage_field)
+            },
+        );
+        engine.register_get(
+            "spirit_storage_field_code",
+            |value: &mut Option<RocoProtocolParseReason>| {
+                value
+                    .as_ref()
+                    .map(RocoProtocolParseReason::spirit_storage_field_code)
+                    .unwrap_or_default()
+            },
+        );
+        engine.register_get("code", |value: &mut RocoProtocolParseContext| {
+            value.code().to_string()
+        });
+        engine.register_get("label", |value: &mut RocoProtocolParseContext| {
+            value.label().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoSpiritStorageProtoContext| {
+            value.code().to_string()
+        });
+        engine.register_get("label", |value: &mut RocoSpiritStorageProtoContext| {
+            value.label().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoSpiritStorageProtoField| {
+            value.code().to_string()
+        });
+        engine.register_get("label", |value: &mut RocoSpiritStorageProtoField| {
+            value.label().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoProtocolParseErrorType| {
+            value.code().to_string()
+        });
+        engine.register_get("layer", |value: &mut RocoProtocolParseErrorType| {
+            value.layer()
+        });
+        engine.register_get("layer_code", |value: &mut RocoProtocolParseErrorType| {
+            value.layer().code().to_string()
+        });
+        engine.register_get("code", |value: &mut RocoProtocolParseLayer| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut ScriptBridgeOperation| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut ScriptBridgeFailureReason| {
+            value.code().to_string()
+        });
+        engine.register_get("message", |value: &mut ScriptBridgeFailureReason| {
+            value.message().to_string()
+        });
+        register_getters!(ScriptBridgeFailure, operation, reason);
+        engine.register_get("message", |value: &mut ScriptBridgeFailure| value.message());
+        engine.register_get("operation_code", |value: &mut ScriptBridgeFailure| {
+            value.operation_code()
+        });
+        engine.register_get("reason_code", |value: &mut ScriptBridgeFailure| {
+            value.reason_code()
+        });
+        engine.register_get("description", |value: &mut ScriptBridgeFailure| {
+            value.description()
+        });
+        engine.register_get("code", |value: &mut ScriptSystemOperation| {
+            value.code().to_string()
+        });
+        engine.register_get("code", |value: &mut ScriptSystemFailureSource| {
+            value.code().to_string()
+        });
+        register_getters!(ScriptSystemFailure, operation, source);
+        engine.register_get("operation_code", |value: &mut ScriptSystemFailure| {
+            value.operation_code()
+        });
+        engine.register_get("source_code", |value: &mut ScriptSystemFailure| {
+            value.source_code()
+        });
+        engine.register_get("message", |value: &mut ScriptSystemFailure| value.message());
+        engine.register_get("description", |value: &mut ScriptSystemFailure| {
+            value.description()
+        });
+        engine.register_get("code", |value: &mut ScriptCombatCommandFailureKind| {
+            value.code().to_string()
+        });
+        engine.register_get("message", |value: &mut ScriptCombatRuntimeError| {
+            value.message()
+        });
+        engine.register_get(
+            "command_failure_kind",
+            |value: &mut ScriptCombatRuntimeError| value.command_failure_kind(),
+        );
+        engine.register_get(
+            "command_failure_kind_code",
+            |value: &mut ScriptCombatRuntimeError| value.command_failure_kind_code(),
+        );
+        engine.register_get("backend_kind", |value: &mut ScriptCombatRuntimeError| {
+            value.backend_kind()
+        });
+        engine.register_get(
+            "backend_kind_code",
+            |value: &mut ScriptCombatRuntimeError| value.backend_kind_code(),
+        );
+        macro_rules! register_error_info_getters {
+            ($type:ty) => {
+                engine.register_get("error_kind_code", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(RocoErrorInfo::kind_code)
+                        .unwrap_or_default()
+                });
+                engine.register_get("error_detail_kind_code", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(RocoErrorInfo::detail_kind_code)
+                        .unwrap_or_default()
+                });
+                engine.register_get("error_network_kind_code", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(RocoErrorInfo::network_kind_code)
+                        .unwrap_or_default()
+                });
+                engine.register_get("error_code", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(|error| error.code.clone())
+                        .unwrap_or_default()
+                });
+                engine.register_get("error_message", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(|error| error.message.clone())
+                        .unwrap_or_default()
+                });
+                engine.register_get("error_detail", |value: &mut $type| {
+                    value
+                        .error
+                        .as_ref()
+                        .map(|error| error.detail.clone())
+                        .unwrap_or(RocoErrorDetail::None)
+                });
+            };
+        }
         register_getters!(ActionResult, ok, code, message, error);
+        register_error_info_getters!(ActionResult);
         register_getters!(
             CombatActionResult,
             ok,
@@ -743,6 +2211,7 @@ impl RocoEngine {
             combat_finished,
             next_action_ready
         );
+        register_error_info_getters!(CombatActionResult);
         register_getters!(MiniGameRewardItem, id, count, item_type);
         register_getters!(MiniGameExtraField, key, value);
         register_getters!(
@@ -761,6 +2230,7 @@ impl RocoEngine {
             Self::to_array(&value.extra_fields)
         });
         register_getters!(MiniGameSubmitTryResult, ok, code, message, error);
+        register_error_info_getters!(MiniGameSubmitTryResult);
         engine.register_get("result", |value: &mut MiniGameSubmitTryResult| {
             value.result.clone()
         });
@@ -818,6 +2288,7 @@ impl RocoEngine {
             day_of_year,
         );
         register_getters!(ServerTimeResult, ok, code, message, error);
+        register_error_info_getters!(ServerTimeResult);
         engine.register_get("result", |value: &mut ServerTimeResult| {
             value.result.clone()
         });
@@ -957,6 +2428,19 @@ impl RocoEngine {
         engine.register_get("nodes", |value: &mut StarTowerStorey| {
             Self::to_array(&value.nodes)
         });
+        engine.register_get("exchange_items", |value: &mut StarTowerStorey| {
+            Self::to_array(&value.exchange_items)
+        });
+        register_getters!(
+            StarTowerExchangeItem,
+            index,
+            item_id,
+            item_name,
+            spirit_id,
+            spirit_name,
+            owned,
+            required,
+        );
         register_getters!(StarTowerTop, star, refresh, fight_desc, task_desc, fight_id,);
         engine.register_get("tokens", |value: &mut StarTowerTop| {
             Self::to_array(&value.tokens)
@@ -990,15 +2474,18 @@ impl RocoEngine {
             countdown,
             auto_sell,
             money,
-            has_top,
         );
+        engine.register_get("has_top", |value: &mut StarTowerInfo| value.has_top());
+        engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
+        engine.register_get("top_or_default", |value: &mut StarTowerInfo| {
+            value.top_or_default()
+        });
         engine.register_get("clips", |value: &mut StarTowerInfo| {
             Self::to_array(&value.clips)
         });
         engine.register_get("storeys", |value: &mut StarTowerInfo| {
             Self::to_array(&value.storeys)
         });
-        engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
         register_getters!(
             SentinelBossInfo,
             index,
@@ -1271,25 +2758,15 @@ impl RocoEngine {
         engine.register_get("players", |value: &mut CapricornInviteListInfo| {
             Self::to_array(&value.players)
         });
-        register_getters!(
-            CapricornTeamOperationInfo,
-            result_code,
-            message,
-            has_team,
-            team,
-        );
+        register_getters!(CapricornTeamOperationInfo, result_code, message, team,);
         register_getters!(CapricornSecondTask, task_type, data1, data2, step, current,);
         register_getters!(
             CapricornBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
         register_getters!(
@@ -1303,13 +2780,9 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_finish,
             finish,
-            has_current,
             current,
-            has_position,
             position,
-            has_second_task,
             second_task,
         );
         engine.register_get("bag_candidates", |value: &mut CapricornSecondInfo| {
@@ -1320,21 +2793,13 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_finish,
             finish,
-            has_current,
             current,
-            has_remain,
             remain,
-            has_price,
             price,
-            has_limit,
             limit,
-            has_progress_percent,
             progress_percent,
-            has_reward_num,
             reward_num,
-            has_tips,
             tips,
         );
         engine.register_get("bag_candidates", |value: &mut CapricornThirdInfo| {
@@ -1356,7 +2821,6 @@ impl RocoEngine {
             today_sum_hit,
             exchange_count0,
             exchange_count1,
-            has_display_item,
             display_item,
         );
         register_getters!(
@@ -1435,10 +2899,7 @@ impl RocoEngine {
             VirgoBellFoxExchangeInfo,
             result_code,
             message,
-            has_item,
-            item_id,
-            item_count,
-            item_type,
+            item,
             light_num,
             tail_num,
             exchange_count0,
@@ -1450,13 +2911,9 @@ impl RocoEngine {
             PiscesBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -1489,13 +2946,9 @@ impl RocoEngine {
             TaurusBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -1532,13 +2985,9 @@ impl RocoEngine {
             ThreeStartersBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
         register_getters!(MagicPioneerField, name);
@@ -1577,13 +3026,9 @@ impl RocoEngine {
             AlchemyFurnaceBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
         register_getters!(
@@ -1591,13 +3036,9 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_daytimes,
             daytimes,
-            has_finish,
             finish,
-            has_progress,
             progress,
-            has_add_progress,
             add_progress
         );
         engine.register_get("pill_counts", |value: &mut MonkeyCultivationInfo| {
@@ -1611,13 +3052,9 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_branch_type,
             branch_type,
-            has_done,
             done,
-            has_schedule,
             schedule,
-            has_add_progress,
             add_progress
         );
         engine.register_get("pill_counts", |value: &mut MonkeyEvoInfo| {
@@ -1634,15 +3071,10 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_vip,
             vip,
-            has_daytimes,
             daytimes,
-            has_finish,
             finish,
-            has_fusion,
             fusion,
-            has_add_progress,
             add_progress
         );
         engine.register_get("required_stone_indexes", |value: &mut RagingFireInfo| {
@@ -1668,44 +3100,24 @@ impl RocoEngine {
             UnicornBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
-        register_getters!(
-            UnicornBossInfo,
-            slot,
-            npc_index,
-            has_spirit_id,
-            spirit_id,
-            has_fight_id,
-            fight_id
-        );
+        register_getters!(UnicornBossInfo, slot, npc_index, spirit_id, fight_id);
         register_getters!(
             UnicornInfo,
             result_code,
             message,
             request_context,
-            has_finish,
             finish,
-            has_start,
             start,
-            has_total,
             total,
-            has_book,
             book,
-            has_purple_vine_count,
             purple_vine_count,
-            has_energy,
             energy,
-            has_fruit_count,
             fruit_count,
-            has_increase,
             increase
         );
         engine.register_get("bosses", |value: &mut UnicornInfo| {
@@ -1747,23 +3159,14 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_month,
             month,
-            has_map,
             map,
-            has_position_1based,
             position_1based,
-            has_times,
             times,
-            has_ticket,
             ticket,
-            has_used_tool_index,
             used_tool_index,
-            has_need_item_index,
             need_item_index,
-            has_add,
             add,
-            has_point,
             point
         );
         engine.register_get("boxes", |value: &mut FourSeasonsInfo| {
@@ -1808,13 +3211,9 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_buy,
             buy,
-            has_level,
             level,
-            has_count_down,
             count_down,
-            has_tear_state,
             tear_state
         );
         engine.register_get("rewards", |value: &mut DiamondTearInfo| {
@@ -1825,13 +3224,9 @@ impl RocoEngine {
             IceCrystalBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money
         );
         register_getters!(
@@ -1846,17 +3241,11 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_progress,
             progress,
-            has_battle_times,
             battle_times,
-            has_battle_index,
             battle_index,
-            has_get_times,
             get_times,
-            has_add,
             add,
-            has_current_battle,
             current_battle
         );
         engine.register_get("item_counts", |value: &mut IceCrystalInfo| {
@@ -1897,11 +3286,8 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_pet_id,
             pet_id,
-            has_result_side,
             result_side,
-            has_item_id,
             item_id,
             count,
             available
@@ -1917,13 +3303,9 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_battle,
             battle,
-            has_schedule,
             schedule,
-            has_time,
             time,
-            has_increase,
             increase
         );
         engine.register_get("fields", |value: &mut WaterSourceInfo| {
@@ -1946,9 +3328,7 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_schedule,
             schedule,
-            has_num,
             num
         );
         engine.register_get("fields", |value: &mut FiresWillInfo| {
@@ -1971,21 +3351,13 @@ impl RocoEngine {
             result_code,
             message,
             request_context,
-            has_battle,
             battle,
-            has_schedule,
             schedule,
-            has_time,
             time,
-            has_num,
             num,
-            has_act,
             act,
-            has_times,
             times,
-            has_sun,
             sun,
-            has_add,
             add
         );
         engine.register_get("fields", |value: &mut BatheSunInfo| {
@@ -2013,13 +3385,9 @@ impl RocoEngine {
             GeminiBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2068,13 +3436,9 @@ impl RocoEngine {
             SagittariusBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2088,13 +3452,9 @@ impl RocoEngine {
             ScorpioBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2108,13 +3468,9 @@ impl RocoEngine {
             AriesBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2150,10 +3506,7 @@ impl RocoEngine {
             AriesThirdExchangeInfo,
             result_code,
             message,
-            has_item,
-            item_id,
-            item_count,
-            item_type,
+            item,
             light_num,
             tail_num,
             exchange_count0,
@@ -2165,13 +3518,9 @@ impl RocoEngine {
             LibraBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2193,10 +3542,7 @@ impl RocoEngine {
             LibraThirdExchangeInfo,
             result_code,
             message,
-            has_item,
-            item_id,
-            item_count,
-            item_type,
+            item,
             light_num,
             tail_num,
             exchange_count0,
@@ -2208,13 +3554,9 @@ impl RocoEngine {
             LeoBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
 
@@ -2249,10 +3591,7 @@ impl RocoEngine {
             LeoFirstExchangeInfo,
             result_code,
             message,
-            has_item,
-            item_id,
-            item_count,
-            item_type,
+            item,
             light_num,
             tail_num,
             exchange_count0,
@@ -2264,23 +3603,12 @@ impl RocoEngine {
             AquariusBagCandidate,
             candidate_index,
             spirit_id,
-            has_bag_index,
             bag_index,
-            has_catch_time,
             catch_time,
-            has_level,
             level,
-            has_need_money,
             need_money,
         );
-        register_getters!(
-            AquariusRewardItem,
-            item_index,
-            item_id,
-            count,
-            has_item_type,
-            item_type
-        );
+        register_getters!(AquariusRewardItem, item_index, item_id, count, item_type);
 
         macro_rules! register_aquarius_info {
             ($ty:ty, $name:literal) => {
@@ -2323,10 +3651,7 @@ impl RocoEngine {
             AquariusSecondExchangeInfo,
             result_code,
             message,
-            has_item,
-            item_id,
-            item_count,
-            item_type,
+            item,
             light_num,
             tail_num,
             exchange_count0,
@@ -2465,10 +3790,10 @@ impl RocoEngine {
             value.my_info.clone()
         });
         engine.register_get("has_my_info", |value: &mut TypeLadderRankInfo| {
-            value.my_info.is_some()
+            value.my_info.is_present()
         });
         engine.register_get("my_info_or_default", |value: &mut TypeLadderRankInfo| {
-            value.my_info.clone().unwrap_or_default()
+            value.my_info.user_or_default()
         });
         engine.register_get("users", |value: &mut TypeLadderRankInfo| {
             Self::to_array(&value.users)
@@ -2493,6 +3818,7 @@ impl RocoEngine {
             Self::to_array(&value.captured_spirits)
         });
         register_getters!(BattleResultQueryResult, ok, code, message, error);
+        register_error_info_getters!(BattleResultQueryResult);
         engine.register_get("result", |value: &mut BattleResultQueryResult| {
             value.result.clone()
         });

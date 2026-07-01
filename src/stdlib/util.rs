@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use rhai::{Array, Dynamic, EvalAltResult, NativeCallContext, Position};
 
-use crate::error::{RocoError, RocoGeneralError};
+use crate::error::{RocoError, RocoGeneralError, RocoGeneralLockTarget};
 
 pub fn to_rhai_error(err: RocoError) -> Box<EvalAltResult> {
     EvalAltResult::ErrorRuntime(err.to_string().into(), rhai::Position::NONE).into()
@@ -22,9 +22,9 @@ pub fn to_rhai_error_in_context(
 pub fn lock_stdlib<T>(
     stdlib: &Arc<Mutex<T>>,
 ) -> Result<std::sync::MutexGuard<'_, T>, Box<EvalAltResult>> {
-    stdlib.lock().map_err(|error| {
+    stdlib.lock().map_err(|_| {
         to_rhai_error(RocoError::Other(RocoGeneralError::LockPoisoned {
-            message: error.to_string(),
+            target: RocoGeneralLockTarget::Stdlib,
         }))
     })
 }

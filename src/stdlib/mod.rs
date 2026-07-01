@@ -1,6 +1,6 @@
 //! Standard library trait and namespace registration modules.
 
-use crate::error::{Result, ScriptUnsupportedError};
+use crate::error::{Result, ScriptFunctionName, ScriptUnsupportedError};
 
 pub mod alchemy_furnace;
 pub mod aquarius;
@@ -67,7 +67,7 @@ pub use traits::*;
 
 fn unsupported<T>(name: &str) -> Result<T> {
     Err(ScriptUnsupportedError::Function {
-        name: name.to_string(),
+        name: ScriptFunctionName::parse(name),
     }
     .into())
 }

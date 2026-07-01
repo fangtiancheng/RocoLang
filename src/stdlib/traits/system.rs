@@ -10,7 +10,13 @@ pub trait RocoSystemStdLib: Send {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map_err(|error| ScriptSystemError::CurrentTimeBeforeUnixEpoch {
-                message: error.to_string(),
+                failure: crate::error::ScriptSystemFailure::new(
+                    crate::error::ScriptSystemOperation::CurrentTimeBeforeUnixEpoch,
+                    crate::error::ScriptSystemFailureSource::SystemTimeBeforeUnixEpoch {
+                        seconds: error.duration().as_secs(),
+                        nanos: error.duration().subsec_nanos(),
+                    },
+                ),
             })?;
         i64::try_from(now.as_millis())
             .map_err(|_| ScriptSystemError::CurrentTimestampExceedsI64.into())

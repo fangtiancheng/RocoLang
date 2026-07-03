@@ -4,7 +4,7 @@ use roco_lang::{
     RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoEvolutionActivityStdLib,
     RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
+    RocoOptionalI64, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
     RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
     RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
     RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult, SkillInfo, SpiritBagInfo,
@@ -81,7 +81,7 @@ impl RocoSpiritStdLib for MockStdLib {
             spirits: vec![SpiritInfo {
                 spirit_id: 1,
                 position: 1,
-                catch_time: 123456,
+                catch_time: RocoOptionalI64::present(123456),
                 name: "Fire Spirit".to_string(),
                 level: 50,
                 hp: 100,
@@ -341,7 +341,7 @@ impl RocoCombatStdLib for MockStdLib {
         Ok(SpiritInfo {
             spirit_id: 1,
             position,
-            catch_time: 123456,
+            catch_time: RocoOptionalI64::present(123456),
             name: "Fire Spirit".to_string(),
             level: 50,
             hp: self.my_hp,
@@ -354,7 +354,7 @@ impl RocoCombatStdLib for MockStdLib {
         Ok(SpiritInfo {
             spirit_id: 2,
             position: 1,
-            catch_time: 0,
+            catch_time: RocoOptionalI64::present(0),
             name: "Rival Spirit".to_string(),
             level: 50,
             hp: self.rival_hp,

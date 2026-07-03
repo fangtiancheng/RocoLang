@@ -17,6 +17,7 @@ pub mod four_seasons;
 pub mod game;
 pub mod gemini;
 pub mod ice_crystal;
+pub mod jump_machine;
 pub mod ladder;
 pub mod leo;
 pub mod libra;

@@ -4,7 +4,7 @@ use roco_lang::{
     RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoError, RocoEvolutionActivityStdLib,
     RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
+    RocoOptionalI64, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
     RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoServerRejectedError,
     RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
     RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
@@ -28,7 +28,7 @@ impl RocoRuntimeStdLib for ErrorTestStdLib {
     fn move_to_scene(&mut self, scene_id: i64, timeout_ms: i64) -> Result<i64> {
         if self.should_fail {
             Err(RocoError::ServerRejected(
-                RocoServerRejectedError::Message {
+                RocoServerRejectedError::HttpResponse {
                     message: "move_to_scene rejected".to_string(),
                 },
             ))
@@ -228,7 +228,7 @@ impl RocoCombatStdLib for ErrorTestStdLib {
         Ok(SpiritInfo {
             spirit_id: 1,
             position: _position,
-            catch_time: 0,
+            catch_time: RocoOptionalI64::present(0),
             name: "Test".to_string(),
             level: 1,
             hp: 100,
@@ -241,7 +241,7 @@ impl RocoCombatStdLib for ErrorTestStdLib {
         Ok(SpiritInfo {
             spirit_id: 2,
             position: 1,
-            catch_time: 0,
+            catch_time: RocoOptionalI64::present(0),
             name: "Rival".to_string(),
             level: 1,
             hp: 100,

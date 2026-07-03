@@ -125,6 +125,12 @@ pub trait RocoAdventureActivityStdLib: Send {
     fn play_guide_qq_game_hall_gift(&mut self) -> Result<QqGameHallGiftInfo> {
         unsupported("play_guide::qq_game_hall_gift")
     }
+    fn jump_machine_query(&mut self) -> Result<JumpMachineInfo> {
+        unsupported("jump_machine::query")
+    }
+    fn jump_machine_play(&mut self) -> Result<JumpMachineInfo> {
+        unsupported("jump_machine::play")
+    }
     fn capricorn_query_palace_notes(&mut self) -> Result<CapricornPalaceNotesInfo> {
         unsupported("capricorn::query_palace_notes")
     }

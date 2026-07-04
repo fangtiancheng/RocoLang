@@ -2296,7 +2296,17 @@ impl RocoEngine {
         engine.register_get("result", |value: &mut ServerTimeResult| {
             value.result.clone()
         });
-        register_getters!(SpiritInfo, spirit_id, position, catch_time, name, level, hp, max_hp);
+        register_getters!(
+            SpiritInfo,
+            spirit_id,
+            position,
+            catch_time,
+            name,
+            level,
+            personality,
+            hp,
+            max_hp
+        );
         engine.register_get("skills", |value: &mut SpiritInfo| {
             Self::to_array(&value.skills)
         });

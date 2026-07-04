@@ -1583,6 +1583,7 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 ),
                 field("name", "string", "精灵名称。"),
                 field("level", "int", "精灵等级。"),
+                field("personality", "int", "性格数字。"),
                 field("hp", "int", "当前 HP。"),
                 field("max_hp", "int", "最大 HP。"),
                 field("skills", "SpiritSkillInfo[]", "技能列表。"),

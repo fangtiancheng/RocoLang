@@ -190,6 +190,7 @@ pub struct SpiritInfo {
     pub catch_time: RocoOptionalI64,
     pub name: String,
     pub level: i64,
+    pub personality: i64,
     pub hp: i64,
     pub max_hp: i64,
     pub skills: Vec<SpiritSkillInfo>,

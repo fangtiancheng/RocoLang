@@ -52,6 +52,7 @@ impl MockStdLib {
                     catch_time: roco_lang::RocoOptionalI64::present(position),
                     name: format!("Spirit {position}"),
                     level: 1,
+                    personality: 0,
                     hp: 0,
                     max_hp: 1,
                     skills: Vec::<SpiritSkillInfo>::new(),
@@ -208,6 +209,7 @@ impl RocoSpiritStdLib for MockStdLib {
             catch_time: roco_lang::RocoOptionalI64::present(catch_time),
             name: format!("Storage Spirit {spirit_id}"),
             level: 100,
+            personality: 0,
             hp: 100,
             max_hp: 100,
             skills: vec![SpiritSkillInfo {

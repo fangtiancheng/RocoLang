@@ -45,6 +45,13 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         catch_time: i64
     );
     register_stdlib_fn_0!(module, stdlib, "recover_all_spirits", recover_all_spirits);
+    register_stdlib_fn_0!(
+        module,
+        stdlib,
+        "get_auto_recover_enabled",
+        get_auto_recover_enabled
+    );
+    register_stdlib_fn_0!(module, stdlib, "toggle_auto_recover", toggle_auto_recover);
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("try_recover_all_spirits", move || {

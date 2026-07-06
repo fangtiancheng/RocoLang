@@ -80,6 +80,14 @@ pub trait RocoSpiritStdLib: Send {
         unsupported("spirit::recover_all_spirits")
     }
 
+    fn get_auto_recover_enabled(&mut self) -> Result<bool> {
+        unsupported("spirit::get_auto_recover_enabled")
+    }
+
+    fn toggle_auto_recover(&mut self) -> Result<bool> {
+        unsupported("spirit::toggle_auto_recover")
+    }
+
     fn try_recover_all_spirits(&mut self) -> Result<ActionResult> {
         match self.recover_all_spirits() {
             Ok(true) => Ok(ActionResult::ok()),

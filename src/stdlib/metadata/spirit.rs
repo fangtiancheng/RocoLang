@@ -49,6 +49,24 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         ),
         super::stdlib_doc!(
             "spirit",
+            "get_auto_recover_enabled",
+            "spirit::get_auto_recover_enabled() -> bool",
+            "查询 PVE 战斗后自动恢复开关状态。",
+            params: [],
+            returns: "已开启返回 true，未开启返回 false。",
+            examples: ["let enabled = spirit::get_auto_recover_enabled();"]
+        ),
+        super::stdlib_doc!(
+            "spirit",
+            "toggle_auto_recover",
+            "spirit::toggle_auto_recover() -> bool",
+            "切换 PVE 战斗后自动恢复开关，并返回切换后的状态。",
+            params: [],
+            returns: "切换后的开关状态。",
+            examples: ["let enabled = spirit::toggle_auto_recover();"]
+        ),
+        super::stdlib_doc!(
+            "spirit",
             "try_recover_all_spirits",
             "spirit::try_recover_all_spirits() -> ActionResult",
             "尝试恢复背包全部精灵体力，失败时返回结构化结果。",

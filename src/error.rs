@@ -3712,20 +3712,10 @@ pub enum RocoProtocolParseReason {
     },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum RocoProtocolParseContext {
-    PauseState,
-    Mail,
-    DazzleDress,
-    ZodiacQueryStatus,
-    ZodiacExchangeItem,
-    ZodiacDisplayItem,
-    CapricornPalaceNotes,
-    CapricornPalaceNote,
-    CapricornInviteOrCancel,
-    CapricornAcceptOrRefuse,
-    CapricornDisbandTeam,
-    CapricornPlayer,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RocoProtocolParseContext {
+    code: String,
+    label: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -3818,38 +3808,19 @@ impl RocoSpiritStorageProtoContext {
 }
 
 impl RocoProtocolParseContext {
-    pub const fn code(self) -> &'static str {
-        match self {
-            Self::PauseState => "pause_state",
-            Self::Mail => "mail",
-            Self::DazzleDress => "dazzle_dress",
-            Self::ZodiacQueryStatus => "zodiac_query_status",
-            Self::ZodiacExchangeItem => "zodiac_exchange_item",
-            Self::ZodiacDisplayItem => "zodiac_display_item",
-            Self::CapricornPalaceNotes => "capricorn_palace_notes",
-            Self::CapricornPalaceNote => "capricorn_palace_note",
-            Self::CapricornInviteOrCancel => "capricorn_invite_or_cancel",
-            Self::CapricornAcceptOrRefuse => "capricorn_accept_or_refuse",
-            Self::CapricornDisbandTeam => "capricorn_disband_team",
-            Self::CapricornPlayer => "capricorn_player",
+    pub fn new(code: impl Into<String>, label: impl Into<String>) -> Self {
+        Self {
+            code: code.into(),
+            label: label.into(),
         }
     }
 
-    pub const fn label(self) -> &'static str {
-        match self {
-            Self::PauseState => "pause state",
-            Self::Mail => "mail",
-            Self::DazzleDress => "dazzle dress",
-            Self::ZodiacQueryStatus => "zodiac query status",
-            Self::ZodiacExchangeItem => "zodiac exchange item",
-            Self::ZodiacDisplayItem => "zodiac display item",
-            Self::CapricornPalaceNotes => "capricorn palace notes",
-            Self::CapricornPalaceNote => "capricorn palace note",
-            Self::CapricornInviteOrCancel => "capricorn invite_or_cancel",
-            Self::CapricornAcceptOrRefuse => "capricorn accept_or_refuse",
-            Self::CapricornDisbandTeam => "capricorn disband_team",
-            Self::CapricornPlayer => "capricorn player",
-        }
+    pub fn code(&self) -> &str {
+        self.code.as_str()
+    }
+
+    pub fn label(&self) -> &str {
+        self.label.as_str()
     }
 }
 
@@ -4064,7 +4035,7 @@ impl RocoProtocolParseReason {
             | Self::MissingIndexedField { context, .. }
             | Self::TooManyItems { context, .. }
             | Self::IndexOutOfBounds { context, .. }
-            | Self::IndexOverflow { context, .. } => Some(*context),
+            | Self::IndexOverflow { context, .. } => Some(context.clone()),
             _ => None,
         }
     }

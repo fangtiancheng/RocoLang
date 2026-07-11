@@ -32,10 +32,10 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_storage_spirit_detail",
-            "spirit::get_storage_spirit_detail(spirit_id: int, catch_time: int) -> SpiritInfo",
+            "spirit::get_storage_spirit_detail(spirit_id: int, catch_time: int) -> StorageSpiritDetailInfo",
             "查询仓库中指定精灵的详细信息。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。"],
-            returns: "精灵详细信息。",
+            returns: "仓库精灵详细信息，包含真实能力值。",
             examples: ["let detail = spirit::get_storage_spirit_detail(1, 0);"]
         ),
         super::stdlib_doc!(

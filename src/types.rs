@@ -284,6 +284,25 @@ pub struct StorageSpiritInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StorageSpiritDetailInfo {
+    pub spirit_id: i64,
+    pub catch_time: i64,
+    pub storage_time: i64,
+    pub name: String,
+    pub level: i64,
+    pub personality: i64,
+    pub hp: i64,
+    pub max_hp: i64,
+    pub pa: i64,
+    pub pd: i64,
+    pub ma: i64,
+    pub md: i64,
+    pub sp: i64,
+    pub hp_ability: i64,
+    pub skills: Vec<SpiritSkillInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BagItemInfo {
     pub item_id: i64,
     pub count: i64,

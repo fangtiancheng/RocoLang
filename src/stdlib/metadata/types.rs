@@ -1610,6 +1610,26 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
                 field("talent_level", "int", "天赋等级。"),
             ],
         ),
+        "StorageSpiritDetailInfo" => (
+            "仓库精灵详细信息。",
+            vec![
+                field("spirit_id", "int", "精灵 ID。"),
+                field("catch_time", "int", "捕获时间。"),
+                field("storage_time", "int", "入库时间。"),
+                field("name", "string", "精灵名称。"),
+                field("level", "int", "精灵等级。"),
+                field("personality", "int", "性格数字。"),
+                field("hp", "int", "当前 HP。"),
+                field("max_hp", "int", "最大 HP。"),
+                field("pa", "int", "真实物攻能力值。"),
+                field("pd", "int", "真实物防能力值。"),
+                field("ma", "int", "真实魔攻能力值。"),
+                field("md", "int", "真实魔防能力值。"),
+                field("sp", "int", "真实速度能力值。"),
+                field("hp_ability", "int", "真实精力能力值。"),
+                field("skills", "SpiritSkillInfo[]", "技能列表。"),
+            ],
+        ),
         "BagItemInfo" => (
             "背包物品数量。",
             vec![

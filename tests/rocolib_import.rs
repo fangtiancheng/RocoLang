@@ -28,7 +28,8 @@ use roco_lang::{
     ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
     ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
     SpiritBookInfo, SpiritBookStates, SpiritBookSummary, SpiritInfo, SpiritSkillInfo,
-    StarTowerInfo, StarTowerTop, StaticSkillInfo, StorageSpiritInfo, UnicornBossInfo, UnicornInfo,
+    StarTowerInfo, StarTowerTop, StaticSkillInfo, StorageSpiritDetailInfo, StorageSpiritInfo,
+    UnicornBossInfo, UnicornInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -201,17 +202,27 @@ impl RocoSpiritStdLib for MockStdLib {
         }])
     }
 
-    fn get_storage_spirit_detail(&mut self, spirit_id: i64, catch_time: i64) -> Result<SpiritInfo> {
+    fn get_storage_spirit_detail(
+        &mut self,
+        spirit_id: i64,
+        catch_time: i64,
+    ) -> Result<StorageSpiritDetailInfo> {
         let skill_id = if catch_time == 30 { 203 } else { 105 };
-        Ok(SpiritInfo {
+        Ok(StorageSpiritDetailInfo {
             spirit_id,
-            position: 0,
-            catch_time: roco_lang::RocoOptionalI64::present(catch_time),
+            catch_time,
+            storage_time: 0,
             name: format!("Storage Spirit {spirit_id}"),
             level: 100,
             personality: 0,
             hp: 100,
             max_hp: 100,
+            pa: 100,
+            pd: 100,
+            ma: 100,
+            md: 100,
+            sp: 100,
+            hp_ability: 100,
             skills: vec![SpiritSkillInfo {
                 skill_id,
                 pp: 10,

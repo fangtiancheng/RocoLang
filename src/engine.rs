@@ -88,8 +88,9 @@ use crate::types::{
     StarTowerTopMission, StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo,
     StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritEvolutionEdge,
     StaticSpiritInfo, StaticSpiritInfoLookupResult, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig,
-    SummonPoolState, SummonRecord, SummonRewardItem, TalentRefreshResult, TaurusBagCandidate,
+    StorageSpiritDetailInfo, StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem,
+    SummonInfo, SummonPoolConfig, SummonPoolState, SummonRecord, SummonRewardItem,
+    TalentRefreshResult, TaurusBagCandidate,
     TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
     ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
     TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
@@ -2311,6 +2312,26 @@ impl RocoEngine {
             Self::to_array(&value.skills)
         });
         register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
+        register_getters!(
+            StorageSpiritDetailInfo,
+            spirit_id,
+            catch_time,
+            storage_time,
+            name,
+            level,
+            personality,
+            hp,
+            max_hp,
+            pa,
+            pd,
+            ma,
+            md,
+            sp,
+            hp_ability
+        );
+        engine.register_get("skills", |value: &mut StorageSpiritDetailInfo| {
+            Self::to_array(&value.skills)
+        });
         register_getters!(SkillPoolSkillInfo, skill_id, pp, inherited, position);
         register_getters!(SkillPoolInfo, spirit_id, position);
         engine.register_get("skills", |value: &mut SkillPoolInfo| {

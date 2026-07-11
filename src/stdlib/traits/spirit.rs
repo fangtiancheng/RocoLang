@@ -18,7 +18,7 @@ pub trait RocoSpiritStdLib: Send {
         &mut self,
         _spirit_id: i64,
         _catch_time: i64,
-    ) -> Result<SpiritInfo> {
+    ) -> Result<StorageSpiritDetailInfo> {
         unsupported("spirit::get_storage_spirit_detail")
     }
 

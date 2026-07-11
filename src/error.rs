@@ -1,7 +1,7 @@
 //! Error types for RocoLang.
 
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use crate::types::RocoRequestContext;
 
@@ -3715,7 +3715,6 @@ pub enum RocoProtocolParseReason {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RocoProtocolParseContext {
     code: String,
-    label: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -3808,19 +3807,20 @@ impl RocoSpiritStorageProtoContext {
 }
 
 impl RocoProtocolParseContext {
-    pub fn new(code: impl Into<String>, label: impl Into<String>) -> Self {
-        Self {
-            code: code.into(),
-            label: label.into(),
-        }
+    pub fn new(code: impl Into<String>) -> Self {
+        Self { code: code.into() }
     }
 
     pub fn code(&self) -> &str {
         self.code.as_str()
     }
 
-    pub fn label(&self) -> &str {
-        self.label.as_str()
+    pub fn label(&self) -> Cow<'_, str> {
+        if self.code.contains('_') {
+            Cow::Owned(self.code.replace('_', " "))
+        } else {
+            Cow::Borrowed(self.code.as_str())
+        }
     }
 }
 

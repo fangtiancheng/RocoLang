@@ -90,14 +90,14 @@ use crate::types::{
     StaticSpiritInfo, StaticSpiritInfoLookupResult, StaticStriveItemInfo, StaticTitleInfo,
     StorageSpiritDetailInfo, StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem,
     SummonInfo, SummonPoolConfig, SummonPoolState, SummonRecord, SummonRewardItem,
-    TalentRefreshResult, TaurusBagCandidate,
-    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
-    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
-    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
-    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
-    UnicornRewardItem, UserInfo, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo,
-    VirgoBellFoxStatusInfo, VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo,
-    VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity, WeekTaskInfo,
+    TalentRefreshResult, TaurusBagCandidate, TaurusCounter, TaurusField, TaurusFirstInfo,
+    TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate, ThreeStartersCounter,
+    ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo, TypeLadderFightRecord,
+    TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo,
+    UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem, UserInfo,
+    VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter, VirgoField,
+    VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity,
+    WeekTaskInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));

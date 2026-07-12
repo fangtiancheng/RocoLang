@@ -34,7 +34,7 @@ use crate::stdlib::{
     jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea, multi_evolution,
     mystery_fusion, news, news_times, personality, pet_training, pisces, play_guide, profile, role,
     sagittarius, scene, scorpio, sentinel_intelligence, session, spirit, spirit_book,
-    spirit_book_state, star_tower, summon, system, taurus, three_starters, treasure_realm,
+    spirit_book_state, star_tower, summon, system, task, taurus, three_starters, treasure_realm,
     type_ladder, unicorn, virgo, weather, RocoStdLib,
 };
 use crate::types::{
@@ -261,6 +261,10 @@ impl RocoEngine {
         let mut news_times_module = rhai::Module::new();
         news_times::register(&mut news_times_module, stdlib.clone());
         engine.register_static_module("news_times", news_times_module.into());
+
+        let mut task_module = rhai::Module::new();
+        task::register(&mut task_module, stdlib.clone());
+        engine.register_static_module("task", task_module.into());
 
         let mut star_tower_module = rhai::Module::new();
         star_tower::register(&mut star_tower_module, stdlib.clone());

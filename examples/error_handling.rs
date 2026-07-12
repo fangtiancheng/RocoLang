@@ -6,10 +6,10 @@ use roco_lang::{
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
     RocoOptionalI64, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
     RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoServerRejectedError,
-    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
-    ScriptLookupEntity, ScriptLookupError, ScriptQueryError, SkillInfo, SpiritBagInfo, SpiritInfo,
-    StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, RoundResult, ScriptLookupEntity, ScriptLookupError, ScriptQueryError,
+    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -364,6 +364,8 @@ impl RocoManorActivityStdLib for ErrorTestStdLib {}
 impl RocoPetTrainingActivityStdLib for ErrorTestStdLib {}
 
 impl RocoNewsActivityStdLib for ErrorTestStdLib {}
+
+impl RocoTaskStdLib for ErrorTestStdLib {}
 
 impl RocoTowerActivityStdLib for ErrorTestStdLib {}
 

@@ -14,6 +14,7 @@ pub trait RocoStdLib:
     + RocoCombatStdLib
     + RocoSpiritBookStdLib
     + RocoSystemStdLib
+    + RocoTaskStdLib
     + Send
 {
 }
@@ -26,6 +27,7 @@ impl<T> RocoStdLib for T where
         + RocoCombatStdLib
         + RocoSpiritBookStdLib
         + RocoSystemStdLib
+        + RocoTaskStdLib
         + Send
 {
 }

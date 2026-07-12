@@ -47,6 +47,7 @@ pub mod spirit_book_state;
 pub mod star_tower;
 pub mod summon;
 pub mod system;
+pub mod task;
 pub mod taurus;
 pub mod three_starters;
 pub mod treasure_realm;

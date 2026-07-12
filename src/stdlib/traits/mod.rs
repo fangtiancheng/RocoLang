@@ -6,6 +6,7 @@ mod runtime;
 mod spirit;
 mod spirit_book;
 mod system;
+mod task;
 
 use super::unsupported;
 use crate::error::{Result, RocoError, ScriptSystemError};
@@ -19,3 +20,4 @@ pub use runtime::*;
 pub use spirit::*;
 pub use spirit_book::*;
 pub use system::*;
+pub use task::*;

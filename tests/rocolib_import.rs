@@ -16,14 +16,15 @@ use roco_lang::{
     RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection, RocoRewardKind,
     RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
     RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoSystemStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
-    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, SceneRoleInfo, ScriptActivityName,
-    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBridgeError,
-    ScriptBridgeFailure, ScriptCombatActionError, ScriptCombatCommandFailureKind,
-    ScriptCombatIntentKind, ScriptCombatPhase, ScriptCombatProtocolError, ScriptCombatRuntimeError,
-    ScriptCombatWaitError, ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity,
-    ScriptLookupError, ScriptModuleName, ScriptPendingResponseError, ScriptQueryError,
-    ScriptRequestError, ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
+    RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib,
+    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
+    SceneRoleInfo, ScriptActivityName, ScriptActivityOperationError, ScriptActivityOptionField,
+    ScriptBridgeError, ScriptBridgeFailure, ScriptCombatActionError,
+    ScriptCombatCommandFailureKind, ScriptCombatIntentKind, ScriptCombatPhase,
+    ScriptCombatProtocolError, ScriptCombatRuntimeError, ScriptCombatWaitError,
+    ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity, ScriptLookupError,
+    ScriptModuleName, ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
+    ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
     ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
     ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
     ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
@@ -1565,6 +1566,8 @@ impl RocoManorActivityStdLib for MockStdLib {}
 impl RocoPetTrainingActivityStdLib for MockStdLib {}
 
 impl RocoNewsActivityStdLib for MockStdLib {}
+
+impl RocoTaskStdLib for MockStdLib {}
 
 impl RocoTowerActivityStdLib for MockStdLib {
     fn star_tower_query(&mut self) -> Result<StarTowerInfo> {

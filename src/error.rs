@@ -779,8 +779,8 @@ impl fmt::Display for ScriptFunctionContextError {
 pub enum ScriptCombatPhase {
     Idle,
     WaitingStartReply,
-    WaitingLocalReady,
-    WaitingPeerReady,
+    WaitingFrontendReady,
+    WaitingServerOpeningRelease,
     PlayingOpening,
     WaitingPlayerAction,
     WaitingRoundResult,
@@ -798,8 +798,8 @@ impl ScriptCombatPhase {
         match self {
             Self::Idle => "idle",
             Self::WaitingStartReply => "waiting_start_reply",
-            Self::WaitingLocalReady => "waiting_local_ready",
-            Self::WaitingPeerReady => "waiting_peer_ready",
+            Self::WaitingFrontendReady => "waiting_frontend_ready",
+            Self::WaitingServerOpeningRelease => "waiting_server_opening_release",
             Self::PlayingOpening => "playing_opening",
             Self::WaitingPlayerAction => "waiting_player_action",
             Self::WaitingRoundResult => "waiting_round_result",
@@ -817,8 +817,8 @@ impl ScriptCombatPhase {
         match self {
             Self::Idle => "Idle",
             Self::WaitingStartReply => "WaitingStartReply",
-            Self::WaitingLocalReady => "WaitingLocalReady",
-            Self::WaitingPeerReady => "WaitingPeerReady",
+            Self::WaitingFrontendReady => "WaitingFrontendReady",
+            Self::WaitingServerOpeningRelease => "WaitingServerOpeningRelease",
             Self::PlayingOpening => "PlayingOpening",
             Self::WaitingPlayerAction => "WaitingPlayerAction",
             Self::WaitingRoundResult => "WaitingRoundResult",
@@ -1146,8 +1146,10 @@ pub enum ScriptBackendCombatRuntimeErrorKind {
     MissingSideRegistry,
     MissingHistoryRecorder,
     MissingBattleFactsForHistorySnapshot,
+    MissingBattleFactsForPresentation,
     MissingObservedInitialStateForRoundHistory,
     MissingRoundBarrierForPresentation,
+    PresentationBuild,
     HistoryRecorder,
     HistoryProjection,
     ChangeSpiritOwnerWithoutBattleFacts,
@@ -1167,10 +1169,12 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::MissingBattleFactsForHistorySnapshot => {
                 "missing_battle_facts_for_history_snapshot"
             }
+            Self::MissingBattleFactsForPresentation => "missing_battle_facts_for_presentation",
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing_observed_initial_state_for_round_history"
             }
             Self::MissingRoundBarrierForPresentation => "missing_round_barrier_for_presentation",
+            Self::PresentationBuild => "presentation_build",
             Self::HistoryRecorder => "history_recorder",
             Self::HistoryProjection => "history_projection",
             Self::ChangeSpiritOwnerWithoutBattleFacts => "change_spirit_owner_without_battle_facts",
@@ -1190,10 +1194,12 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::MissingBattleFactsForHistorySnapshot => {
                 "missing battle facts for history snapshot"
             }
+            Self::MissingBattleFactsForPresentation => "missing battle facts for presentation",
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing observed initial state for round history"
             }
             Self::MissingRoundBarrierForPresentation => "missing round barrier for presentation",
+            Self::PresentationBuild => "presentation build",
             Self::HistoryRecorder => "history recorder",
             Self::HistoryProjection => "history projection",
             Self::ChangeSpiritOwnerWithoutBattleFacts => "change spirit owner without battle facts",

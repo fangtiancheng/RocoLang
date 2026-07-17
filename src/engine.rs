@@ -1136,7 +1136,7 @@ impl RocoEngine {
         engine.register_get("skills", |value: &mut CombatSpiritState| {
             Self::to_array(&value.skills)
         });
-        register_getters!(CombatSideState, active_position);
+        register_getters!(CombatSideState, uin, active_position);
         engine.register_get("spirits", |value: &mut CombatSideState| {
             Self::to_array(&value.spirits)
         });

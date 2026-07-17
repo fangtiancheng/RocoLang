@@ -1556,6 +1556,7 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
         "CombatSideState" => (
             "战斗一方的出战状态。",
             vec![
+                field("uin", "int", "该方玩家 UIN。"),
                 field("active_position", "int", "当前出战精灵位置。"),
                 field("spirits", "CombatSpiritState[]", "该方精灵状态列表。"),
             ],

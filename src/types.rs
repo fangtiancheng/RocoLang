@@ -2621,6 +2621,7 @@ pub struct CombatSpiritState {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatSideState {
+    pub uin: i64,
     pub active_position: i64,
     pub spirits: Vec<CombatSpiritState>,
 }

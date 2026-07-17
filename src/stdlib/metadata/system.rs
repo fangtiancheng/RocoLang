@@ -40,6 +40,18 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         ),
         super::stdlib_doc!(
             "system",
+            "random_int",
+            "system::random_int(min_inclusive: int, max_inclusive: int) -> int",
+            "在闭区间内均匀生成一个随机整数。",
+            params: [
+                "min_inclusive" => "允许返回的最小整数。",
+                "max_inclusive" => "允许返回的最大整数，必须不小于 min_inclusive。"
+            ],
+            returns: "闭区间 [min_inclusive, max_inclusive] 内的随机整数。",
+            examples: ["let die = system::random_int(1, 6);"]
+        ),
+        super::stdlib_doc!(
+            "system",
             "sleep_until_ms",
             "system::sleep_until_ms(target_ms: int) -> ()",
             "暂停脚本直到指定 Unix 毫秒时间戳。",

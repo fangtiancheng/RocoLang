@@ -1559,7 +1559,24 @@ fn enum_like_modules_expose_combat_constants() {
 
 impl RocoCombatStdLib for MockStdLib {}
 
-impl RocoSystemStdLib for MockStdLib {}
+impl RocoSystemStdLib for MockStdLib {
+    fn random_int(&mut self, min_inclusive: i64, max_inclusive: i64) -> Result<i64> {
+        assert!(min_inclusive <= max_inclusive);
+        Ok(max_inclusive)
+    }
+}
+
+#[test]
+fn system_random_int_is_available_to_scripts_with_inclusive_bounds() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let result = engine
+        .eval("system::random_int(-3, 7)")
+        .expect("system::random_int should be registered");
+
+    assert_eq!(result.as_int().expect("int result"), 7);
+}
 
 impl RocoManorActivityStdLib for MockStdLib {}
 

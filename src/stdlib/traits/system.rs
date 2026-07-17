@@ -22,6 +22,10 @@ pub trait RocoSystemStdLib: Send {
             .map_err(|_| ScriptSystemError::CurrentTimestampExceedsI64.into())
     }
 
+    fn random_int(&mut self, _min_inclusive: i64, _max_inclusive: i64) -> Result<i64> {
+        unsupported("system::random_int")
+    }
+
     fn sleep_until_ms(&mut self, target_ms: i64) -> Result<()> {
         let now = self.now_ms()?;
         if target_ms <= now {

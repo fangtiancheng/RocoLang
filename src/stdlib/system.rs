@@ -26,6 +26,17 @@ pub fn register_functions<T: RocoStdLib + 'static>(module: &mut Module, stdlib: 
     }
     {
         let stdlib = stdlib.clone();
+        module.set_native_fn(
+            "random_int",
+            move |min_inclusive: i64, max_inclusive: i64| {
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.random_int(min_inclusive, max_inclusive)
+                    .map_err(to_rhai_error)
+            },
+        );
+    }
+    {
+        let stdlib = stdlib.clone();
         module.set_native_fn("sleep_until_ms", move |target_ms: i64| {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.sleep_until_ms(target_ms).map_err(to_rhai_error)

@@ -1139,14 +1139,14 @@ impl ScriptCombatCommandFailureKind {
 pub enum ScriptBackendCombatRuntimeErrorKind {
     BattleFacts,
     SideResolution,
+    InvalidStartRequest,
     InvalidReadyPhasePayload,
     MissingStartContext,
     InvalidPhase,
     MissingStartSummary,
     MissingSideRegistry,
     MissingHistoryRecorder,
-    MissingBattleFactsForHistorySnapshot,
-    MissingBattleFactsForPresentation,
+    MissingBattleFacts,
     MissingObservedInitialStateForRoundHistory,
     MissingRoundPresentation,
     PresentationBuild,
@@ -1160,16 +1160,14 @@ impl ScriptBackendCombatRuntimeErrorKind {
         match self {
             Self::BattleFacts => "battle_facts",
             Self::SideResolution => "side_resolution",
+            Self::InvalidStartRequest => "invalid_start_request",
             Self::InvalidReadyPhasePayload => "invalid_ready_phase_payload",
             Self::MissingStartContext => "missing_start_context",
             Self::InvalidPhase => "invalid_phase",
             Self::MissingStartSummary => "missing_start_summary",
             Self::MissingSideRegistry => "missing_side_registry",
             Self::MissingHistoryRecorder => "missing_history_recorder",
-            Self::MissingBattleFactsForHistorySnapshot => {
-                "missing_battle_facts_for_history_snapshot"
-            }
-            Self::MissingBattleFactsForPresentation => "missing_battle_facts_for_presentation",
+            Self::MissingBattleFacts => "missing_battle_facts",
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing_observed_initial_state_for_round_history"
             }
@@ -1185,16 +1183,14 @@ impl ScriptBackendCombatRuntimeErrorKind {
         match self {
             Self::BattleFacts => "battle facts",
             Self::SideResolution => "side resolution",
+            Self::InvalidStartRequest => "invalid start request",
             Self::InvalidReadyPhasePayload => "invalid ready phase payload",
             Self::MissingStartContext => "missing start context",
             Self::InvalidPhase => "invalid phase",
             Self::MissingStartSummary => "missing start summary",
             Self::MissingSideRegistry => "missing side registry",
             Self::MissingHistoryRecorder => "missing history recorder",
-            Self::MissingBattleFactsForHistorySnapshot => {
-                "missing battle facts for history snapshot"
-            }
-            Self::MissingBattleFactsForPresentation => "missing battle facts for presentation",
+            Self::MissingBattleFacts => "missing battle facts",
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing observed initial state for round history"
             }

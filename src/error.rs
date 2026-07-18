@@ -1148,7 +1148,7 @@ pub enum ScriptBackendCombatRuntimeErrorKind {
     MissingBattleFactsForHistorySnapshot,
     MissingBattleFactsForPresentation,
     MissingObservedInitialStateForRoundHistory,
-    MissingRoundBarrierForPresentation,
+    MissingRoundPresentation,
     PresentationBuild,
     HistoryRecorder,
     HistoryProjection,
@@ -1173,7 +1173,7 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing_observed_initial_state_for_round_history"
             }
-            Self::MissingRoundBarrierForPresentation => "missing_round_barrier_for_presentation",
+            Self::MissingRoundPresentation => "missing_round_presentation",
             Self::PresentationBuild => "presentation_build",
             Self::HistoryRecorder => "history_recorder",
             Self::HistoryProjection => "history_projection",
@@ -1198,7 +1198,7 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::MissingObservedInitialStateForRoundHistory => {
                 "missing observed initial state for round history"
             }
-            Self::MissingRoundBarrierForPresentation => "missing round barrier for presentation",
+            Self::MissingRoundPresentation => "missing active presentation",
             Self::PresentationBuild => "presentation build",
             Self::HistoryRecorder => "history recorder",
             Self::HistoryProjection => "history projection",

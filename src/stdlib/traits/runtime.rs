@@ -142,6 +142,78 @@ pub trait RocoRuntimeStdLib: Send {
         Ok(Vec::new())
     }
 
+    fn memory_today(&mut self) -> Result<String> {
+        unsupported("memory::today")
+    }
+
+    fn memory_daily_get_int(&mut self, _key: &str, default_value: i64) -> Result<i64> {
+        Ok(default_value)
+    }
+
+    fn memory_daily_set_int(&mut self, _key: &str, _value: i64) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_increment_int(&mut self, _key: &str, _delta: i64) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_get_string(&mut self, _key: &str, default_value: &str) -> Result<String> {
+        Ok(default_value.to_string())
+    }
+
+    fn memory_daily_set_string(&mut self, _key: &str, _value: &str) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_get_bool(&mut self, _key: &str, default_value: bool) -> Result<bool> {
+        Ok(default_value)
+    }
+
+    fn memory_daily_set_bool(&mut self, _key: &str, _value: bool) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_delete(&mut self, _key: &str) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_clear(&mut self) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_list_keys(&mut self) -> Result<Vec<(String, String)>> {
+        Ok(Vec::new())
+    }
+
+    fn memory_daily_battle_observed_started(&mut self) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_battle_observed_completed(&mut self) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_battle_tracking_since(&mut self) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_battle_limit_reached(&mut self) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn memory_daily_battle_limit(&mut self) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_battle_limit_return_code(&mut self) -> Result<i64> {
+        Ok(0)
+    }
+
+    fn memory_daily_battle_limit_message(&mut self) -> Result<String> {
+        Ok(String::new())
+    }
+
     fn is_in_combat(&mut self) -> Result<bool> {
         Ok(false)
     }

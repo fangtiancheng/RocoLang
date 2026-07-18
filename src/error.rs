@@ -1260,6 +1260,10 @@ pub enum ScriptSessionMemoryError {
         expected: ScriptSessionValueKind,
         actual: ScriptSessionValueKind,
     },
+    PersistentDateUnavailable,
+    PersistentFailure {
+        message: String,
+    },
 }
 
 impl fmt::Display for ScriptSessionMemoryError {
@@ -1275,6 +1279,13 @@ impl fmt::Display for ScriptSessionMemoryError {
                 expected.as_str(),
                 actual.as_str()
             ),
+            Self::PersistentDateUnavailable => write!(
+                f,
+                "server date is not ready; persistent daily memory never falls back to the local date"
+            ),
+            Self::PersistentFailure { message } => {
+                write!(f, "persistent memory operation failed: {message}")
+            }
         }
     }
 }
@@ -1283,24 +1294,29 @@ impl ScriptSessionMemoryError {
     pub const fn kind_code(&self) -> &'static str {
         match self {
             Self::TypeMismatch { .. } => "type_mismatch",
+            Self::PersistentDateUnavailable => "persistent_date_unavailable",
+            Self::PersistentFailure { .. } => "persistent_failure",
         }
     }
 
     pub fn key(&self) -> String {
         match self {
             Self::TypeMismatch { key, .. } => key.clone(),
+            Self::PersistentDateUnavailable | Self::PersistentFailure { .. } => String::new(),
         }
     }
 
     pub fn expected_kind_code(&self) -> String {
         match self {
             Self::TypeMismatch { expected, .. } => expected.as_str().to_string(),
+            Self::PersistentDateUnavailable | Self::PersistentFailure { .. } => String::new(),
         }
     }
 
     pub fn actual_kind_code(&self) -> String {
         match self {
             Self::TypeMismatch { actual, .. } => actual.as_str().to_string(),
+            Self::PersistentDateUnavailable | Self::PersistentFailure { .. } => String::new(),
         }
     }
 }

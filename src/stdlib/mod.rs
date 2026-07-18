@@ -24,6 +24,7 @@ pub mod libra;
 pub mod lookup;
 pub mod magic_pioneer;
 pub mod manor;
+pub mod memory;
 pub mod metadata;
 pub mod mountain_sea;
 pub mod multi_evolution;

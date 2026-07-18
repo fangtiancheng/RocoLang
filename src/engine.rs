@@ -31,11 +31,11 @@ use crate::error::{
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
     dark_city, diamond_tear, evolution_edge_kind, four_seasons, game, gemini, ice_crystal,
-    jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, mountain_sea, multi_evolution,
-    mystery_fusion, news, news_times, personality, pet_training, pisces, play_guide, profile, role,
-    sagittarius, scene, scorpio, sentinel_intelligence, session, spirit, spirit_book,
-    spirit_book_state, star_tower, summon, system, task, taurus, three_starters, treasure_realm,
-    type_ladder, unicorn, virgo, weather, RocoStdLib,
+    jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, memory, mountain_sea,
+    multi_evolution, mystery_fusion, news, news_times, personality, pet_training, pisces,
+    play_guide, profile, role, sagittarius, scene, scorpio, sentinel_intelligence, session, spirit,
+    spirit_book, spirit_book_state, star_tower, summon, system, task, taurus, three_starters,
+    treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -193,6 +193,10 @@ impl RocoEngine {
         let mut session_module = rhai::Module::new();
         session::register(&mut session_module, stdlib.clone());
         engine.register_static_module("session", session_module.into());
+
+        let mut memory_module = rhai::Module::new();
+        memory::register(&mut memory_module, stdlib.clone());
+        engine.register_static_module("memory", memory_module.into());
 
         let mut profile_module = rhai::Module::new();
         profile::register(&mut profile_module, stdlib.clone());

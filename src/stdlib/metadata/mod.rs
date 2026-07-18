@@ -5,6 +5,7 @@ mod enum_helpers;
 mod game;
 mod lookup;
 mod manor;
+mod memory;
 mod news;
 mod pet_training;
 mod profile;
@@ -165,6 +166,7 @@ fn detailed_stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     docs.extend(lookup::docs());
     docs.extend(spirit_book::docs());
     docs.extend(session::docs());
+    docs.extend(memory::docs());
     docs.extend(enum_helpers::docs());
     docs
 }

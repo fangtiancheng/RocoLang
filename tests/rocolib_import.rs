@@ -65,6 +65,78 @@ impl MockStdLib {
 }
 
 impl RocoRuntimeStdLib for MockStdLib {
+    fn memory_today(&mut self) -> Result<String> {
+        Ok("2026-07-18".to_string())
+    }
+
+    fn memory_daily_get_int(&mut self, _key: &str, default_value: i64) -> Result<i64> {
+        Ok(default_value + 1)
+    }
+
+    fn memory_daily_set_int(&mut self, _key: &str, _value: i64) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_increment_int(&mut self, _key: &str, delta: i64) -> Result<i64> {
+        Ok(delta + 10)
+    }
+
+    fn memory_daily_get_string(&mut self, _key: &str, default_value: &str) -> Result<String> {
+        Ok(format!("{default_value}-stored"))
+    }
+
+    fn memory_daily_set_string(&mut self, _key: &str, _value: &str) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_get_bool(&mut self, _key: &str, default_value: bool) -> Result<bool> {
+        Ok(!default_value)
+    }
+
+    fn memory_daily_set_bool(&mut self, _key: &str, _value: bool) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_delete(&mut self, _key: &str) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_clear(&mut self) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_list_keys(&mut self) -> Result<Vec<(String, String)>> {
+        Ok(vec![("task.count".to_string(), "integer".to_string())])
+    }
+
+    fn memory_daily_battle_observed_started(&mut self) -> Result<i64> {
+        Ok(11)
+    }
+
+    fn memory_daily_battle_observed_completed(&mut self) -> Result<i64> {
+        Ok(9)
+    }
+
+    fn memory_daily_battle_tracking_since(&mut self) -> Result<i64> {
+        Ok(123_456)
+    }
+
+    fn memory_daily_battle_limit_reached(&mut self) -> Result<bool> {
+        Ok(true)
+    }
+
+    fn memory_daily_battle_limit(&mut self) -> Result<i64> {
+        Ok(2_000)
+    }
+
+    fn memory_daily_battle_limit_return_code(&mut self) -> Result<i64> {
+        Ok(41)
+    }
+
+    fn memory_daily_battle_limit_message(&mut self) -> Result<String> {
+        Ok("limit".to_string())
+    }
+
     fn query_server_time(&mut self) -> Result<roco_lang::ServerTimeInfo> {
         if self.fail_server_time {
             return Err(RocoError::NetworkError(
@@ -313,6 +385,38 @@ impl RocoSpiritBookStdLib for MockStdLib {
             states: vec![0, 3],
         })
     }
+}
+
+#[test]
+fn persistent_daily_memory_apis_are_available_to_scripts() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let _ = engine
+        .eval(
+            r#"
+                system::assert(memory::today() == "2026-07-18", "date mismatch");
+                system::assert(memory::daily_get_int("task.count", 3) == 4, "int get mismatch");
+                system::assert(memory::daily_set_int("task.count", 4), "int set mismatch");
+                system::assert(memory::daily_increment_int("task.count", 2) == 12, "int increment mismatch");
+                system::assert(memory::daily_get_string("task.phase", "new") == "new-stored", "string get mismatch");
+                system::assert(memory::daily_set_string("task.phase", "done"), "string set mismatch");
+                system::assert(memory::daily_get_bool("task.done", false), "bool get mismatch");
+                system::assert(memory::daily_set_bool("task.done", true), "bool set mismatch");
+                system::assert(memory::daily_delete("task.done"), "delete mismatch");
+                system::assert(memory::daily_clear(), "clear mismatch");
+                let keys = memory::daily_list_keys();
+                system::assert(keys["task.count"] == "integer", "key list mismatch");
+                system::assert(memory::daily_battle_observed_started() == 11, "started mismatch");
+                system::assert(memory::daily_battle_observed_completed() == 9, "completed mismatch");
+                system::assert(memory::daily_battle_tracking_since() == 123456, "tracking mismatch");
+                system::assert(memory::daily_battle_limit_reached(), "limit state mismatch");
+                system::assert(memory::daily_battle_limit() == 2000, "limit mismatch");
+                system::assert(memory::daily_battle_limit_return_code() == 41, "limit code mismatch");
+                system::assert(memory::daily_battle_limit_message() == "limit", "limit message mismatch");
+            "#,
+        )
+        .expect("persistent daily memory APIs should be exposed to scripts");
 }
 
 #[test]

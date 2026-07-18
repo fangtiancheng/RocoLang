@@ -142,6 +142,78 @@ pub trait RocoRuntimeStdLib: Send {
         Ok(Vec::new())
     }
 
+    fn memory_today(&mut self) -> Result<String> {
+        unsupported("memory::today")
+    }
+
+    fn memory_daily_get_int(&mut self, _key: &str, _default_value: i64) -> Result<i64> {
+        unsupported("memory::daily_get_int")
+    }
+
+    fn memory_daily_set_int(&mut self, _key: &str, _value: i64) -> Result<bool> {
+        unsupported("memory::daily_set_int")
+    }
+
+    fn memory_daily_increment_int(&mut self, _key: &str, _delta: i64) -> Result<i64> {
+        unsupported("memory::daily_increment_int")
+    }
+
+    fn memory_daily_get_string(&mut self, _key: &str, _default_value: &str) -> Result<String> {
+        unsupported("memory::daily_get_string")
+    }
+
+    fn memory_daily_set_string(&mut self, _key: &str, _value: &str) -> Result<bool> {
+        unsupported("memory::daily_set_string")
+    }
+
+    fn memory_daily_get_bool(&mut self, _key: &str, _default_value: bool) -> Result<bool> {
+        unsupported("memory::daily_get_bool")
+    }
+
+    fn memory_daily_set_bool(&mut self, _key: &str, _value: bool) -> Result<bool> {
+        unsupported("memory::daily_set_bool")
+    }
+
+    fn memory_daily_delete(&mut self, _key: &str) -> Result<bool> {
+        unsupported("memory::daily_delete")
+    }
+
+    fn memory_daily_clear(&mut self) -> Result<bool> {
+        unsupported("memory::daily_clear")
+    }
+
+    fn memory_daily_list_keys(&mut self) -> Result<Vec<(String, String)>> {
+        unsupported("memory::daily_list_keys")
+    }
+
+    fn memory_daily_battle_observed_started(&mut self) -> Result<i64> {
+        unsupported("memory::daily_battle_observed_started")
+    }
+
+    fn memory_daily_battle_observed_completed(&mut self) -> Result<i64> {
+        unsupported("memory::daily_battle_observed_completed")
+    }
+
+    fn memory_daily_battle_tracking_since(&mut self) -> Result<i64> {
+        unsupported("memory::daily_battle_tracking_since")
+    }
+
+    fn memory_daily_battle_limit_reached(&mut self) -> Result<bool> {
+        unsupported("memory::daily_battle_limit_reached")
+    }
+
+    fn memory_daily_battle_limit(&mut self) -> Result<i64> {
+        unsupported("memory::daily_battle_limit")
+    }
+
+    fn memory_daily_battle_limit_return_code(&mut self) -> Result<i64> {
+        unsupported("memory::daily_battle_limit_return_code")
+    }
+
+    fn memory_daily_battle_limit_message(&mut self) -> Result<String> {
+        unsupported("memory::daily_battle_limit_message")
+    }
+
     fn is_in_combat(&mut self) -> Result<bool> {
         Ok(false)
     }

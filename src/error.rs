@@ -1139,7 +1139,6 @@ impl ScriptCombatCommandFailureKind {
 pub enum ScriptBackendCombatRuntimeErrorKind {
     BattleFacts,
     SideResolution,
-    InvalidStartRequest,
     InvalidReadyPhasePayload,
     MissingStartContext,
     InvalidPhase,
@@ -1152,7 +1151,6 @@ pub enum ScriptBackendCombatRuntimeErrorKind {
     PresentationBuild,
     HistoryRecorder,
     HistoryProjection,
-    ChangeSpiritOwnerWithoutBattleFacts,
 }
 
 impl ScriptBackendCombatRuntimeErrorKind {
@@ -1160,7 +1158,6 @@ impl ScriptBackendCombatRuntimeErrorKind {
         match self {
             Self::BattleFacts => "battle_facts",
             Self::SideResolution => "side_resolution",
-            Self::InvalidStartRequest => "invalid_start_request",
             Self::InvalidReadyPhasePayload => "invalid_ready_phase_payload",
             Self::MissingStartContext => "missing_start_context",
             Self::InvalidPhase => "invalid_phase",
@@ -1175,7 +1172,6 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::PresentationBuild => "presentation_build",
             Self::HistoryRecorder => "history_recorder",
             Self::HistoryProjection => "history_projection",
-            Self::ChangeSpiritOwnerWithoutBattleFacts => "change_spirit_owner_without_battle_facts",
         }
     }
 
@@ -1183,7 +1179,6 @@ impl ScriptBackendCombatRuntimeErrorKind {
         match self {
             Self::BattleFacts => "battle facts",
             Self::SideResolution => "side resolution",
-            Self::InvalidStartRequest => "invalid start request",
             Self::InvalidReadyPhasePayload => "invalid ready phase payload",
             Self::MissingStartContext => "missing start context",
             Self::InvalidPhase => "invalid phase",
@@ -1198,7 +1193,6 @@ impl ScriptBackendCombatRuntimeErrorKind {
             Self::PresentationBuild => "presentation build",
             Self::HistoryRecorder => "history recorder",
             Self::HistoryProjection => "history projection",
-            Self::ChangeSpiritOwnerWithoutBattleFacts => "change spirit owner without battle facts",
         }
     }
 }

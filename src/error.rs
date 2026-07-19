@@ -3658,6 +3658,11 @@ pub enum RocoProtocolParseReason {
         write_len: usize,
         src_len: usize,
     },
+    ByteArrayLengthOutOfRange {
+        context: String,
+        length: usize,
+        max: usize,
+    },
     ProtoEncode,
     ProtoDecode,
     ProtoMissingRetInfo,
@@ -3914,6 +3919,7 @@ impl RocoProtocolParseReason {
             Self::ByteArrayWriteInvalidSourceLength { .. } => {
                 "byte_array_write_invalid_source_length"
             }
+            Self::ByteArrayLengthOutOfRange { .. } => "byte_array_length_out_of_range",
             Self::ProtoEncode => "proto_encode",
             Self::ProtoDecode => "proto_decode",
             Self::ProtoMissingRetInfo => "proto_missing_ret_info",
@@ -3960,6 +3966,11 @@ impl RocoProtocolParseReason {
                 "ADF write overflow: source range {src_idx}..{} exceeds source length {src_len}",
                 src_idx.saturating_add(*write_len)
             ),
+            Self::ByteArrayLengthOutOfRange {
+                context,
+                length,
+                max,
+            } => format!("ADF {context} length {length} exceeds maximum {max}"),
             Self::ProtoEncode => "proto encode failed".to_string(),
             Self::ProtoDecode => "proto decode failed".to_string(),
             Self::ProtoMissingRetInfo => "proto response missing ret_info".to_string(),

@@ -5327,6 +5327,7 @@ pub enum RocoReturnCodeKind {
     GenericFailure,
     SafeCodeRequired,
     RoleUnavailable,
+    CommandFailure { code: i32 },
     Unrecognized { code: i32 },
 }
 
@@ -5336,6 +5337,7 @@ impl RocoReturnCodeKind {
             Self::GenericFailure => -1,
             Self::SafeCodeRequired => -4,
             Self::RoleUnavailable => -7,
+            Self::CommandFailure { code } => *code,
             Self::Unrecognized { code } => *code,
         }
     }
@@ -5345,6 +5347,7 @@ impl RocoReturnCodeKind {
             Self::GenericFailure => "generic_failure",
             Self::SafeCodeRequired => "safe_code_required",
             Self::RoleUnavailable => "role_unavailable",
+            Self::CommandFailure { .. } => "command_failure",
             Self::Unrecognized { .. } => "unrecognized",
         }
     }
@@ -5354,6 +5357,7 @@ impl RocoReturnCodeKind {
             Self::GenericFailure => "generic failure",
             Self::SafeCodeRequired => "safe code required",
             Self::RoleUnavailable => "role unavailable",
+            Self::CommandFailure { .. } => "command rejected",
             Self::Unrecognized { .. } => "unrecognized return code",
         }
     }
@@ -5895,7 +5899,10 @@ impl From<ScriptUnsupportedError> for RocoError {
 
 #[cfg(test)]
 mod tests {
-    use super::{RocoErrorKind, RocoNetworkErrorKind, ScriptCombatCommandFailureKind};
+    use super::{
+        RocoErrorKind, RocoNetworkErrorKind, RocoReturnCodeKind, RocoReturnCodeRejection,
+        ScriptCombatCommandFailureKind,
+    };
 
     #[test]
     fn error_kind_keeps_family_and_structured_kind_codes_separate() {
@@ -5912,6 +5919,24 @@ mod tests {
         assert_eq!(
             ScriptCombatCommandFailureKind::LineupSkill.code(),
             "lineup_skill"
+        );
+    }
+
+    #[test]
+    fn contextual_command_failure_preserves_the_protocol_code() {
+        let kind = RocoReturnCodeKind::CommandFailure { code: 4 };
+
+        assert_eq!(kind.code(), 4);
+        assert_eq!(kind.kind_code(), "command_failure");
+        assert_eq!(kind.label(), "command rejected");
+
+        let rejection = RocoReturnCodeRejection {
+            kind,
+            message: "not enough Rockbay".to_string(),
+        };
+        assert_eq!(
+            rejection.description(),
+            "command rejected (4): not enough Rockbay"
         );
     }
 }

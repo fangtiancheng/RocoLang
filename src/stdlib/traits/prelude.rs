@@ -8,6 +8,8 @@ use super::*;
 /// use `try_*` unless they also follow the `ActionResult` convention.
 pub trait RocoStdLib:
     RocoRuntimeStdLib
+    + RocoIncubativeMachineStdLib
+    + RocoPetEggStdLib
     + RocoSpiritStdLib
     + RocoActivityStdLib
     + RocoLookupStdLib
@@ -21,6 +23,8 @@ pub trait RocoStdLib:
 
 impl<T> RocoStdLib for T where
     T: RocoRuntimeStdLib
+        + RocoIncubativeMachineStdLib
+        + RocoPetEggStdLib
         + RocoSpiritStdLib
         + RocoActivityStdLib
         + RocoLookupStdLib

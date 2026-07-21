@@ -31,11 +31,12 @@ use crate::error::{
 use crate::stdlib::{
     alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
     dark_city, diamond_tear, evolution_edge_kind, four_seasons, game, gemini, ice_crystal,
-    jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, memory, mountain_sea,
-    multi_evolution, mystery_fusion, news, news_times, personality, pet_training, pisces,
-    play_guide, profile, role, sagittarius, scene, scorpio, sentinel_intelligence, session, spirit,
-    spirit_book, spirit_book_state, star_tower, summon, system, task, taurus, three_starters,
-    treasure_realm, type_ladder, unicorn, virgo, weather, RocoStdLib,
+    incubative_machine, jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, memory,
+    mountain_sea, multi_evolution, mystery_fusion, news, news_times, personality, pet_egg,
+    pet_training, pisces, play_guide, profile, remote_state, role, sagittarius, scene, scorpio,
+    sentinel_intelligence, session, spirit, spirit_book, spirit_book_state, star_tower, summon,
+    system, task, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
+    RocoStdLib,
 };
 use crate::types::{
     ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
@@ -190,6 +191,10 @@ impl RocoEngine {
         scene::register(&mut scene_module, stdlib.clone());
         engine.register_static_module("scene", scene_module.into());
 
+        let mut remote_state_module = rhai::Module::new();
+        remote_state::register(&mut remote_state_module, stdlib.clone());
+        engine.register_static_module("remote_state", remote_state_module.into());
+
         let mut session_module = rhai::Module::new();
         session::register(&mut session_module, stdlib.clone());
         engine.register_static_module("session", session_module.into());
@@ -269,6 +274,14 @@ impl RocoEngine {
         let mut task_module = rhai::Module::new();
         task::register(&mut task_module, stdlib.clone());
         engine.register_static_module("task", task_module.into());
+
+        let mut incubative_machine_module = rhai::Module::new();
+        incubative_machine::register(&mut incubative_machine_module, stdlib.clone());
+        engine.register_static_module("incubative_machine", incubative_machine_module.into());
+
+        let mut pet_egg_module = rhai::Module::new();
+        pet_egg::register(&mut pet_egg_module, stdlib.clone());
+        engine.register_static_module("pet_egg", pet_egg_module.into());
 
         let mut star_tower_module = rhai::Module::new();
         star_tower::register(&mut star_tower_module, stdlib.clone());

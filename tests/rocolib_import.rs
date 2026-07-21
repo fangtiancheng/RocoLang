@@ -4,27 +4,24 @@ use roco_lang::{
     CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo,
     DiamondTearInfo, FourSeasonsInfo, IceCrystalBattleInfo, IceCrystalInfo, MultiEvolutionInfo,
     MultiEvolutionRewardItem, Result, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
-    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
     RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
     RocoDebugHooks, RocoDisplayItem, RocoEngine, RocoError, RocoErrorDetail, RocoErrorInfo,
-    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoHttpBridgeErrorKind,
+    RocoEvolutionActivityStdLib, RocoHomeActivityStdLib, RocoHttpBridgeErrorKind,
     RocoHttpBusinessRejection, RocoIncubativeMachineStdLib, RocoInvalidParamError,
-    RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
-    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNetResponseParseSource,
-    RocoNetResponseParseTarget, RocoNetworkError, RocoNewsActivityStdLib, RocoPetEggStdLib,
-    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoProtocolParseErrorType,
-    RocoProtocolParseFailureKind, RocoRemoteStateStdLib, RocoRequestContext, RocoReturnCodeKind,
-    RocoReturnCodeRejection, RocoRewardKind, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
-    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError,
+    RocoLookupStdLib, RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib,
+    RocoNetResponseParseSource, RocoNetResponseParseTarget, RocoNetworkError,
+    RocoNewsActivityStdLib, RocoPetEggStdLib, RocoPetTrainingActivityStdLib,
+    RocoProtocolParseErrorType, RocoProtocolParseFailureKind, RocoRemoteStateStdLib,
+    RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection, RocoRewardKind,
+    RocoRuntimeStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError,
     RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
-    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
-    RocoVirgoActivityStdLib, SceneRoleInfo, ScriptActivityName, ScriptActivityOperationError,
-    ScriptActivityOptionField, ScriptBridgeError, ScriptBridgeFailure, ScriptCombatActionError,
-    ScriptCombatCommandFailureKind, ScriptCombatIntentKind, ScriptCombatPhase,
-    ScriptCombatProtocolError, ScriptCombatRuntimeError, ScriptCombatWaitError,
-    ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity, ScriptLookupError,
-    ScriptModuleName, ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
-    ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
+    RocoTowerActivityStdLib, RocoZodiacActivityStdLib, SceneRoleInfo, ScriptActivityName,
+    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBridgeError,
+    ScriptBridgeFailure, ScriptCombatActionError, ScriptCombatCommandFailureKind,
+    ScriptCombatIntentKind, ScriptCombatPhase, ScriptCombatProtocolError, ScriptCombatRuntimeError,
+    ScriptCombatWaitError, ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity,
+    ScriptLookupError, ScriptModuleName, ScriptPendingResponseError, ScriptQueryError,
+    ScriptRequestError, ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
     ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
     ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
     ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
@@ -1680,6 +1677,8 @@ fn system_random_int_is_available_to_scripts_with_inclusive_bounds() {
 
 impl RocoManorActivityStdLib for MockStdLib {}
 
+impl RocoHomeActivityStdLib for MockStdLib {}
+
 impl RocoPetTrainingActivityStdLib for MockStdLib {}
 
 impl RocoNewsActivityStdLib for MockStdLib {}
@@ -1884,7 +1883,9 @@ impl RocoEvolutionActivityStdLib for MockStdLib {
 
 impl RocoMagicPioneerActivityStdLib for MockStdLib {}
 
-impl RocoAdventureActivityStdLib for MockStdLib {
+impl RocoAdventureActivityStdLib for MockStdLib {}
+
+impl RocoZodiacActivityStdLib for MockStdLib {
     fn capricorn_invite_player(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
         Ok(CapricornTeamOperationInfo {
             result_code: 0,
@@ -1934,31 +1935,7 @@ impl RocoAdventureActivityStdLib for MockStdLib {
             bag_candidates: Vec::new(),
         })
     }
-}
 
-impl RocoAriesActivityStdLib for MockStdLib {}
-
-impl RocoLibraActivityStdLib for MockStdLib {}
-
-impl RocoLeoActivityStdLib for MockStdLib {}
-
-impl RocoCancerActivityStdLib for MockStdLib {}
-
-impl RocoVirgoActivityStdLib for MockStdLib {}
-
-impl RocoPiscesActivityStdLib for MockStdLib {}
-
-impl RocoTaurusActivityStdLib for MockStdLib {}
-
-impl RocoThreeStartersActivityStdLib for MockStdLib {}
-
-impl RocoGeminiActivityStdLib for MockStdLib {}
-
-impl RocoSagittariusActivityStdLib for MockStdLib {}
-
-impl RocoScorpioActivityStdLib for MockStdLib {}
-
-impl RocoAquariusActivityStdLib for MockStdLib {
     fn aquarius_first_query(&mut self) -> Result<AquariusFirstInfo> {
         Ok(AquariusFirstInfo {
             result_code: 0,

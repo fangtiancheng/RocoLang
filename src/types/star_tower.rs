@@ -107,6 +107,24 @@ pub struct StarTowerTopReward {
 
 pub(super) fn register_rhai_getters(engine: &mut Engine) {
     register_optional_getters!(engine, RocoOptionalStarTowerTop);
+    engine.register_get("star", |value: &mut RocoOptionalStarTowerTop| {
+        value.value().map(|top| top.star).unwrap_or_default()
+    });
+    engine.register_get("fight_id", |value: &mut RocoOptionalStarTowerTop| {
+        value.value().map(|top| top.fight_id).unwrap_or_default()
+    });
+    engine.register_get("tokens", |value: &mut RocoOptionalStarTowerTop| {
+        value
+            .value()
+            .map(|top| to_array(&top.tokens))
+            .unwrap_or_default()
+    });
+    engine.register_get("exchanges", |value: &mut RocoOptionalStarTowerTop| {
+        value
+            .value()
+            .map(|top| to_array(&top.exchanges))
+            .unwrap_or_default()
+    });
     register_getters!(
         engine,
         StarTowerNode,
@@ -184,6 +202,9 @@ pub(super) fn register_rhai_getters(engine: &mut Engine) {
         auto_sell,
         money
     );
+    engine.register_get("has_top", |value: &mut StarTowerInfo| {
+        value.top.is_present()
+    });
     engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
     engine.register_get("clips", |value: &mut StarTowerInfo| to_array(&value.clips));
     engine.register_get("storeys", |value: &mut StarTowerInfo| {

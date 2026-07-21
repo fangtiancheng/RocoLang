@@ -3705,6 +3705,11 @@ pub enum RocoProtocolParseReason {
     MissingField {
         field: RocoProtocolFieldName,
     },
+    InvalidValue {
+        context: RocoProtocolParseContext,
+        field: RocoProtocolFieldName,
+        value: i64,
+    },
     MissingIndexedField {
         context: RocoProtocolParseContext,
         index: usize,
@@ -3958,6 +3963,7 @@ impl RocoProtocolParseReason {
             Self::MissingRetInfo { .. } => "missing_ret_info",
             Self::MissingRetCode => "missing_ret_code",
             Self::MissingField { .. } => "missing_field",
+            Self::InvalidValue { .. } => "invalid_value",
             Self::MissingIndexedField { .. } => "missing_indexed_field",
             Self::TooManyItems { .. } => "too_many_items",
             Self::IndexOutOfBounds { .. } => "index_out_of_bounds",
@@ -4011,6 +4017,11 @@ impl RocoProtocolParseReason {
             }
             Self::MissingRetCode => "ret_info missing ret_code field".to_string(),
             Self::MissingField { field } => format!("response missing {field} field"),
+            Self::InvalidValue {
+                context,
+                field,
+                value,
+            } => format!("{} response has invalid {field} value: {value}", context.label()),
             Self::MissingIndexedField {
                 context,
                 index,
@@ -4089,6 +4100,7 @@ impl RocoProtocolParseReason {
     pub fn context(&self) -> Option<RocoProtocolParseContext> {
         match self {
             Self::MissingRetInfo { context }
+            | Self::InvalidValue { context, .. }
             | Self::MissingIndexedField { context, .. }
             | Self::TooManyItems { context, .. }
             | Self::IndexOutOfBounds { context, .. }
@@ -4105,9 +4117,9 @@ impl RocoProtocolParseReason {
 
     pub fn field_name(&self) -> Option<RocoProtocolFieldName> {
         match self {
-            Self::MissingField { field } | Self::MissingIndexedField { field, .. } => {
-                Some(field.clone())
-            }
+            Self::MissingField { field }
+            | Self::InvalidValue { field, .. }
+            | Self::MissingIndexedField { field, .. } => Some(field.clone()),
             _ => None,
         }
     }
@@ -4235,13 +4247,30 @@ pub enum RocoNetResponseParseTarget {
     UseSpiritItem,
     EquipmentBag,
     SpiritEquipmentOperation,
+    HomeOverview,
+    HomeFriendList,
+    HomeTrainingSpirits,
+    HomeTrainingSpiritReport,
+    HomeTakeTrainingSpirit,
+    HomeCoachSpirits,
     ManorGroundInfo,
     ManorItemCount,
+    ManorPlantStatus,
+    ManorApplyReclaim,
     ManorApplySow,
     ManorApplyReap,
     ManorApplyUproot,
     ManorApplyWeed,
     ManorUseFertilizer,
+    ManorStrawmanPlay,
+    ManorStrawmanReward,
+    ManorStrawmanGift,
+    ManorCocoTreeStatus,
+    ManorCocoTreeFeed,
+    ManorFriendCocoTreeStatus,
+    ManorFriendCocoTreeFeed,
+    ManorFriendList,
+    ManorFriendDetails,
     NewsTimesQueryReports,
     QueryActivities,
     TaskInfoList,
@@ -4296,13 +4325,30 @@ impl RocoNetResponseParseTarget {
             Self::UseSpiritItem => "use_spirit_item",
             Self::EquipmentBag => "equipment_bag",
             Self::SpiritEquipmentOperation => "spirit_equipment_operation",
+            Self::HomeOverview => "home_overview",
+            Self::HomeFriendList => "home_friend_list",
+            Self::HomeTrainingSpirits => "home_training_spirits",
+            Self::HomeTrainingSpiritReport => "home_training_spirit_report",
+            Self::HomeTakeTrainingSpirit => "home_take_training_spirit",
+            Self::HomeCoachSpirits => "home_coach_spirits",
             Self::ManorGroundInfo => "manor_ground_info",
             Self::ManorItemCount => "manor_item_count",
+            Self::ManorPlantStatus => "manor_plant_status",
+            Self::ManorApplyReclaim => "manor_apply_reclaim",
             Self::ManorApplySow => "manor_apply_sow",
             Self::ManorApplyReap => "manor_apply_reap",
             Self::ManorApplyUproot => "manor_apply_uproot",
             Self::ManorApplyWeed => "manor_apply_weed",
             Self::ManorUseFertilizer => "manor_use_fertilizer",
+            Self::ManorStrawmanPlay => "manor_strawman_play",
+            Self::ManorStrawmanReward => "manor_strawman_reward",
+            Self::ManorStrawmanGift => "manor_strawman_gift",
+            Self::ManorCocoTreeStatus => "manor_coco_tree_status",
+            Self::ManorCocoTreeFeed => "manor_coco_tree_feed",
+            Self::ManorFriendCocoTreeStatus => "manor_friend_coco_tree_status",
+            Self::ManorFriendCocoTreeFeed => "manor_friend_coco_tree_feed",
+            Self::ManorFriendList => "manor_friend_list",
+            Self::ManorFriendDetails => "manor_friend_details",
             Self::NewsTimesQueryReports => "news_times_query_reports",
             Self::QueryActivities => "query_activities",
             Self::TaskInfoList => "task_info_list",
@@ -4357,13 +4403,30 @@ impl RocoNetResponseParseTarget {
             Self::UseSpiritItem => "UseSpiritItemResponse",
             Self::EquipmentBag => "EquipmentBagResponse",
             Self::SpiritEquipmentOperation => "SpiritEquipmentOperationResponse",
+            Self::HomeOverview => "HomeOverviewResponse",
+            Self::HomeFriendList => "HomeFriendListResponse",
+            Self::HomeTrainingSpirits => "HomeTrainingSpiritListResponse",
+            Self::HomeTrainingSpiritReport => "HomeTrainingSpiritReportResponse",
+            Self::HomeTakeTrainingSpirit => "HomeTakeTrainingSpiritResponse",
+            Self::HomeCoachSpirits => "HomeCoachSpiritListResponse",
             Self::ManorGroundInfo => "ManorGroundInfoResponse",
             Self::ManorItemCount => "ManorItemCountResponse",
+            Self::ManorPlantStatus => "ManorPlantStatusResponse",
+            Self::ManorApplyReclaim => "ManorApplyReclaimResponse",
             Self::ManorApplySow => "ManorApplySowResponse",
             Self::ManorApplyReap => "ManorApplyReapResponse",
             Self::ManorApplyUproot => "ManorApplyUprootResponse",
             Self::ManorApplyWeed => "ManorApplyWeedResponse",
             Self::ManorUseFertilizer => "ManorUseFertilizerResponse",
+            Self::ManorStrawmanPlay => "ManorOnScarecrowResultResponse",
+            Self::ManorStrawmanReward => "ManorGetStrawmanRewardResponse",
+            Self::ManorStrawmanGift => "ManorGetStrawmanGiftResponse",
+            Self::ManorCocoTreeStatus => "ManorCocoTreeStatusResponse",
+            Self::ManorCocoTreeFeed => "ManorCocoTreeFeedResponse",
+            Self::ManorFriendCocoTreeStatus => "ManorFriendCocoTreeStatusResponse",
+            Self::ManorFriendCocoTreeFeed => "ManorFriendCocoTreeFeedResponse",
+            Self::ManorFriendList => "ManorQqSimpleInfoResponse",
+            Self::ManorFriendDetails => "ManorQqDetailInfoResponse",
             Self::NewsTimesQueryReports => "NewsTimesQueryReportsResponse",
             Self::QueryActivities => "QueryActivitiesResponse",
             Self::TaskInfoList => "TaskInfoListResponse",

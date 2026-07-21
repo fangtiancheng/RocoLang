@@ -1,4 +1,4 @@
-use super::super::*;
+use super::super::super::*;
 
 pub trait RocoPetTrainingActivityStdLib: Send {
     fn pet_training_query(&mut self, _training_type: i64) -> Result<PetTrainingResult> {

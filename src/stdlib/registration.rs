@@ -49,6 +49,7 @@ pub(crate) fn register_modules<T: RocoStdLib + 'static>(
     for (name, module) in registered_value_modules() {
         engine.register_static_module(name, module.into());
     }
+    register_stdlib_module!(engine, stdlib, home);
     register_stdlib_module!(engine, stdlib, manor);
     register_stdlib_module!(engine, stdlib, pet_training);
     register_stdlib_module!(engine, stdlib, news);

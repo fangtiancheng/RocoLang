@@ -2,6 +2,9 @@ use super::*;
 
 /// Generic task socket APIs.
 pub trait RocoTaskStdLib: Send {
+    fn report_progress(&mut self, _task_index: i64) -> Result<TaskProgressResult> {
+        unsupported("task::report_progress")
+    }
     fn task_query_info_list(&mut self) -> Result<TaskInfoList> {
         unsupported("task::query_info_list")
     }
@@ -24,10 +27,6 @@ pub trait RocoTaskStdLib: Send {
 
     fn task_query_magic_growup_info(&mut self) -> Result<MagicGrowupInfo> {
         unsupported("task::query_magic_growup_info")
-    }
-
-    fn task_condition_query_status_raw(&mut self, _task_id: i64) -> Result<TaskConditionStatusRaw> {
-        unsupported("task::condition_query_status_raw")
     }
 
     fn task_condition_apply_complete(&mut self, _npc_id: i64) -> Result<TaskConditionApplyResult> {

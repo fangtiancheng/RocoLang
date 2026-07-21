@@ -15,6 +15,7 @@ function Convert-RustTypeToRhaiType {
     '^(i64|u64|i32|u32|usize|isize)$' { return "int" }
     '^bool$' { return "bool" }
     '^(&str|String)$' { return "string" }
+    '^rhai::Blob$' { return "blob" }
     '^(Array|Vec<.*>)$' { return "array" }
     default { return $type }
   }

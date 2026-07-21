@@ -2,13 +2,15 @@ use roco_lang::{
     BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
     RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
     RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoEvolutionActivityStdLib,
-    RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
-    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoOptionalI64, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult,
-    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    RocoGeminiActivityStdLib, RocoIncubativeMachineStdLib, RocoLeoActivityStdLib,
+    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
+    RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoOptionalI64, RocoPetEggStdLib,
+    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRemoteStateStdLib,
+    RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
+    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, RoundResult, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo,
+    StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -444,6 +446,12 @@ impl RocoPetTrainingActivityStdLib for MockStdLib {}
 impl RocoNewsActivityStdLib for MockStdLib {}
 
 impl RocoTaskStdLib for MockStdLib {}
+
+impl RocoIncubativeMachineStdLib for MockStdLib {}
+
+impl RocoPetEggStdLib for MockStdLib {}
+
+impl RocoRemoteStateStdLib for MockStdLib {}
 
 impl RocoTowerActivityStdLib for MockStdLib {}
 

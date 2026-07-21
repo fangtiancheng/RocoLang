@@ -38,6 +38,7 @@ pub mod pet_training;
 pub mod pisces;
 pub mod play_guide;
 pub mod profile;
+mod registration;
 pub mod remote_state;
 pub mod role;
 pub mod sagittarius;
@@ -65,10 +66,11 @@ pub mod traits;
 
 pub use metadata::{
     documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
-    registered_stdlib_function_registrations, stdlib_function_docs, StdlibFieldDoc,
-    StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration, StdlibParamDoc,
-    StdlibReturnDoc,
+    registered_stdlib_function_registrations, stdlib_function_docs, stdlib_type_docs,
+    StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration,
+    StdlibParamDoc, StdlibReturnDoc,
 };
+pub(crate) use registration::register_modules;
 pub use traits::*;
 
 fn unsupported<T>(name: &str) -> Result<T> {

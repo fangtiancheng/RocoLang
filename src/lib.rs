@@ -6,6 +6,7 @@ pub mod builtin_sources;
 pub mod debugger;
 pub mod engine;
 pub mod error;
+pub mod language_service;
 pub mod rocolib;
 pub mod stdlib;
 pub mod types;
@@ -42,19 +43,25 @@ pub use error::{
     ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
     ScriptSystemOperation, ScriptUnsupportedError, ScriptWaitContext,
 };
+pub use language_service::{
+    analyze_script, builtin_module_function_docs, rhai_language_metadata,
+    RocoBuiltinModuleFunctionDoc, RocoLanguageFunctionDoc, RocoLanguageKeywordDoc,
+    RocoLanguageMetadata, RocoScriptDiagnostic, RocoScriptDiagnosticSeverity,
+};
 pub use stdlib::{
     documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
-    registered_stdlib_function_registrations, stdlib_function_docs, RocoActivityStdLib,
-    RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib,
-    RocoAriesActivityStdLib, RocoCancerActivityStdLib, RocoCombatStdLib,
-    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoIncubativeMachineStdLib,
-    RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    registered_stdlib_function_registrations, stdlib_function_docs, stdlib_type_docs,
+    RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
+    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
+    RocoCombatStdLib, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib,
+    RocoIncubativeMachineStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoPetEggStdLib, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
-    RocoZodiacActivityStdLib, StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey,
-    StdlibFunctionRegistration, StdlibParamDoc, StdlibReturnDoc,
+    RocoPetEggStdLib, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib,
+    RocoRemoteStateStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoStdLib,
+    RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RocoZodiacActivityStdLib, StdlibFieldDoc,
+    StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration, StdlibParamDoc,
+    StdlibReturnDoc,
 };
 pub use types::*;

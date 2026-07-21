@@ -120,10 +120,18 @@ impl fmt::Display for RocoScriptLocation {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RocoScriptError {
-    pub kind: RocoScriptErrorKind,
-    pub message: String,
     pub location: RocoScriptLocation,
     pub source: RocoScriptErrorSource,
+}
+
+impl RocoScriptError {
+    pub const fn kind(&self) -> RocoScriptErrorKind {
+        self.source.kind()
+    }
+
+    pub fn message(&self) -> String {
+        self.source.message()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -182,7 +190,7 @@ pub enum RocoScriptRuntimeErrorValue {
     },
     RocoTypeJsonSerialize {
         type_name: String,
-        source: RocoJsonErrorInfo,
+        source: Box<RocoJsonErrorInfo>,
     },
 }
 
@@ -212,7 +220,7 @@ impl RocoScriptRuntimeErrorValue {
     pub fn roco_type_json_serialize<T>(error: &serde_json::Error) -> Self {
         Self::RocoTypeJsonSerialize {
             type_name: std::any::type_name::<T>().to_string(),
-            source: RocoJsonErrorInfo::from_serde_json_error(error),
+            source: Box::new(RocoJsonErrorInfo::from_serde_json_error(error)),
         }
     }
 
@@ -384,6 +392,19 @@ pub enum RocoScriptEvalErrorSource {
 }
 
 impl RocoScriptErrorSource {
+    pub const fn kind(&self) -> RocoScriptErrorKind {
+        match self {
+            Self::Parse(_) => RocoScriptErrorKind::Parse,
+            Self::Eval(RocoScriptEvalErrorSource::FunctionCall { .. }) => {
+                RocoScriptErrorKind::FunctionCall
+            }
+            Self::Eval(RocoScriptEvalErrorSource::Module { .. }) => RocoScriptErrorKind::Module,
+            Self::Eval(RocoScriptEvalErrorSource::Terminated) => RocoScriptErrorKind::Terminated,
+            Self::Eval(RocoScriptEvalErrorSource::Runtime { .. }) => RocoScriptErrorKind::Runtime,
+            Self::Eval(_) => RocoScriptErrorKind::Eval,
+        }
+    }
+
     pub const fn code(&self) -> &'static str {
         match self {
             Self::Parse(source) => source.code(),
@@ -2030,6 +2051,10 @@ pub enum ScriptRequestError {
     UnsupportedCombatType {
         value: u8,
     },
+    UnsupportedOperation {
+        context: RocoRequestContext,
+        value: u8,
+    },
 }
 
 impl ScriptRequestError {
@@ -2046,6 +2071,7 @@ impl ScriptRequestError {
             Self::InvalidCombatCommand { .. } => "invalid_combat_command",
             Self::UnsupportedCombatServerType { .. } => "unsupported_combat_server_type",
             Self::UnsupportedCombatType { .. } => "unsupported_combat_type",
+            Self::UnsupportedOperation { .. } => "unsupported_operation",
         }
     }
 
@@ -2093,7 +2119,15 @@ impl ScriptRequestError {
             Self::UnsupportedCombatServerType { value } | Self::UnsupportedCombatType { value } => {
                 *value as i64
             }
+            Self::UnsupportedOperation { value, .. } => *value as i64,
             _ => -1,
+        }
+    }
+
+    pub fn operation_context(&self) -> RocoRequestContext {
+        match self {
+            Self::UnsupportedOperation { context, .. } => context.clone(),
+            _ => RocoRequestContext::default(),
         }
     }
 
@@ -2396,6 +2430,9 @@ impl fmt::Display for ScriptRequestError {
             }
             Self::UnsupportedCombatType { value } => {
                 write!(f, "unsupported combat_type: {value}")
+            }
+            Self::UnsupportedOperation { context, value } => {
+                write!(f, "unsupported {} operation: {value}", context.raw)
             }
         }
     }
@@ -4183,6 +4220,8 @@ pub enum RocoNetResponseParseTarget {
     ChangeScene,
     ReturnCode,
     QueryServerTime,
+    RemoteSceneData,
+    RemoteNpcValue,
     QuerySpiritBookStates,
     PauseState,
     QuerySpiritBag,
@@ -4206,10 +4245,12 @@ pub enum RocoNetResponseParseTarget {
     NewsTimesQueryReports,
     QueryActivities,
     TaskInfoList,
+    TaskProgress,
+    IncubativeMachine,
+    PetEgg,
     CompleteTask,
     TaskAchievementList,
     MagicGrowupInfo,
-    TaskConditionStatusRaw,
     TaskConditionApplyComplete,
     TaskConditionStatus,
     LadderPersonalInfo,
@@ -4240,6 +4281,8 @@ impl RocoNetResponseParseTarget {
             Self::ChangeScene => "change_scene",
             Self::ReturnCode => "return_code",
             Self::QueryServerTime => "query_server_time",
+            Self::RemoteSceneData => "remote_scene_data",
+            Self::RemoteNpcValue => "remote_npc_value",
             Self::QuerySpiritBookStates => "query_spirit_book_states",
             Self::PauseState => "pause_state",
             Self::QuerySpiritBag => "query_spirit_bag",
@@ -4263,10 +4306,12 @@ impl RocoNetResponseParseTarget {
             Self::NewsTimesQueryReports => "news_times_query_reports",
             Self::QueryActivities => "query_activities",
             Self::TaskInfoList => "task_info_list",
+            Self::TaskProgress => "task_progress",
+            Self::IncubativeMachine => "incubative_machine",
+            Self::PetEgg => "pet_egg",
             Self::CompleteTask => "complete_task",
             Self::TaskAchievementList => "task_achievement_list",
             Self::MagicGrowupInfo => "magic_growup_info",
-            Self::TaskConditionStatusRaw => "task_condition_status_raw",
             Self::TaskConditionApplyComplete => "task_condition_apply_complete",
             Self::TaskConditionStatus => "task_condition_status",
             Self::LadderPersonalInfo => "ladder_personal_info",
@@ -4297,6 +4342,8 @@ impl RocoNetResponseParseTarget {
             Self::ChangeScene => "ChangeSceneResponse",
             Self::ReturnCode => "ReturnCode",
             Self::QueryServerTime => "QueryServerTimeResponse",
+            Self::RemoteSceneData => "RemoteSceneDataResponse",
+            Self::RemoteNpcValue => "RemoteNpcValueResponse",
             Self::QuerySpiritBookStates => "SpiritBookStateResponse",
             Self::PauseState => "PauseStateResponse",
             Self::QuerySpiritBag => "QuerySpiritBagResponse",
@@ -4320,10 +4367,12 @@ impl RocoNetResponseParseTarget {
             Self::NewsTimesQueryReports => "NewsTimesQueryReportsResponse",
             Self::QueryActivities => "QueryActivitiesResponse",
             Self::TaskInfoList => "TaskInfoListResponse",
+            Self::TaskProgress => "ReportTaskRsp",
+            Self::IncubativeMachine => "IncubativeMachineResponse",
+            Self::PetEgg => "PetEggResponse",
             Self::CompleteTask => "CompleteTaskResponse",
             Self::TaskAchievementList => "TaskAchievementListResponse",
             Self::MagicGrowupInfo => "MagicGrowupInfoResponse",
-            Self::TaskConditionStatusRaw => "TaskConditionStatusRawResponse",
             Self::TaskConditionApplyComplete => "ApplyTaskConditionCompleteResponse",
             Self::TaskConditionStatus => "TaskConditionStatusResponse",
             Self::LadderPersonalInfo => "LadderPersonalInfoResponse",
@@ -5215,7 +5264,7 @@ impl RocoNetworkError {
         let detail = match self {
             Self::NetResponseParseFailed { target, source } => {
                 RocoErrorDetail::NetResponseParse(RocoNetResponseParseFailure {
-                    target: target.clone(),
+                    target: *target,
                     source: source.clone(),
                 })
             }
@@ -5244,7 +5293,7 @@ impl RocoNetworkError {
     pub fn net_response_parse_failure(&self) -> Option<RocoNetResponseParseFailure> {
         match self {
             Self::NetResponseParseFailed { target, source } => Some(RocoNetResponseParseFailure {
-                target: target.clone(),
+                target: *target,
                 source: source.clone(),
             }),
             _ => None,
@@ -5547,7 +5596,7 @@ impl fmt::Display for RocoError {
                         write!(f, " in {}:{}", source, position)?
                     }
                 }
-                write!(f, ": [{}] {}", error.kind, error.message)
+                write!(f, ": [{}] {}", error.kind(), error.message())
             }
             RocoError::StdLib(error) => write!(f, "StdLib error: {}", error),
             RocoError::InvalidParam(error) => write!(f, "Invalid parameter: {}", error),
@@ -5578,7 +5627,7 @@ impl RocoError {
 
     pub fn code(&self) -> String {
         match self {
-            Self::ScriptError(error) => format!("script.{}", error.kind.as_str()),
+            Self::ScriptError(error) => format!("script.{}", error.kind().as_str()),
             Self::StdLib(error) => error.code().to_string(),
             Self::InvalidParam(_) => "invalid_param".to_string(),
             Self::NetworkError(error) => error.code().to_string(),
@@ -5903,6 +5952,17 @@ mod tests {
         RocoErrorKind, RocoNetworkErrorKind, RocoReturnCodeKind, RocoReturnCodeRejection,
         ScriptCombatCommandFailureKind,
     };
+
+    #[test]
+    fn error_types_remain_compact() {
+        assert!(size_of::<super::RocoScriptError>() <= 112);
+        assert!(size_of::<super::RocoError>() <= 120);
+        assert_eq!(
+            size_of::<crate::types::RocoRequestContext>(),
+            size_of::<String>()
+        );
+        assert!(size_of::<super::RocoHttpBusinessRejection>() <= 56);
+    }
 
     #[test]
     fn error_kind_keeps_family_and_structured_kind_codes_separate() {

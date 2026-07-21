@@ -16,89 +16,69 @@ use crate::error::{
     RocoNetResponseParseSource, RocoNetResponseParseTarget, RocoNetworkErrorKind, RocoParamRange,
     RocoProtocolFieldName, RocoProtocolParseContext, RocoProtocolParseErrorType,
     RocoProtocolParseFailureKind, RocoProtocolParseLayer, RocoProtocolParseReason,
-    RocoReturnCodeKind, RocoReturnCodeRejection, RocoScriptError, RocoScriptErrorKind,
-    RocoScriptErrorSource, RocoScriptEvalErrorSource, RocoScriptLocation,
-    RocoScriptParseErrorSource, RocoScriptPosition, RocoScriptRuntimeErrorValue,
-    RocoSpiritStorageProtoContext, RocoSpiritStorageProtoField, ScriptActivityName,
-    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBackendCombatRuntimeErrorKind,
-    ScriptBridgeFailure, ScriptBridgeFailureReason, ScriptBridgeOperation, ScriptCombatActionError,
-    ScriptCombatCommandFailureKind, ScriptCombatPhase, ScriptCombatRuntimeError,
-    ScriptCombatWaitError, ScriptFunctionContextError, ScriptFunctionName, ScriptHttpResponseName,
-    ScriptModuleName, ScriptQueryError, ScriptRequestError, ScriptResponseName,
-    ScriptSpiritOperationError, ScriptStaticDataError, ScriptSystemFailure,
-    ScriptSystemFailureSource, ScriptSystemOperation,
+    RocoReturnCodeKind, RocoReturnCodeRejection, RocoScriptError, RocoScriptErrorSource,
+    RocoScriptEvalErrorSource, RocoScriptLocation, RocoScriptParseErrorSource, RocoScriptPosition,
+    RocoScriptRuntimeErrorValue, RocoSpiritStorageProtoContext, RocoSpiritStorageProtoField,
+    ScriptActivityName, ScriptActivityOperationError, ScriptActivityOptionField,
+    ScriptBackendCombatRuntimeErrorKind, ScriptBridgeFailure, ScriptBridgeFailureReason,
+    ScriptBridgeOperation, ScriptCombatActionError, ScriptCombatCommandFailureKind,
+    ScriptCombatPhase, ScriptCombatRuntimeError, ScriptCombatWaitError, ScriptFunctionContextError,
+    ScriptFunctionName, ScriptHttpResponseName, ScriptModuleName, ScriptQueryError,
+    ScriptRequestError, ScriptResponseName, ScriptSpiritOperationError, ScriptStaticDataError,
+    ScriptSystemFailure, ScriptSystemFailureSource, ScriptSystemOperation,
 };
-use crate::stdlib::{
-    alchemy_furnace, aquarius, aries, cancer, capricorn, combat, combat_result, combat_status,
-    dark_city, diamond_tear, evolution_edge_kind, four_seasons, game, gemini, ice_crystal,
-    incubative_machine, jump_machine, ladder, leo, libra, lookup, magic_pioneer, manor, memory,
-    mountain_sea, multi_evolution, mystery_fusion, news, news_times, personality, pet_egg,
-    pet_training, pisces, play_guide, profile, remote_state, role, sagittarius, scene, scorpio,
-    sentinel_intelligence, session, spirit, spirit_book, spirit_book_state, star_tower, summon,
-    system, task, taurus, three_starters, treasure_realm, type_ladder, unicorn, virgo, weather,
-    RocoStdLib,
-};
+use crate::stdlib::RocoStdLib;
 use crate::types::{
-    ActionResult, AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate,
-    AmendNatureInfo, AquariusBagCandidate, AquariusCounter, AquariusField, AquariusFirstInfo,
-    AquariusRewardItem, AquariusSecondExchangeInfo, AquariusSecondInfo, AquariusSecondStatusInfo,
-    AquariusThirdInfo, AriesBagCandidate, AriesCounter, AriesField, AriesFirstInfo, AriesReward,
-    AriesSecondInfo, AriesThirdExchangeInfo, AriesThirdInfo, AriesThirdStatusInfo, BagItemInfo,
-    BatheSunInfo, BattleCapturedSpirit, BattleResult, BattleResultQueryResult, BattleSpiritResult,
-    BloodGiftInfo, BloodGiftItemRequirement, BloodGiftOption, CancerItemInfo,
-    CancerMendShapeBagInfo, CancerMendShapeInfo, CancerPetInfo, CancerSharpScorpionInfo,
-    CancerUnsealMemoriesBagInfo, CancerUnsealMemoriesInfo, CapricornBagCandidate,
-    CapricornInviteListInfo, CapricornPalaceNoteItem, CapricornPalaceNotesInfo,
-    CapricornSecondInfo, CapricornSecondTask, CapricornStarPalaceInfo, CapricornTeamOperationInfo,
-    CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo, CombatActionResult,
-    CombatActionSnapshot, CombatActions, CombatSideState, CombatSpiritState, CombatState,
-    DarkCityExchangeItem, DarkCityExpeditionInfo, DarkCityReputationInfo, DiamondProgressReward,
-    DiamondTaskInfo, DiamondTaskProgress, DiamondTearInfo, DiamondTearRewardItem, FiresWillInfo,
-    FourSeasonsInfo, FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem,
-    FourSeasonsShopRewardInfo, GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo,
-    GeminiRewardItem, GeminiSecondInfo, GeminiThirdInfo, IceCrystalBagCandidate,
-    IceCrystalBattleInfo, IceCrystalInfo, IceCrystalRewardItem, JumpMachineInfo,
-    JumpMachineRewardItem, LadderFightRecord, LadderInfo, LadderMatchConfig,
-    LadderQuestConfigEntry, LadderQuestInfo, LadderRankInfo, LadderRankUser, LadderSpiritCostEntry,
-    LadderSpiritInfo, LeoBagCandidate, LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo,
-    LeoFirstStatusInfo, LeoSecondInfo, LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField,
-    LibraFirstInfo, LibraSecondInfo, LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo,
-    MagicPioneerField, MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult,
-    ManorGroundInfo, ManorInfo, ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult,
-    ManorUprootResult, ManorWeedResult, MiniGameExtraField, MiniGameRewardItem,
-    MiniGameSubmitResult, MiniGameSubmitTryResult, MonkeyCultivationInfo, MonkeyEvoInfo,
-    MountainSeaBossInfo, MountainSeaInfo, MountainSeaSoulInfo, MultiEvolutionCandidate,
-    MultiEvolutionInfo, MultiEvolutionRewardItem, MysteryFusionBattleInfo, MysteryFusionInfo,
-    MysteryFusionMaterialBag, MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo,
-    NewsActiveItem, NewsTimesReport, NewsTimesReportsResult, PetTrainingResult,
-    PetTrainingRewardItem, PiscesBagCandidate, PiscesCounter, PiscesField, PiscesFirstInfo,
-    PiscesSecondInfo, PiscesThirdInfo, PlayGuideRewardItem, QqGameHallGiftInfo, RagingFireInfo,
-    RocoDisplayItem, RocoOptionalCapricornSecondTask, RocoOptionalCapricornTeamSnapshot,
-    RocoOptionalDisplayItem, RocoOptionalI64, RocoOptionalIceCrystalBattleInfo,
-    RocoOptionalStarTowerTop, RocoOptionalTypeLadderRankUser, RocoRequestContext, RocoRewardKind,
-    SagittariusBagCandidate, SagittariusCounter, SagittariusField, SagittariusFirstInfo,
-    SagittariusRewardItem, SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture,
-    SagittariusThirdInfo, SceneRoleInfo, SceneSpiritInfo, ScorpioBagCandidate, ScorpioCounter,
-    ScorpioField, ScorpioFirstInfo, ScorpioReward, ScorpioSecondInfo, ScorpioThirdInfo,
-    SentinelBossInfo, SentinelExchangeInfo, SentinelIntelligenceInfo, SentinelSpiritExchangeInfo,
-    ServerTimeInfo, ServerTimeResult, SkillPoolInfo, SkillPoolSkillInfo, SkillStoneResult,
-    SkillStoneSkillInfo, SkillSwitchResult, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
+    AlchemyFurnaceBagCandidate, AlchemyFurnaceRewardItem, AmendNatureCandidate, AmendNatureInfo,
+    AquariusBagCandidate, AquariusCounter, AquariusField, AquariusFirstInfo, AquariusRewardItem,
+    AquariusSecondExchangeInfo, AquariusSecondInfo, AquariusSecondStatusInfo, AquariusThirdInfo,
+    AriesBagCandidate, AriesCounter, AriesField, AriesFirstInfo, AriesReward, AriesSecondInfo,
+    AriesThirdExchangeInfo, AriesThirdInfo, AriesThirdStatusInfo, BatheSunInfo, BloodGiftInfo,
+    BloodGiftItemRequirement, BloodGiftOption, CancerItemInfo, CancerMendShapeBagInfo,
+    CancerMendShapeInfo, CancerPetInfo, CancerSharpScorpionInfo, CancerUnsealMemoriesBagInfo,
+    CancerUnsealMemoriesInfo, CapricornBagCandidate, CapricornInviteListInfo,
+    CapricornPalaceNoteItem, CapricornPalaceNotesInfo, CapricornSecondInfo, CapricornSecondTask,
+    CapricornStarPalaceInfo, CapricornTeamOperationInfo, CapricornTeamPlayer,
+    CapricornTeamSnapshot, CapricornThirdInfo, DarkCityExchangeItem, DarkCityExpeditionInfo,
+    DarkCityReputationInfo, DiamondTearInfo, DiamondTearRewardItem, FiresWillInfo, FourSeasonsInfo,
+    FourSeasonsMonthlySpiritRewardInfo, FourSeasonsRewardItem, FourSeasonsShopRewardInfo,
+    GeminiBagCandidate, GeminiCounter, GeminiField, GeminiFirstInfo, GeminiRewardItem,
+    GeminiSecondInfo, GeminiThirdInfo, IceCrystalBagCandidate, IceCrystalBattleInfo,
+    IceCrystalInfo, IceCrystalRewardItem, IncubativeMachineActionResult, IncubativeMachineEggInfo,
+    IncubativeMachineEggListResult, IncubativeMachineGetSpiritResult,
+    IncubativeMachineIncubationInfo, IncubativeMachineIncubationResult, IncubativeMachineInfo,
+    LadderFightRecord, LadderInfo, LadderMatchConfig, LadderQuestConfigEntry, LadderQuestInfo,
+    LadderRankInfo, LadderRankUser, LadderSpiritCostEntry, LadderSpiritInfo, LeoBagCandidate,
+    LeoCounter, LeoField, LeoFirstExchangeInfo, LeoFirstInfo, LeoFirstStatusInfo, LeoSecondInfo,
+    LeoThirdInfo, LibraBagCandidate, LibraCounter, LibraField, LibraFirstInfo, LibraSecondInfo,
+    LibraThirdExchangeInfo, LibraThirdInfo, LibraThirdStatusInfo, MagicPioneerField,
+    MagicPioneerInfo, MagicPioneerRewardItem, ManorFertilizerResult, ManorGroundInfo, ManorInfo,
+    ManorItemCount, ManorReapResult, ManorRewardInfo, ManorSowResult, ManorUprootResult,
+    ManorWeedResult, MonkeyCultivationInfo, MonkeyEvoInfo, MountainSeaBossInfo, MountainSeaInfo,
+    MountainSeaSoulInfo, MultiEvolutionCandidate, MultiEvolutionInfo, MultiEvolutionRewardItem,
+    MysteryFusionBattleInfo, MysteryFusionInfo, MysteryFusionMaterialBag,
+    MysteryFusionMaterialCandidate, MysteryFusionRecipeInfo, PetEggBeginResult, PetEggCancelResult,
+    PetEggInfo, PetEggPreviewResult, PetEggSpeedUpResult, PetEggSpiritInfo, PiscesBagCandidate,
+    PiscesCounter, PiscesField, PiscesFirstInfo, PiscesSecondInfo, PiscesThirdInfo, RagingFireInfo,
+    RemoteSceneData, RocoRequestContext, RocoRewardKind, SagittariusBagCandidate,
+    SagittariusCounter, SagittariusField, SagittariusFirstInfo, SagittariusRewardItem,
+    SagittariusScore, SagittariusSecondInfo, SagittariusStarPicture, SagittariusThirdInfo,
+    ScorpioBagCandidate, ScorpioCounter, ScorpioField, ScorpioFirstInfo, ScorpioReward,
+    ScorpioSecondInfo, ScorpioThirdInfo, SentinelBossInfo, SentinelExchangeInfo,
+    SentinelIntelligenceInfo, SentinelSpiritExchangeInfo, SpiritBookEntry, SpiritBookGroup,
     SpiritBookInfo, SpiritBookSpiritState, SpiritBookStates, SpiritBookSummary,
-    SpiritEquipmentBagInfo, SpiritEquipmentInfo, SpiritInfo, SpiritSkillInfo,
-    StarTowerExchangeItem, StarTowerInfo, StarTowerNode, StarTowerStorey, StarTowerTop,
-    StarTowerTopMission, StarTowerTopReward, StaticGuardianPetPropertyInfo, StaticItemInfo,
+    SpiritEquipmentBagInfo, SpiritEquipmentInfo, StaticGuardianPetPropertyInfo, StaticItemInfo,
     StaticMagicInfo, StaticPluginInfo, StaticSkillInfo, StaticSpiritEvolutionEdge,
     StaticSpiritInfo, StaticSpiritInfoLookupResult, StaticStriveItemInfo, StaticTitleInfo,
-    StorageSpiritDetailInfo, StorageSpiritInfo, SummonExchangeGroup, SummonExchangeItem,
-    SummonInfo, SummonPoolConfig, SummonPoolState, SummonRecord, SummonRewardItem,
-    TalentRefreshResult, TaurusBagCandidate, TaurusCounter, TaurusField, TaurusFirstInfo,
-    TaurusSecondInfo, TaurusThirdInfo, ThreeStartersBagCandidate, ThreeStartersCounter,
-    ThreeStartersField, ThreeStartersRewardItem, TreasureRealmInfo, TypeLadderFightRecord,
-    TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo, TypeLadderRankUser, TypeLadderSpiritInfo,
-    UnicornBagCandidate, UnicornBossInfo, UnicornInfo, UnicornRewardItem, UserInfo,
-    VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo, VirgoCounter, VirgoField,
-    VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo, WaterSourceInfo, WeekTaskActivity,
-    WeekTaskInfo,
+    SummonExchangeGroup, SummonExchangeItem, SummonInfo, SummonPoolConfig, SummonPoolState,
+    SummonRecord, SummonRewardItem, TalentRefreshResult, TaskProgressResult, TaurusBagCandidate,
+    TaurusCounter, TaurusField, TaurusFirstInfo, TaurusSecondInfo, TaurusThirdInfo,
+    ThreeStartersBagCandidate, ThreeStartersCounter, ThreeStartersField, ThreeStartersRewardItem,
+    TreasureRealmInfo, TypeLadderFightRecord, TypeLadderInfo, TypeLadderRank, TypeLadderRankInfo,
+    TypeLadderRankUser, TypeLadderSpiritInfo, UnicornBagCandidate, UnicornBossInfo, UnicornInfo,
+    UnicornRewardItem, VirgoBellFoxExchangeInfo, VirgoBellFoxInfo, VirgoBellFoxStatusInfo,
+    VirgoCounter, VirgoField, VirgoFindHalidomInfo, VirgoPetInfo, VirgoServeGodInfo,
+    WaterSourceInfo,
 };
 
 include!(concat!(env!("OUT_DIR"), "/roco_type_list.rs"));
@@ -186,236 +166,8 @@ impl RocoEngine {
 
     fn register_stdlib<T: RocoStdLib + 'static>(engine: &mut Engine, stdlib: Arc<Mutex<T>>) {
         Self::register_static_info_types(engine);
-
-        let mut scene_module = rhai::Module::new();
-        scene::register(&mut scene_module, stdlib.clone());
-        engine.register_static_module("scene", scene_module.into());
-
-        let mut remote_state_module = rhai::Module::new();
-        remote_state::register(&mut remote_state_module, stdlib.clone());
-        engine.register_static_module("remote_state", remote_state_module.into());
-
-        let mut session_module = rhai::Module::new();
-        session::register(&mut session_module, stdlib.clone());
-        engine.register_static_module("session", session_module.into());
-
-        let mut memory_module = rhai::Module::new();
-        memory::register(&mut memory_module, stdlib.clone());
-        engine.register_static_module("memory", memory_module.into());
-
-        let mut profile_module = rhai::Module::new();
-        profile::register(&mut profile_module, stdlib.clone());
-        engine.register_static_module("profile", profile_module.into());
-
-        let mut role_module = rhai::Module::new();
-        role::register(&mut role_module, stdlib.clone());
-        engine.register_static_module("role", role_module.into());
-
-        let mut game_module = rhai::Module::new();
-        game::register(&mut game_module, stdlib.clone());
-        engine.register_static_module("game", game_module.into());
-
-        let mut ladder_module = rhai::Module::new();
-        ladder::register(&mut ladder_module, stdlib.clone());
-        engine.register_static_module("ladder", ladder_module.into());
-
-        let mut type_ladder_module = rhai::Module::new();
-        type_ladder::register(&mut type_ladder_module, stdlib.clone());
-        engine.register_static_module("type_ladder", type_ladder_module.into());
-
-        let mut spirit_module = rhai::Module::new();
-        spirit::register(&mut spirit_module, stdlib.clone());
-        engine.register_static_module("spirit", spirit_module.into());
-
-        let mut spirit_book_module = rhai::Module::new();
-        spirit_book::register(&mut spirit_book_module, stdlib.clone());
-        engine.register_static_module("spirit_book", spirit_book_module.into());
-
-        let mut spirit_book_state_module = rhai::Module::new();
-        spirit_book_state::register(&mut spirit_book_state_module);
-        engine.register_static_module("spirit_book_state", spirit_book_state_module.into());
-
-        let mut evolution_edge_kind_module = rhai::Module::new();
-        evolution_edge_kind::register(&mut evolution_edge_kind_module);
-        engine.register_static_module("evolution_edge_kind", evolution_edge_kind_module.into());
-
-        let mut personality_module = rhai::Module::new();
-        personality::register(&mut personality_module);
-        engine.register_static_module("personality", personality_module.into());
-
-        let mut weather_module = rhai::Module::new();
-        weather::register(&mut weather_module);
-        engine.register_static_module("weather", weather_module.into());
-
-        let mut combat_status_module = rhai::Module::new();
-        combat_status::register(&mut combat_status_module);
-        engine.register_static_module("combat_status", combat_status_module.into());
-
-        let mut combat_result_module = rhai::Module::new();
-        combat_result::register(&mut combat_result_module);
-        engine.register_static_module("combat_result", combat_result_module.into());
-
-        let mut manor_module = rhai::Module::new();
-        manor::register(&mut manor_module, stdlib.clone());
-        engine.register_static_module("manor", manor_module.into());
-
-        let mut pet_training_module = rhai::Module::new();
-        pet_training::register(&mut pet_training_module, stdlib.clone());
-        engine.register_static_module("pet_training", pet_training_module.into());
-
-        let mut news_module = rhai::Module::new();
-        news::register(&mut news_module, stdlib.clone());
-        engine.register_static_module("news", news_module.into());
-
-        let mut news_times_module = rhai::Module::new();
-        news_times::register(&mut news_times_module, stdlib.clone());
-        engine.register_static_module("news_times", news_times_module.into());
-
-        let mut task_module = rhai::Module::new();
-        task::register(&mut task_module, stdlib.clone());
-        engine.register_static_module("task", task_module.into());
-
-        let mut incubative_machine_module = rhai::Module::new();
-        incubative_machine::register(&mut incubative_machine_module, stdlib.clone());
-        engine.register_static_module("incubative_machine", incubative_machine_module.into());
-
-        let mut pet_egg_module = rhai::Module::new();
-        pet_egg::register(&mut pet_egg_module, stdlib.clone());
-        engine.register_static_module("pet_egg", pet_egg_module.into());
-
-        let mut star_tower_module = rhai::Module::new();
-        star_tower::register(&mut star_tower_module, stdlib.clone());
-        engine.register_static_module("star_tower", star_tower_module.into());
-
-        let mut sentinel_intelligence_module = rhai::Module::new();
-        sentinel_intelligence::register(&mut sentinel_intelligence_module, stdlib.clone());
-        engine.register_static_module("sentinel_intelligence", sentinel_intelligence_module.into());
-
-        let mut mountain_sea_module = rhai::Module::new();
-        mountain_sea::register(&mut mountain_sea_module, stdlib.clone());
-        engine.register_static_module("mountain_sea", mountain_sea_module.into());
-
-        let mut magic_pioneer_module = rhai::Module::new();
-        magic_pioneer::register(&mut magic_pioneer_module, stdlib.clone());
-        engine.register_static_module("magic_pioneer", magic_pioneer_module.into());
-
-        let mut alchemy_furnace_module = rhai::Module::new();
-        alchemy_furnace::register(&mut alchemy_furnace_module, stdlib.clone());
-        engine.register_static_module("alchemy_furnace", alchemy_furnace_module.into());
-
-        let mut unicorn_module = rhai::Module::new();
-        unicorn::register(&mut unicorn_module, stdlib.clone());
-        engine.register_static_module("unicorn", unicorn_module.into());
-
-        let mut four_seasons_module = rhai::Module::new();
-        four_seasons::register(&mut four_seasons_module, stdlib.clone());
-        engine.register_static_module("four_seasons", four_seasons_module.into());
-
-        let mut ice_crystal_module = rhai::Module::new();
-        ice_crystal::register(&mut ice_crystal_module, stdlib.clone());
-        engine.register_static_module("ice_crystal", ice_crystal_module.into());
-
-        let mut multi_evolution_module = rhai::Module::new();
-        multi_evolution::register(&mut multi_evolution_module, stdlib.clone());
-        engine.register_static_module("multi_evolution", multi_evolution_module.into());
-
-        let mut diamond_tear_module = rhai::Module::new();
-        diamond_tear::register(&mut diamond_tear_module, stdlib.clone());
-        engine.register_static_module("diamond_tear", diamond_tear_module.into());
-
-        let mut dark_city_module = rhai::Module::new();
-        dark_city::register(&mut dark_city_module, stdlib.clone());
-        engine.register_static_module("dark_city", dark_city_module.into());
-
-        let mut mystery_fusion_module = rhai::Module::new();
-        mystery_fusion::register(&mut mystery_fusion_module, stdlib.clone());
-        engine.register_static_module("mystery_fusion", mystery_fusion_module.into());
-
-        let mut treasure_realm_module = rhai::Module::new();
-        treasure_realm::register(&mut treasure_realm_module, stdlib.clone());
-        engine.register_static_module("treasure_realm", treasure_realm_module.into());
-
-        let mut summon_module = rhai::Module::new();
-        summon::register(&mut summon_module, stdlib.clone());
-        engine.register_static_module("summon", summon_module.into());
-
-        let mut play_guide_module = rhai::Module::new();
-        play_guide::register(&mut play_guide_module, stdlib.clone());
-        engine.register_static_module("play_guide", play_guide_module.into());
-
-        let mut jump_machine_module = rhai::Module::new();
-        jump_machine::register(&mut jump_machine_module, stdlib.clone());
-        engine.register_static_module("jump_machine", jump_machine_module.into());
-
-        let mut capricorn_module = rhai::Module::new();
-        capricorn::register(&mut capricorn_module, stdlib.clone());
-        engine.register_static_module("capricorn", capricorn_module.into());
-
-        let mut cancer_module = rhai::Module::new();
-        cancer::register(&mut cancer_module, stdlib.clone());
-        engine.register_static_module("cancer", cancer_module.into());
-
-        let mut virgo_module = rhai::Module::new();
-        virgo::register(&mut virgo_module, stdlib.clone());
-        engine.register_static_module("virgo", virgo_module.into());
-
-        let mut pisces_module = rhai::Module::new();
-        pisces::register(&mut pisces_module, stdlib.clone());
-        engine.register_static_module("pisces", pisces_module.into());
-
-        let mut taurus_module = rhai::Module::new();
-        taurus::register(&mut taurus_module, stdlib.clone());
-        engine.register_static_module("taurus", taurus_module.into());
-
-        let mut three_starters_module = rhai::Module::new();
-        three_starters::register(&mut three_starters_module, stdlib.clone());
-        engine.register_static_module("three_starters", three_starters_module.into());
-
-        let mut gemini_module = rhai::Module::new();
-        gemini::register(&mut gemini_module, stdlib.clone());
-        engine.register_static_module("gemini", gemini_module.into());
-
-        let mut sagittarius_module = rhai::Module::new();
-        sagittarius::register(&mut sagittarius_module, stdlib.clone());
-        engine.register_static_module("sagittarius", sagittarius_module.into());
-
-        let mut aquarius_module = rhai::Module::new();
-        aquarius::register(&mut aquarius_module, stdlib.clone());
-        engine.register_static_module("aquarius", aquarius_module.into());
-
-        let mut aries_module = rhai::Module::new();
-        aries::register(&mut aries_module, stdlib.clone());
-        engine.register_static_module("aries", aries_module.into());
-
-        let mut scorpio_module = rhai::Module::new();
-        scorpio::register(&mut scorpio_module, stdlib.clone());
-        engine.register_static_module("scorpio", scorpio_module.into());
-
-        let mut libra_module = rhai::Module::new();
-        libra::register(&mut libra_module, stdlib.clone());
-        engine.register_static_module("libra", libra_module.into());
-
-        let mut leo_module = rhai::Module::new();
-        leo::register(&mut leo_module, stdlib.clone());
-        engine.register_static_module("leo", leo_module.into());
-
-        let mut lookup_module = rhai::Module::new();
-        lookup::register(&mut lookup_module, stdlib.clone());
-        engine.register_static_module("lookup", lookup_module.into());
-
-        let mut combat_module = rhai::Module::new();
-        combat::register(&mut combat_module, stdlib.clone());
-        engine.register_static_module("combat", combat_module.into());
-
-        let mut system_module = rhai::Module::new();
-        system::register(&mut system_module, stdlib.clone());
-        engine.register_static_module("system", system_module.into());
-
-        let mut global_system_module = rhai::Module::new();
-        system::register_functions(&mut global_system_module, stdlib);
-        engine.register_global_module(global_system_module.into());
+        crate::stdlib::register_modules(engine, stdlib);
     }
-
     pub fn eval(&mut self, script: &str) -> Result<Dynamic> {
         self.engine.eval(script).map_err(Self::map_eval_error)
     }
@@ -760,14 +512,6 @@ impl RocoEngine {
 
     fn map_eval_error(error: Box<rhai::EvalAltResult>) -> RocoError {
         let position = error.position();
-        let kind = match error.as_ref() {
-            rhai::EvalAltResult::ErrorParsing(..) => RocoScriptErrorKind::Parse,
-            rhai::EvalAltResult::ErrorTerminated(..) => RocoScriptErrorKind::Terminated,
-            rhai::EvalAltResult::ErrorRuntime(..) => RocoScriptErrorKind::Runtime,
-            rhai::EvalAltResult::ErrorInFunctionCall(..) => RocoScriptErrorKind::FunctionCall,
-            rhai::EvalAltResult::ErrorInModule(..) => RocoScriptErrorKind::Module,
-            _ => RocoScriptErrorKind::Eval,
-        };
         let location_source = match error.as_ref() {
             rhai::EvalAltResult::ErrorInFunctionCall(_, source, ..) if !source.is_empty() => {
                 Some(source.clone())
@@ -776,8 +520,6 @@ impl RocoEngine {
         };
         let error_source = RocoScriptErrorSource::Eval(Self::script_eval_error_source(&error));
         RocoError::ScriptError(RocoScriptError {
-            kind,
-            message: error_source.message(),
             location: Self::script_location(location_source, position),
             source: error_source,
         })
@@ -843,8 +585,6 @@ impl RocoEngine {
                             rhai::debugger::DebuggerEvent::FunctionExitWithError(_) => {
                                 "function_exit_error".to_string()
                             }
-                            rhai::debugger::DebuggerEvent::Start
-                            | rhai::debugger::DebuggerEvent::End => unreachable!(),
                             _ => "debugger_event".to_string(),
                         };
                         let stack = context
@@ -955,8 +695,6 @@ impl RocoEngine {
         let error_source =
             RocoScriptErrorSource::Parse(Self::script_parse_error_source(error.err_type()));
         RocoError::ScriptError(RocoScriptError {
-            kind: RocoScriptErrorKind::Parse,
-            message: error_source.message(),
             location: Self::script_location(source, position),
             source: error_source,
         })
@@ -1001,81 +739,115 @@ impl RocoEngine {
             };
         }
         for_each_roco_type!(register_roco_type_basics);
-        register_getters!(RocoRequestContext, raw, domain, action);
+        crate::types::register_rhai_getters(engine);
+        engine.register_get("raw", |value: &mut RocoRequestContext| value.raw.clone());
+        engine.register_get("domain", |value: &mut RocoRequestContext| {
+            value.domain().to_string()
+        });
+        engine.register_get("action", |value: &mut RocoRequestContext| {
+            value.action().to_string()
+        });
         engine.register_get("code", |value: &mut RocoRewardKind| {
             value.code().to_string()
         });
-        engine.register_get("present", |value: &mut RocoOptionalI64| value.is_present());
-        engine.register_get("value", |value: &mut RocoOptionalI64| value.value_or(0));
-        engine.register_get("value_or_missing", |value: &mut RocoOptionalI64| {
-            value.value_or(-1)
-        });
-        register_getters!(RocoDisplayItem, item_id, item_count, item_type);
-        engine.register_get("present", |value: &mut RocoOptionalDisplayItem| {
-            value.is_present()
-        });
-        engine.register_get("item", |value: &mut RocoOptionalDisplayItem| {
-            value.item_or_default()
-        });
-        engine.register_get("present", |value: &mut RocoOptionalIceCrystalBattleInfo| {
-            value.is_present()
-        });
-        engine.register_get("battle", |value: &mut RocoOptionalIceCrystalBattleInfo| {
-            value.battle_or_default()
-        });
-        engine.register_get("present", |value: &mut RocoOptionalCapricornSecondTask| {
-            value.is_present()
-        });
-        engine.register_get("task", |value: &mut RocoOptionalCapricornSecondTask| {
-            value.task_or_default()
-        });
-        engine.register_get("present", |value: &mut RocoOptionalStarTowerTop| {
-            value.is_present()
-        });
-        engine.register_get("top", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default()
-        });
-        engine.register_get("star", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default().star
-        });
-        engine.register_get("refresh", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default().refresh
-        });
-        engine.register_get("fight_desc", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default().fight_desc
-        });
-        engine.register_get("task_desc", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default().task_desc
-        });
-        engine.register_get("fight_id", |value: &mut RocoOptionalStarTowerTop| {
-            value.top_or_default().fight_id
-        });
-        engine.register_get("tokens", |value: &mut RocoOptionalStarTowerTop| {
-            Self::to_array(&value.top_or_default().tokens)
-        });
-        engine.register_get("exchanges", |value: &mut RocoOptionalStarTowerTop| {
-            Self::to_array(&value.top_or_default().exchanges)
-        });
-        engine.register_get("missions", |value: &mut RocoOptionalStarTowerTop| {
-            Self::to_array(&value.top_or_default().missions)
-        });
-        engine.register_get("rewards", |value: &mut RocoOptionalStarTowerTop| {
-            Self::to_array(&value.top_or_default().rewards)
-        });
-        engine.register_get(
-            "present",
-            |value: &mut RocoOptionalCapricornTeamSnapshot| value.is_present(),
+        register_getters!(
+            IncubativeMachineEggInfo,
+            egg_id,
+            incubate_time,
+            property,
+            catch_time,
+            egg_uin,
+            egg_name,
+            roco_name
         );
-        engine.register_get("team", |value: &mut RocoOptionalCapricornTeamSnapshot| {
-            value.team_or_default()
+        register_getters!(
+            IncubativeMachineIncubationInfo,
+            egg_type,
+            spirit_id,
+            egg_id,
+            percentile,
+            remainder_time,
+            stage,
+            egg_name,
+            property
+        );
+        register_getters!(
+            IncubativeMachineEggListResult,
+            result_code,
+            message,
+            egg_type,
+            total_pages,
+            current_page
+        );
+        engine.register_get("eggs", |value: &mut IncubativeMachineEggListResult| {
+            Self::to_array(&value.eggs)
         });
-        engine.register_get("present", |value: &mut RocoOptionalTypeLadderRankUser| {
-            value.is_present()
+        register_getters!(
+            IncubativeMachineInfo,
+            result_code,
+            message,
+            guide,
+            incubator_type,
+            total_pages,
+            current_page,
+            incubation
+        );
+        engine.register_get("eggs", |value: &mut IncubativeMachineInfo| {
+            Self::to_array(&value.eggs)
         });
-        engine.register_get("user", |value: &mut RocoOptionalTypeLadderRankUser| {
-            value.user_or_default()
+        register_getters!(
+            IncubativeMachineIncubationResult,
+            result_code,
+            message,
+            incubation
+        );
+        register_getters!(IncubativeMachineActionResult, result_code, message);
+        register_getters!(
+            IncubativeMachineGetSpiritResult,
+            result_code,
+            message,
+            spirit_id,
+            spirit_level
+        );
+        register_getters!(
+            PetEggSpiritInfo,
+            spirit_id,
+            level,
+            exp_to_next_level,
+            personality,
+            hp,
+            max_hp,
+            caught_time,
+            caught_location,
+            storage_time
+        );
+        engine.register_get("skills", |value: &mut PetEggSpiritInfo| {
+            Self::to_array(&value.skills)
         });
-
+        register_getters!(
+            PetEggInfo,
+            result_code,
+            message,
+            current_egg_count,
+            max_egg_count,
+            vip_count,
+            male,
+            female,
+            egg
+        );
+        register_getters!(
+            PetEggSpeedUpResult,
+            result_code,
+            message,
+            current_egg_count,
+            max_egg_count,
+            vip_count
+        );
+        register_getters!(PetEggBeginResult, result_code, message, max_egg_count);
+        register_getters!(PetEggCancelResult, result_code, message, detail_code);
+        register_getters!(PetEggPreviewResult, result_code, message, egg);
+        register_getters!(RemoteSceneData, scene_id, values);
+        register_getters!(TaskProgressResult, result_code, message);
         macro_rules! register_virgo_cgi_info {
             ($type:ty, $name:literal) => {
                 engine.register_type_with_name::<$type>($name);
@@ -1138,37 +910,6 @@ impl RocoEngine {
                 });
             };
         }
-        register_getters!(
-            CombatActions,
-            can_submit_action,
-            can_use_skill,
-            can_capture,
-            can_use_item,
-            can_change_spirit,
-            can_escape,
-            can_use_any_skill,
-            can_change_to_any_spirit,
-        );
-        register_getters!(CombatSpiritState, position, spirit_id, level, hp, max_hp);
-        engine.register_get("skills", |value: &mut CombatSpiritState| {
-            Self::to_array(&value.skills)
-        });
-        register_getters!(CombatSideState, uin, active_position);
-        engine.register_get("spirits", |value: &mut CombatSideState| {
-            Self::to_array(&value.spirits)
-        });
-        register_getters!(CombatState, round, weather, weather_round);
-        engine.register_get("my_side", |value: &mut CombatState| value.my_side.clone());
-        engine.register_get("rival_side", |value: &mut CombatState| {
-            value.rival_side.clone()
-        });
-        register_getters!(CombatActionSnapshot, is_finished);
-        engine.register_get("state", |value: &mut CombatActionSnapshot| {
-            value.state.clone()
-        });
-        engine.register_get("actions", |value: &mut CombatActionSnapshot| {
-            value.actions.clone()
-        });
         engine.register_type_with_name::<RocoScriptErrorSource>("RocoScriptErrorSource");
         engine.register_type_with_name::<RocoScriptParseErrorSource>("RocoScriptParseErrorSource");
         engine.register_type_with_name::<RocoScriptEvalErrorSource>("RocoScriptEvalErrorSource");
@@ -1355,6 +1096,9 @@ impl RocoEngine {
             value.spirit_index()
         });
         engine.register_get("value", |value: &mut ScriptRequestError| value.value());
+        engine.register_get("operation_context", |value: &mut ScriptRequestError| {
+            value.operation_context()
+        });
         engine.register_type_with_name::<ScriptSpiritOperationError>("ScriptSpiritOperationError");
         engine.register_get("kind_code", |value: &mut ScriptSpiritOperationError| {
             value.kind_code()
@@ -2179,87 +1923,6 @@ impl RocoEngine {
             "backend_kind_code",
             |value: &mut ScriptCombatRuntimeError| value.backend_kind_code(),
         );
-        macro_rules! register_error_info_getters {
-            ($type:ty) => {
-                engine.register_get("error_kind_code", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(RocoErrorInfo::kind_code)
-                        .unwrap_or_default()
-                });
-                engine.register_get("error_detail_kind_code", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(RocoErrorInfo::detail_kind_code)
-                        .unwrap_or_default()
-                });
-                engine.register_get("error_network_kind_code", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(RocoErrorInfo::network_kind_code)
-                        .unwrap_or_default()
-                });
-                engine.register_get("error_code", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(|error| error.code.clone())
-                        .unwrap_or_default()
-                });
-                engine.register_get("error_message", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(|error| error.message.clone())
-                        .unwrap_or_default()
-                });
-                engine.register_get("error_detail", |value: &mut $type| {
-                    value
-                        .error
-                        .as_ref()
-                        .map(|error| error.detail.clone())
-                        .unwrap_or(RocoErrorDetail::None)
-                });
-            };
-        }
-        register_getters!(ActionResult, ok, code, message, error);
-        register_error_info_getters!(ActionResult);
-        register_getters!(
-            CombatActionResult,
-            ok,
-            code,
-            message,
-            error,
-            ack_received,
-            combat_finished,
-            next_action_ready
-        );
-        register_error_info_getters!(CombatActionResult);
-        register_getters!(MiniGameRewardItem, id, count, item_type);
-        register_getters!(MiniGameExtraField, key, value);
-        register_getters!(
-            MiniGameSubmitResult,
-            ok,
-            code,
-            message,
-            game_id,
-            score,
-            game_type
-        );
-        engine.register_get("items", |value: &mut MiniGameSubmitResult| {
-            Self::to_array(&value.items)
-        });
-        engine.register_get("extra_fields", |value: &mut MiniGameSubmitResult| {
-            Self::to_array(&value.extra_fields)
-        });
-        register_getters!(MiniGameSubmitTryResult, ok, code, message, error);
-        register_error_info_getters!(MiniGameSubmitTryResult);
-        engine.register_get("result", |value: &mut MiniGameSubmitTryResult| {
-            value.result.clone()
-        });
         register_getters!(
             TalentRefreshResult,
             position,
@@ -2288,260 +1951,6 @@ impl RocoEngine {
             sp_talent_new,
             hp_talent_new,
         );
-        register_getters!(
-            UserInfo,
-            uin,
-            id,
-            nick_name,
-            level,
-            is_vip,
-            vip_level,
-            vip_expiring_days,
-            vip_lulu,
-            trainer_level,
-            trainer_exp,
-        );
-        register_getters!(
-            ServerTimeInfo,
-            stamp,
-            full_year,
-            month,
-            date,
-            hours,
-            minutes,
-            seconds,
-            day,
-            day_of_year,
-        );
-        register_getters!(ServerTimeResult, ok, code, message, error);
-        register_error_info_getters!(ServerTimeResult);
-        engine.register_get("result", |value: &mut ServerTimeResult| {
-            value.result.clone()
-        });
-        register_getters!(
-            SpiritInfo,
-            spirit_id,
-            position,
-            catch_time,
-            name,
-            level,
-            personality,
-            hp,
-            max_hp
-        );
-        engine.register_get("skills", |value: &mut SpiritInfo| {
-            Self::to_array(&value.skills)
-        });
-        register_getters!(SpiritSkillInfo, skill_id, pp, inherited);
-        register_getters!(
-            StorageSpiritDetailInfo,
-            spirit_id,
-            catch_time,
-            storage_time,
-            name,
-            level,
-            personality,
-            hp,
-            max_hp,
-            pa,
-            pd,
-            ma,
-            md,
-            sp,
-            hp_ability
-        );
-        engine.register_get("skills", |value: &mut StorageSpiritDetailInfo| {
-            Self::to_array(&value.skills)
-        });
-        register_getters!(SkillPoolSkillInfo, skill_id, pp, inherited, position);
-        register_getters!(SkillPoolInfo, spirit_id, position);
-        engine.register_get("skills", |value: &mut SkillPoolInfo| {
-            Self::to_array(&value.skills)
-        });
-        register_getters!(SkillSwitchResult, spirit_id, position, skill_slot, skill_id);
-        register_getters!(SkillStoneSkillInfo, skill_id, pp, inherited);
-        register_getters!(
-            SkillStoneResult,
-            ok,
-            result_code,
-            message,
-            item_id,
-            position,
-            needs_replace,
-        );
-        engine.register_get("old_skills", |value: &mut SkillStoneResult| {
-            Self::to_array(&value.old_skills)
-        });
-        engine.register_get("new_skills", |value: &mut SkillStoneResult| {
-            Self::to_array(&value.new_skills)
-        });
-        register_getters!(
-            StorageSpiritInfo,
-            spirit_id,
-            catch_time,
-            storage_time,
-            level,
-            sex,
-            skin_flag,
-            talent_type,
-            talent_level,
-        );
-        register_getters!(
-            SceneSpiritInfo,
-            spirit_id,
-            count,
-            area_index,
-            is_rare,
-            is_boss,
-            is_npc_boss,
-        );
-        register_getters!(
-            SceneRoleInfo,
-            uin,
-            id,
-            nick_name,
-            level,
-            loc_x,
-            loc_y,
-            pk_state,
-            is_in_combat,
-            is_vip,
-            vip_level,
-            trainer_level,
-            trainer_exp,
-        );
-        register_getters!(BagItemInfo, item_id, count);
-        register_getters!(
-            BattleSpiritResult,
-            position,
-            exp,
-            level_delta,
-            level,
-            next_exp,
-            effort,
-            evolve_spirit_id,
-        );
-        engine.register_get("new_skill_ids", |value: &mut BattleSpiritResult| {
-            Self::to_array(&value.new_skill_ids)
-        });
-        register_getters!(BattleCapturedSpirit, spirit_id, level, disposition);
-        engine.register_get("property_list", |value: &mut BattleCapturedSpirit| {
-            Self::to_array(&value.property_list)
-        });
-        engine.register_get("flair_list", |value: &mut BattleCapturedSpirit| {
-            Self::to_array(&value.flair_list)
-        });
-        register_getters!(
-            NewsTimesReport,
-            id,
-            report_type,
-            begin_time,
-            end_time,
-            name_image_url,
-            app_url,
-        );
-        engine.register_get("act_begin_time", |value: &mut NewsTimesReport| {
-            Self::to_array(&value.act_begin_time)
-        });
-        engine.register_get("act_end_time", |value: &mut NewsTimesReport| {
-            Self::to_array(&value.act_end_time)
-        });
-        register_getters!(NewsTimesReportsResult, gift_gotten);
-        engine.register_get("reports", |value: &mut NewsTimesReportsResult| {
-            Self::to_array(&value.reports)
-        });
-        engine.register_get(
-            "player_status_today",
-            |value: &mut NewsTimesReportsResult| Self::to_array(&value.player_status_today),
-        );
-        engine.register_get(
-            "player_status_forever",
-            |value: &mut NewsTimesReportsResult| Self::to_array(&value.player_status_forever),
-        );
-        register_getters!(
-            NewsActiveItem,
-            id,
-            scene_id,
-            npc_x,
-            npc_y,
-            time,
-            content,
-            auto_start,
-            script_url,
-            app_url,
-        );
-        register_getters!(
-            StarTowerNode,
-            node_index,
-            star,
-            spirit_id,
-            fight_id,
-            item_id,
-            reward,
-            equip_id,
-        );
-        register_getters!(StarTowerStorey, storey_index, first, can_quick_fight);
-        engine.register_get("nodes", |value: &mut StarTowerStorey| {
-            Self::to_array(&value.nodes)
-        });
-        engine.register_get("exchange_items", |value: &mut StarTowerStorey| {
-            Self::to_array(&value.exchange_items)
-        });
-        register_getters!(
-            StarTowerExchangeItem,
-            index,
-            item_id,
-            item_name,
-            spirit_id,
-            spirit_name,
-            owned,
-            required,
-        );
-        register_getters!(StarTowerTop, star, refresh, fight_desc, task_desc, fight_id,);
-        engine.register_get("tokens", |value: &mut StarTowerTop| {
-            Self::to_array(&value.tokens)
-        });
-        engine.register_get("exchanges", |value: &mut StarTowerTop| {
-            Self::to_array(&value.exchanges)
-        });
-        engine.register_get("missions", |value: &mut StarTowerTop| {
-            Self::to_array(&value.missions)
-        });
-        engine.register_get("rewards", |value: &mut StarTowerTop| {
-            Self::to_array(&value.rewards)
-        });
-        register_getters!(StarTowerTopMission, index, description, completed);
-        register_getters!(
-            StarTowerTopReward,
-            index,
-            threshold,
-            name,
-            amount,
-            state,
-            claimed,
-            claimable,
-        );
-        register_getters!(
-            StarTowerInfo,
-            result_code,
-            message,
-            mop,
-            boss_id,
-            countdown,
-            auto_sell,
-            money,
-        );
-        engine.register_get("has_top", |value: &mut StarTowerInfo| value.has_top());
-        engine.register_get("top", |value: &mut StarTowerInfo| value.top.clone());
-        engine.register_get("top_or_default", |value: &mut StarTowerInfo| {
-            value.top_or_default()
-        });
-        engine.register_get("clips", |value: &mut StarTowerInfo| {
-            Self::to_array(&value.clips)
-        });
-        engine.register_get("storeys", |value: &mut StarTowerInfo| {
-            Self::to_array(&value.storeys)
-        });
         register_getters!(
             SentinelBossInfo,
             index,
@@ -2752,73 +2161,6 @@ impl RocoEngine {
         });
         engine.register_get("records", |value: &mut SummonInfo| {
             Self::to_array(&value.records)
-        });
-        register_getters!(PlayGuideRewardItem, id, count, item_type);
-        register_getters!(WeekTaskActivity, activity_id, reward_count);
-        register_getters!(
-            WeekTaskInfo,
-            result_code,
-            message,
-            ticket_item_id,
-            ticket_count,
-        );
-        engine.register_get("progress", |value: &mut WeekTaskInfo| {
-            Self::to_array(&value.progress)
-        });
-        engine.register_get("button_states", |value: &mut WeekTaskInfo| {
-            Self::to_array(&value.button_states)
-        });
-        engine.register_get("new_activities", |value: &mut WeekTaskInfo| {
-            Self::to_array(&value.new_activities)
-        });
-        engine.register_get("old_activities", |value: &mut WeekTaskInfo| {
-            Self::to_array(&value.old_activities)
-        });
-        engine.register_get("rewards", |value: &mut WeekTaskInfo| {
-            Self::to_array(&value.rewards)
-        });
-        register_getters!(DiamondTaskProgress, index, current, target, completed,);
-        register_getters!(
-            DiamondProgressReward,
-            index,
-            threshold,
-            state,
-            claimable,
-            claimed,
-        );
-        register_getters!(DiamondTaskInfo, result_code, message, vip, reward_type);
-        engine.register_get("tasks", |value: &mut DiamondTaskInfo| {
-            Self::to_array(&value.tasks)
-        });
-        engine.register_get("rewards", |value: &mut DiamondTaskInfo| {
-            Self::to_array(&value.rewards)
-        });
-        engine.register_get("reward_items", |value: &mut DiamondTaskInfo| {
-            Self::to_array(&value.reward_items)
-        });
-        register_getters!(QqGameHallGiftInfo, result_code, message);
-        engine.register_get("rewards", |value: &mut QqGameHallGiftInfo| {
-            Self::to_array(&value.rewards)
-        });
-        register_getters!(
-            JumpMachineRewardItem,
-            reward_id,
-            reward_kind,
-            raw_reward_type,
-            count,
-        );
-        register_getters!(
-            JumpMachineInfo,
-            result_code,
-            message,
-            can_play,
-            coin,
-            main_pet_id,
-            storage_full,
-            pet_id,
-        );
-        engine.register_get("rewards", |value: &mut JumpMachineInfo| {
-            Self::to_array(&value.rewards)
         });
         register_getters!(CapricornPalaceNoteItem, item_index, item_id, count, need);
         register_getters!(CapricornPalaceNotesInfo, can_summon);
@@ -3865,38 +3207,8 @@ impl RocoEngine {
         engine.register_get("my_info", |value: &mut TypeLadderRankInfo| {
             value.my_info.clone()
         });
-        engine.register_get("has_my_info", |value: &mut TypeLadderRankInfo| {
-            value.my_info.is_present()
-        });
-        engine.register_get("my_info_or_default", |value: &mut TypeLadderRankInfo| {
-            value.my_info.user_or_default()
-        });
         engine.register_get("users", |value: &mut TypeLadderRankInfo| {
             Self::to_array(&value.users)
-        });
-        register_getters!(
-            BattleResult,
-            winner,
-            total_rounds,
-            finish_code,
-            trainer_exp,
-            next_level_trainer_exp,
-            honour_point,
-            exp_add_bits,
-        );
-        engine.register_get("obtained_items", |value: &mut BattleResult| {
-            Self::to_array(&value.obtained_items)
-        });
-        engine.register_get("spirit_results", |value: &mut BattleResult| {
-            Self::to_array(&value.spirit_results)
-        });
-        engine.register_get("captured_spirits", |value: &mut BattleResult| {
-            Self::to_array(&value.captured_spirits)
-        });
-        register_getters!(BattleResultQueryResult, ok, code, message, error);
-        register_error_info_getters!(BattleResultQueryResult);
-        engine.register_get("result", |value: &mut BattleResultQueryResult| {
-            value.result.clone()
         });
         register_getters!(BloodGiftItemRequirement, item_id, count, need);
         register_getters!(
@@ -4049,22 +3361,6 @@ impl RocoEngine {
         );
         engine.register_get("ground", |value: &mut ManorFertilizerResult| {
             value.ground.clone()
-        });
-        register_getters!(PetTrainingRewardItem, item_id, count);
-        register_getters!(
-            PetTrainingResult,
-            ok,
-            result_code,
-            message,
-            training_type,
-            pet_id,
-            raw_text,
-        );
-        engine.register_get("rewards", |value: &mut PetTrainingResult| {
-            Self::to_array(&value.rewards)
-        });
-        engine.register_get("spirits", |value: &mut SpiritBagInfo| {
-            Self::to_array(&value.spirits)
         });
         register_getters!(
             StaticItemInfo,

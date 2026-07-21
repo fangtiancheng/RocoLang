@@ -2,11 +2,25 @@ use std::{env, fs, path::PathBuf};
 
 fn main() {
     println!("cargo:rerun-if-changed=src/types.rs");
+    println!("cargo:rerun-if-changed=src/types");
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let types_path = manifest_dir.join("src").join("types.rs");
-    let types = fs::read_to_string(&types_path).unwrap();
-    let type_names = collect_public_type_names(&types);
+    let types_dir = manifest_dir.join("src").join("types");
+    let mut sources = vec![types_path];
+    if types_dir.is_dir() {
+        let mut domain_sources = fs::read_dir(types_dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .filter(|path| path.extension().is_some_and(|extension| extension == "rs"))
+            .collect::<Vec<_>>();
+        domain_sources.sort();
+        sources.extend(domain_sources);
+    }
+    let type_names = sources
+        .into_iter()
+        .flat_map(|path| collect_public_type_names(&fs::read_to_string(path).unwrap()))
+        .collect::<Vec<_>>();
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let output_path = out_dir.join("roco_type_list.rs");

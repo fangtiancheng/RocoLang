@@ -10,6 +10,7 @@ mod news;
 mod pet_training;
 mod profile;
 mod registered;
+mod remote_state;
 mod role;
 mod scene;
 mod session;
@@ -130,6 +131,10 @@ pub fn stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     docs
 }
 
+pub fn stdlib_type_docs() -> Vec<StdlibReturnDoc> {
+    types::reachable_type_docs(&stdlib_function_docs())
+}
+
 pub fn find_stdlib_function_doc(module: &str, name: &str) -> Option<StdlibFunctionDoc> {
     stdlib_function_docs()
         .into_iter()
@@ -156,6 +161,7 @@ fn detailed_stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     docs.extend(system::docs());
     docs.extend(profile::docs());
     docs.extend(scene::docs());
+    docs.extend(remote_state::docs());
     docs.extend(game::docs());
     docs.extend(role::docs());
     docs.extend(manor::docs());
@@ -308,8 +314,51 @@ mod tests {
     }
 
     #[test]
+    fn type_docs_include_nested_types_without_direct_function_returns() {
+        let docs = stdlib_type_docs();
+        assert!(docs
+            .iter()
+            .any(|doc| doc.type_name == "StaticSpiritEvolutionEdge"));
+    }
+
+    #[test]
+    fn reachable_struct_fields_have_type_docs() {
+        let docs = stdlib_type_docs();
+        let known = docs
+            .iter()
+            .map(|doc| doc.type_name.as_str())
+            .collect::<std::collections::HashSet<_>>();
+        let primitives = [
+            "()", "bool", "int", "float", "char", "string", "dynamic", "map", "Map", "blob",
+        ];
+        let missing = docs
+            .iter()
+            .flat_map(|doc| &doc.fields)
+            .filter_map(|field| {
+                let type_name = field
+                    .type_name
+                    .split('|')
+                    .next()
+                    .unwrap_or_default()
+                    .trim()
+                    .trim_end_matches('?')
+                    .trim_end_matches("[]");
+                (!type_name.is_empty()
+                    && !primitives.contains(&type_name)
+                    && !known.contains(type_name))
+                .then_some(type_name)
+            })
+            .collect::<std::collections::BTreeSet<_>>();
+
+        assert!(
+            missing.is_empty(),
+            "missing reachable type docs: {missing:?}"
+        );
+    }
+
+    #[test]
     fn documented_struct_returns_have_return_docs() {
-        let primitive_returns = ["()", "bool", "int", "string", "map", "Array"];
+        let primitive_returns = ["()", "bool", "int", "string", "map", "Array", "blob"];
         let docs = stdlib_function_docs();
         let missing: Vec<_> = docs
             .iter()

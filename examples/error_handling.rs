@@ -2,14 +2,16 @@ use roco_lang::{
     BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
     RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
     RocoCancerActivityStdLib, RocoCombatStdLib, RocoEngine, RocoError, RocoEvolutionActivityStdLib,
-    RocoGeminiActivityStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
-    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoOptionalI64, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRuntimeStdLib,
-    RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib, RocoServerRejectedError,
-    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
-    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
-    RocoVirgoActivityStdLib, RoundResult, ScriptLookupEntity, ScriptLookupError, ScriptQueryError,
-    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    RocoGeminiActivityStdLib, RocoIncubativeMachineStdLib, RocoLeoActivityStdLib,
+    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
+    RocoManorActivityStdLib, RocoNewsActivityStdLib, RocoOptionalI64, RocoPetEggStdLib,
+    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoRemoteStateStdLib,
+    RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
+    RocoServerRejectedError, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib,
+    RocoTaskStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult, ScriptLookupEntity,
+    ScriptLookupError, ScriptQueryError, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo,
+    StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -366,6 +368,12 @@ impl RocoPetTrainingActivityStdLib for ErrorTestStdLib {}
 impl RocoNewsActivityStdLib for ErrorTestStdLib {}
 
 impl RocoTaskStdLib for ErrorTestStdLib {}
+
+impl RocoIncubativeMachineStdLib for ErrorTestStdLib {}
+
+impl RocoPetEggStdLib for ErrorTestStdLib {}
+
+impl RocoRemoteStateStdLib for ErrorTestStdLib {}
 
 impl RocoTowerActivityStdLib for ErrorTestStdLib {}
 

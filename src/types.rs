@@ -1,26 +1,200 @@
 //! 共享类型定义
 
-use crate::{RocoError, RocoErrorInfo};
-use serde::{Deserialize, Serialize};
+use rhai::{Array, Dynamic, Engine};
+use serde::{ser::SerializeStruct, Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+macro_rules! register_getters {
+    ($engine:expr, $type:ty, $($field:ident),+ $(,)?) => {
+        $(
+            $engine.register_get(stringify!($field), |value: &mut $type| {
+                value.$field.clone()
+            });
+        )+
+    };
+}
+
+macro_rules! register_error_info_getters {
+    ($engine:expr, $type:ty) => {
+        $engine.register_get("error_kind_code", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(crate::RocoErrorInfo::kind_code)
+                .unwrap_or_default()
+        });
+        $engine.register_get("error_detail_kind_code", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(crate::RocoErrorInfo::detail_kind_code)
+                .unwrap_or_default()
+        });
+        $engine.register_get("error_network_kind_code", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(crate::RocoErrorInfo::network_kind_code)
+                .unwrap_or_default()
+        });
+        $engine.register_get("error_code", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(|error| error.code.clone())
+                .unwrap_or_default()
+        });
+        $engine.register_get("error_message", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(|error| error.message.clone())
+                .unwrap_or_default()
+        });
+        $engine.register_get("error_detail", |value: &mut $type| {
+            value
+                .error
+                .as_ref()
+                .map(|error| error.detail.clone())
+                .unwrap_or(crate::RocoErrorDetail::None)
+        });
+    };
+}
+
+macro_rules! register_optional_getters {
+    ($engine:expr, $type:ty) => {
+        $engine.register_get("present", |value: &mut $type| value.is_present());
+        $engine.register_get("value", |value: &mut $type| {
+            value
+                .value()
+                .map(rhai::Dynamic::from)
+                .unwrap_or(rhai::Dynamic::UNIT)
+        });
+    };
+}
+
+mod action;
+mod combat;
+mod game;
+mod incubative_machine;
+mod jump_machine;
+mod news;
+mod pet_egg;
+mod pet_training;
+mod play_guide;
+mod profile;
+mod remote_state;
+mod scene;
+mod spirit;
+mod star_tower;
+mod task;
+
+pub use action::*;
+pub use combat::*;
+pub use game::*;
+pub use incubative_machine::*;
+pub use jump_machine::*;
+pub use news::*;
+pub use pet_egg::*;
+pub use pet_training::*;
+pub use play_guide::*;
+pub use profile::*;
+pub use remote_state::*;
+pub use scene::*;
+pub use spirit::*;
+pub use star_tower::*;
+pub use task::*;
+
+pub(crate) fn register_rhai_getters(engine: &mut Engine) {
+    register_shared_rhai_getters(engine);
+    action::register_rhai_getters(engine);
+    combat::register_rhai_getters(engine);
+    game::register_rhai_getters(engine);
+    jump_machine::register_rhai_getters(engine);
+    news::register_rhai_getters(engine);
+    pet_training::register_rhai_getters(engine);
+    play_guide::register_rhai_getters(engine);
+    profile::register_rhai_getters(engine);
+    scene::register_rhai_getters(engine);
+    spirit::register_rhai_getters(engine);
+    star_tower::register_rhai_getters(engine);
+    task::register_rhai_getters(engine);
+}
+
+fn register_shared_rhai_getters(engine: &mut Engine) {
+    register_getters!(engine, RocoDisplayItem, item_id, item_count, item_type);
+    register_optional_getters!(engine, RocoOptionalI64);
+    register_optional_getters!(engine, RocoOptionalDisplayItem);
+    register_optional_getters!(engine, RocoOptionalIceCrystalBattleInfo);
+    register_optional_getters!(engine, RocoOptionalCapricornSecondTask);
+    register_optional_getters!(engine, RocoOptionalCapricornTeamSnapshot);
+    register_optional_getters!(engine, RocoOptionalTypeLadderRankUser);
+}
+
+fn to_array<T: Clone + Send + Sync + 'static>(items: &[T]) -> Array {
+    items.iter().cloned().map(Dynamic::from).collect()
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct RocoRequestContext {
     pub raw: String,
-    pub domain: String,
-    pub action: String,
 }
 
 impl RocoRequestContext {
     pub fn from_raw(raw: impl Into<String>) -> Self {
-        let raw = raw.into();
-        let (domain, action) = raw
+        Self { raw: raw.into() }
+    }
+
+    pub fn domain(&self) -> &str {
+        self.raw
             .split_once('.')
-            .map(|(domain, action)| (domain.to_string(), action.to_string()))
-            .unwrap_or_else(|| (raw.clone(), String::new()));
-        Self {
-            raw,
-            domain,
-            action,
+            .map(|(domain, _)| domain)
+            .unwrap_or(&self.raw)
+    }
+
+    pub fn action(&self) -> &str {
+        self.raw
+            .split_once('.')
+            .map(|(_, action)| action)
+            .unwrap_or_default()
+    }
+}
+
+impl Serialize for RocoRequestContext {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("RocoRequestContext", 3)?;
+        state.serialize_field("raw", &self.raw)?;
+        state.serialize_field("domain", self.domain())?;
+        state.serialize_field("action", self.action())?;
+        state.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for RocoRequestContext {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct WireContext {
+            #[serde(default)]
+            raw: String,
+            #[serde(default)]
+            domain: String,
+            #[serde(default)]
+            action: String,
+        }
+
+        let wire = WireContext::deserialize(deserializer)?;
+        if !wire.raw.is_empty() {
+            return Ok(Self::from_raw(wire.raw));
+        }
+        if wire.action.is_empty() {
+            Ok(Self::from_raw(wire.domain))
+        } else {
+            Ok(Self::from_raw(format!("{}.{}", wire.domain, wire.action)))
         }
     }
 }
@@ -83,10 +257,10 @@ impl RocoOptionalI64 {
         matches!(self, Self::Present { .. })
     }
 
-    pub const fn value_or(self, default: i64) -> i64 {
+    pub const fn value(self) -> Option<i64> {
         match self {
-            Self::Missing => default,
-            Self::Present { value } => value,
+            Self::Missing => None,
+            Self::Present { value } => Some(value),
         }
     }
 }
@@ -115,7 +289,7 @@ pub struct RocoDisplayItem {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RocoOptionalDisplayItem {
     Missing,
-    Present { item: RocoDisplayItem },
+    Present { value: RocoDisplayItem },
 }
 
 impl RocoOptionalDisplayItem {
@@ -123,22 +297,18 @@ impl RocoOptionalDisplayItem {
         Self::Missing
     }
 
-    pub const fn present(item: RocoDisplayItem) -> Self {
-        Self::Present { item }
+    pub const fn present(value: RocoDisplayItem) -> Self {
+        Self::Present { value }
     }
 
     pub const fn is_present(self) -> bool {
         matches!(self, Self::Present { .. })
     }
 
-    pub const fn item_or_default(self) -> RocoDisplayItem {
+    pub const fn value(self) -> Option<RocoDisplayItem> {
         match self {
-            Self::Missing => RocoDisplayItem {
-                item_id: 0,
-                item_count: 0,
-                item_type: 0,
-            },
-            Self::Present { item } => item,
+            Self::Missing => None,
+            Self::Present { value } => Some(value),
         }
     }
 }
@@ -151,16 +321,29 @@ mod tests {
     fn request_context_splits_domain_and_action() {
         let context = RocoRequestContext::from_raw("virgo.query_status");
         assert_eq!(context.raw, "virgo.query_status");
-        assert_eq!(context.domain, "virgo");
-        assert_eq!(context.action, "query_status");
+        assert_eq!(context.domain(), "virgo");
+        assert_eq!(context.action(), "query_status");
     }
 
     #[test]
     fn request_context_preserves_unknown_single_segment() {
         let context = RocoRequestContext::from_raw("legacy");
         assert_eq!(context.raw, "legacy");
-        assert_eq!(context.domain, "legacy");
-        assert_eq!(context.action, "");
+        assert_eq!(context.domain(), "legacy");
+        assert_eq!(context.action(), "");
+    }
+
+    #[test]
+    fn request_context_serde_preserves_derived_fields() {
+        let context = RocoRequestContext::from_raw("virgo.query_status");
+        let value = serde_json::to_value(&context).expect("request context should serialize");
+        assert_eq!(value["raw"], "virgo.query_status");
+        assert_eq!(value["domain"], "virgo");
+        assert_eq!(value["action"], "query_status");
+
+        let decoded: RocoRequestContext =
+            serde_json::from_value(value).expect("request context should deserialize");
+        assert_eq!(decoded, context);
     }
 
     #[test]
@@ -176,470 +359,10 @@ mod tests {
         let missing = RocoOptionalI64::from(None::<u32>);
         let present = RocoOptionalI64::from(Some(7_u32));
         assert!(!missing.is_present());
-        assert_eq!(missing.value_or(42), 42);
+        assert_eq!(missing.value(), None);
         assert!(present.is_present());
-        assert_eq!(present.value_or(42), 7);
+        assert_eq!(present.value(), Some(7));
     }
-}
-
-/// 宠物信息
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpiritInfo {
-    pub spirit_id: i64,
-    pub position: i64,
-    pub catch_time: RocoOptionalI64,
-    pub name: String,
-    pub level: i64,
-    pub personality: i64,
-    pub hp: i64,
-    pub max_hp: i64,
-    pub skills: Vec<SpiritSkillInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SceneSpiritInfo {
-    pub spirit_id: i64,
-    pub count: i64,
-    pub area_index: i64,
-    pub is_rare: bool,
-    pub is_boss: bool,
-    pub is_npc_boss: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SceneRoleInfo {
-    pub uin: i64,
-    pub id: i64,
-    pub nick_name: String,
-    pub level: i64,
-    pub loc_x: i64,
-    pub loc_y: i64,
-    pub pk_state: i64,
-    pub is_in_combat: bool,
-    pub is_vip: bool,
-    pub vip_level: i64,
-    pub trainer_level: i64,
-    pub trainer_exp: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpiritSkillInfo {
-    pub skill_id: i64,
-    pub pp: i64,
-    pub inherited: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SkillPoolSkillInfo {
-    pub skill_id: i64,
-    pub pp: i64,
-    pub inherited: bool,
-    pub position: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SkillPoolInfo {
-    pub spirit_id: i64,
-    pub position: i64,
-    pub skills: Vec<SkillPoolSkillInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SkillSwitchResult {
-    pub spirit_id: i64,
-    pub position: i64,
-    pub skill_slot: i64,
-    pub skill_id: i64,
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct SkillStoneSkillInfo {
-    pub skill_id: i64,
-    pub pp: i64,
-    pub inherited: bool,
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct SkillStoneResult {
-    pub ok: bool,
-    pub result_code: i64,
-    pub message: String,
-    pub item_id: i64,
-    pub position: i64,
-    pub needs_replace: bool,
-    pub old_skills: Vec<SkillStoneSkillInfo>,
-    pub new_skills: Vec<SkillStoneSkillInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StorageSpiritInfo {
-    pub spirit_id: i64,
-    pub catch_time: i64,
-    pub storage_time: i64,
-    pub level: i64,
-    pub sex: i64,
-    pub skin_flag: i64,
-    pub talent_type: i64,
-    pub talent_level: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StorageSpiritDetailInfo {
-    pub spirit_id: i64,
-    pub catch_time: i64,
-    pub storage_time: i64,
-    pub name: String,
-    pub level: i64,
-    pub personality: i64,
-    pub hp: i64,
-    pub max_hp: i64,
-    pub pa: i64,
-    pub pd: i64,
-    pub ma: i64,
-    pub md: i64,
-    pub sp: i64,
-    pub hp_ability: i64,
-    pub skills: Vec<SpiritSkillInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BagItemInfo {
-    pub item_id: i64,
-    pub count: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UserInfo {
-    pub uin: i64,
-    pub id: i64,
-    pub nick_name: String,
-    pub level: i64,
-    pub is_vip: bool,
-    pub vip_level: i64,
-    pub vip_expiring_days: i64,
-    pub vip_lulu: i64,
-    pub trainer_level: i64,
-    pub trainer_exp: i64,
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ServerTimeInfo {
-    pub stamp: i64,
-    pub full_year: i64,
-    pub month: i64,
-    pub date: i64,
-    pub hours: i64,
-    pub minutes: i64,
-    pub seconds: i64,
-    pub day: i64,
-    pub day_of_year: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ServerTimeResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub error: Option<RocoErrorInfo>,
-    pub result: ServerTimeInfo,
-}
-
-impl ServerTimeResult {
-    pub fn ok(result: ServerTimeInfo) -> Self {
-        Self {
-            ok: true,
-            code: 0,
-            message: String::new(),
-            error: None,
-            result,
-        }
-    }
-
-    pub fn failed(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 2,
-            message: message.into(),
-            error: None,
-            result: ServerTimeInfo::default(),
-        }
-    }
-
-    pub fn failed_with_error(error: RocoError) -> Self {
-        let message = error.message();
-        Self {
-            ok: false,
-            code: 2,
-            message,
-            error: Some(error.info()),
-            result: ServerTimeInfo::default(),
-        }
-    }
-}
-
-/// 家园锻炼奖励道具。
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct PetTrainingRewardItem {
-    pub item_id: i64,
-    pub count: i64,
-}
-
-/// 家园锻炼 CGI 返回结果。
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct PetTrainingResult {
-    pub ok: bool,
-    pub result_code: i64,
-    pub message: String,
-    pub training_type: i64,
-    pub pet_id: i64,
-    pub rewards: Vec<PetTrainingRewardItem>,
-    pub raw_text: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpiritBagInfo {
-    pub spirits: Vec<SpiritInfo>,
-}
-
-/// 战斗信息
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BattleInfo {
-    pub battle_id: String,
-    pub my_uin: i64,
-    pub rival_uin: i64,
-    pub started: bool,
-}
-
-/// 回合结果
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RoundResult {
-    pub round: i64,
-    pub my_hp: i64,
-    pub rival_hp: i64,
-    pub finished: bool,
-}
-
-/// 战斗结果
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct BattleResult {
-    pub winner: Option<i64>,
-    pub total_rounds: i64,
-    pub finish_code: i64,
-    pub trainer_exp: i64,
-    pub next_level_trainer_exp: i64,
-    pub honour_point: i64,
-    pub exp_add_bits: i64,
-    pub obtained_items: Vec<BagItemInfo>,
-    pub spirit_results: Vec<BattleSpiritResult>,
-    pub captured_spirits: Vec<BattleCapturedSpirit>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BattleResultQueryResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub error: Option<RocoErrorInfo>,
-    pub result: Option<BattleResult>,
-}
-
-impl BattleResultQueryResult {
-    pub fn ok(result: BattleResult) -> Self {
-        Self {
-            ok: true,
-            code: 0,
-            message: String::new(),
-            error: None,
-            result: Some(result),
-        }
-    }
-
-    pub fn unavailable(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 1,
-            message: message.into(),
-            error: None,
-            result: None,
-        }
-    }
-
-    pub fn unavailable_with_error(error: RocoError) -> Self {
-        Self {
-            ok: false,
-            code: 1,
-            message: error.message(),
-            error: Some(error.info()),
-            result: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BattleSpiritResult {
-    pub position: i64,
-    pub exp: i64,
-    pub level_delta: i64,
-    pub level: i64,
-    pub next_exp: i64,
-    pub effort: i64,
-    pub new_skill_ids: Vec<i64>,
-    pub evolve_spirit_id: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BattleCapturedSpirit {
-    pub spirit_id: i64,
-    pub level: i64,
-    pub disposition: i64,
-    pub property_list: Vec<i64>,
-    pub flair_list: Vec<i64>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewsTimesReport {
-    pub id: i64,
-    pub report_type: i64,
-    pub begin_time: i64,
-    pub end_time: i64,
-    pub act_begin_time: Vec<i64>,
-    pub act_end_time: Vec<i64>,
-    pub name_image_url: String,
-    pub app_url: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewsTimesReportsResult {
-    pub reports: Vec<NewsTimesReport>,
-    pub player_status_today: Vec<i64>,
-    pub player_status_forever: Vec<i64>,
-    pub gift_gotten: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewsActiveItem {
-    pub id: i64,
-    pub scene_id: i64,
-    pub npc_x: i64,
-    pub npc_y: i64,
-    pub time: String,
-    pub content: String,
-    pub auto_start: bool,
-    pub script_url: String,
-    pub app_url: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerInfo {
-    pub result_code: i64,
-    pub message: String,
-    pub mop: i64,
-    pub boss_id: i64,
-    pub countdown: i64,
-    pub auto_sell: bool,
-    pub money: i64,
-    pub clips: Vec<i64>,
-    pub storeys: Vec<StarTowerStorey>,
-    pub top: RocoOptionalStarTowerTop,
-}
-
-impl StarTowerInfo {
-    pub fn has_top(&self) -> bool {
-        self.top.is_present()
-    }
-
-    pub fn top_or_default(&self) -> StarTowerTop {
-        self.top.top_or_default()
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerStorey {
-    pub storey_index: i64,
-    pub first: i64,
-    pub can_quick_fight: bool,
-    pub nodes: Vec<StarTowerNode>,
-    pub exchange_items: Vec<StarTowerExchangeItem>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerNode {
-    pub node_index: i64,
-    pub star: i64,
-    pub spirit_id: i64,
-    pub fight_id: i64,
-    pub item_id: i64,
-    pub reward: i64,
-    pub equip_id: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerExchangeItem {
-    pub index: i64,
-    pub item_id: i64,
-    pub item_name: String,
-    pub spirit_id: RocoOptionalI64,
-    pub spirit_name: String,
-    pub owned: i64,
-    pub required: i64,
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct StarTowerTop {
-    pub star: i64,
-    pub refresh: i64,
-    pub fight_desc: String,
-    pub task_desc: String,
-    pub fight_id: i64,
-    pub tokens: Vec<i64>,
-    pub exchanges: Vec<i64>,
-    pub missions: Vec<StarTowerTopMission>,
-    pub rewards: Vec<StarTowerTopReward>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum RocoOptionalStarTowerTop {
-    Missing,
-    Present { top: StarTowerTop },
-}
-
-impl RocoOptionalStarTowerTop {
-    pub const fn missing() -> Self {
-        Self::Missing
-    }
-
-    pub const fn present(top: StarTowerTop) -> Self {
-        Self::Present { top }
-    }
-
-    pub const fn is_present(&self) -> bool {
-        matches!(self, Self::Present { .. })
-    }
-
-    pub fn top_or_default(&self) -> StarTowerTop {
-        match self {
-            Self::Missing => StarTowerTop::default(),
-            Self::Present { top } => top.clone(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerTopMission {
-    pub index: i64,
-    pub description: String,
-    pub completed: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StarTowerTopReward {
-    pub index: i64,
-    pub threshold: i64,
-    pub name: String,
-    pub amount: String,
-    pub state: i64,
-    pub claimed: bool,
-    pub claimable: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -879,180 +602,6 @@ pub struct SummonRecord {
     pub day: i64,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct PlayGuideRewardItem {
-    pub id: i64,
-    pub count: i64,
-    pub item_type: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WeekTaskActivity {
-    pub activity_id: i64,
-    pub reward_count: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WeekTaskInfo {
-    pub result_code: i64,
-    pub message: String,
-    pub progress: Vec<i64>,
-    pub button_states: Vec<i64>,
-    pub ticket_item_id: i64,
-    pub ticket_count: i64,
-    pub new_activities: Vec<WeekTaskActivity>,
-    pub old_activities: Vec<WeekTaskActivity>,
-    pub rewards: Vec<PlayGuideRewardItem>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DiamondTaskProgress {
-    pub index: i64,
-    pub current: i64,
-    pub target: i64,
-    pub completed: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DiamondProgressReward {
-    pub index: i64,
-    pub threshold: i64,
-    pub state: i64,
-    pub claimable: bool,
-    pub claimed: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DiamondTaskInfo {
-    pub result_code: i64,
-    pub message: String,
-    pub vip: i64,
-    pub reward_type: i64,
-    pub tasks: Vec<DiamondTaskProgress>,
-    pub rewards: Vec<DiamondProgressReward>,
-    pub reward_items: Vec<PlayGuideRewardItem>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct QqGameHallGiftInfo {
-    pub result_code: i64,
-    pub message: String,
-    pub rewards: Vec<PlayGuideRewardItem>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskInfo {
-    pub story_id: i64,
-    pub task_id: i64,
-    pub status: i64,
-    pub task_type: i64,
-    pub task_type_sub: i64,
-    pub theme_id: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskInfoList {
-    pub result_code: i64,
-    pub message: String,
-    pub tasks: Vec<TaskInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskItemChanged {
-    pub item_id: i64,
-    pub item_count: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompleteTaskResult {
-    pub result_code: i64,
-    pub message: String,
-    pub money_add: i64,
-    pub exp_add: i64,
-    pub honor_add: i64,
-    pub power_add: i64,
-    pub intellect_add: i64,
-    pub charm_add: i64,
-    pub story_id: i64,
-    pub changed_items: Vec<TaskItemChanged>,
-    pub tasks: Vec<TaskInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskAchievement {
-    pub theme_id: i64,
-    pub finish_time: i64,
-    pub story_id: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskAchievementList {
-    pub result_code: i64,
-    pub message: String,
-    pub achievements: Vec<TaskAchievement>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MagicGrowupInfo {
-    pub ui_ret: i64,
-    pub rating_title: i64,
-    pub progress: i64,
-    pub energy: i64,
-    pub spirit_levels: Vec<i64>,
-    pub honor_times: Vec<i64>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskConditionProgress {
-    pub state: i64,
-    pub now_value: i64,
-    pub max_value: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskConditionStatusRaw {
-    pub result_code: i64,
-    pub message: String,
-    pub task_id: i64,
-    pub condition_status_bytes: Vec<i64>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskConditionStatus {
-    pub result_code: i64,
-    pub message: String,
-    pub task_id: i64,
-    pub conditions: Vec<TaskConditionProgress>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TaskConditionApplyResult {
-    pub result_code: i64,
-    pub message: String,
-    pub npc_id: i64,
-    pub changed_items: Vec<TaskItemChanged>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct JumpMachineRewardItem {
-    pub reward_id: i64,
-    pub reward_kind: RocoRewardKind,
-    pub raw_reward_type: i64,
-    pub count: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct JumpMachineInfo {
-    pub result_code: i64,
-    pub message: String,
-    pub can_play: bool,
-    pub coin: i64,
-    pub main_pet_id: RocoOptionalI64,
-    pub storage_full: bool,
-    pub pet_id: RocoOptionalI64,
-    pub rewards: Vec<JumpMachineRewardItem>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapricornPalaceNoteItem {
     pub item_index: i64,
@@ -1097,7 +646,7 @@ pub struct CapricornTeamOperationInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RocoOptionalCapricornTeamSnapshot {
     Missing,
-    Present { team: CapricornTeamSnapshot },
+    Present { value: CapricornTeamSnapshot },
 }
 
 impl RocoOptionalCapricornTeamSnapshot {
@@ -1105,18 +654,18 @@ impl RocoOptionalCapricornTeamSnapshot {
         Self::Missing
     }
 
-    pub const fn present(team: CapricornTeamSnapshot) -> Self {
-        Self::Present { team }
+    pub const fn present(value: CapricornTeamSnapshot) -> Self {
+        Self::Present { value }
     }
 
     pub const fn is_present(&self) -> bool {
         matches!(self, Self::Present { .. })
     }
 
-    pub fn team_or_default(&self) -> CapricornTeamSnapshot {
+    pub fn value(&self) -> Option<CapricornTeamSnapshot> {
         match self {
-            Self::Missing => CapricornTeamSnapshot::default(),
-            Self::Present { team } => team.clone(),
+            Self::Missing => None,
+            Self::Present { value } => Some(value.clone()),
         }
     }
 }
@@ -1133,7 +682,7 @@ pub struct CapricornSecondTask {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RocoOptionalCapricornSecondTask {
     Missing,
-    Present { task: CapricornSecondTask },
+    Present { value: CapricornSecondTask },
 }
 
 impl RocoOptionalCapricornSecondTask {
@@ -1141,18 +690,18 @@ impl RocoOptionalCapricornSecondTask {
         Self::Missing
     }
 
-    pub const fn present(task: CapricornSecondTask) -> Self {
-        Self::Present { task }
+    pub const fn present(value: CapricornSecondTask) -> Self {
+        Self::Present { value }
     }
 
     pub const fn is_present(&self) -> bool {
         matches!(self, Self::Present { .. })
     }
 
-    pub fn task_or_default(&self) -> CapricornSecondTask {
+    pub fn value(&self) -> Option<CapricornSecondTask> {
         match self {
-            Self::Missing => CapricornSecondTask::default(),
-            Self::Present { task } => task.clone(),
+            Self::Missing => None,
+            Self::Present { value } => Some(value.clone()),
         }
     }
 }
@@ -1725,7 +1274,7 @@ pub struct IceCrystalBattleInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RocoOptionalIceCrystalBattleInfo {
     Missing,
-    Present { battle: IceCrystalBattleInfo },
+    Present { value: IceCrystalBattleInfo },
 }
 
 impl RocoOptionalIceCrystalBattleInfo {
@@ -1733,21 +1282,18 @@ impl RocoOptionalIceCrystalBattleInfo {
         Self::Missing
     }
 
-    pub const fn present(battle: IceCrystalBattleInfo) -> Self {
-        Self::Present { battle }
+    pub const fn present(value: IceCrystalBattleInfo) -> Self {
+        Self::Present { value }
     }
 
     pub const fn is_present(&self) -> bool {
         matches!(self, Self::Present { .. })
     }
 
-    pub fn battle_or_default(&self) -> IceCrystalBattleInfo {
+    pub fn value(&self) -> Option<IceCrystalBattleInfo> {
         match self {
-            Self::Missing => IceCrystalBattleInfo {
-                battle_index: 0,
-                fight_id: 0,
-            },
-            Self::Present { battle } => battle.clone(),
+            Self::Missing => None,
+            Self::Present { value } => Some(value.clone()),
         }
     }
 }
@@ -2561,7 +2107,7 @@ pub struct TypeLadderRankUser {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RocoOptionalTypeLadderRankUser {
     Missing,
-    Present { user: TypeLadderRankUser },
+    Present { value: TypeLadderRankUser },
 }
 
 impl RocoOptionalTypeLadderRankUser {
@@ -2569,18 +2115,18 @@ impl RocoOptionalTypeLadderRankUser {
         Self::Missing
     }
 
-    pub const fn present(user: TypeLadderRankUser) -> Self {
-        Self::Present { user }
+    pub const fn present(value: TypeLadderRankUser) -> Self {
+        Self::Present { value }
     }
 
     pub const fn is_present(&self) -> bool {
         matches!(self, Self::Present { .. })
     }
 
-    pub fn user_or_default(&self) -> TypeLadderRankUser {
+    pub fn value(&self) -> Option<TypeLadderRankUser> {
         match self {
-            Self::Missing => TypeLadderRankUser::default(),
-            Self::Present { user } => user.clone(),
+            Self::Missing => None,
+            Self::Present { value } => Some(value.clone()),
         }
     }
 }
@@ -2595,286 +2141,6 @@ impl From<Option<TypeLadderRankUser>> for RocoOptionalTypeLadderRankUser {
 pub struct TypeLadderRankInfo {
     pub my_info: RocoOptionalTypeLadderRankUser,
     pub users: Vec<TypeLadderRankUser>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatActions {
-    pub can_submit_action: bool,
-    pub can_use_skill: bool,
-    pub can_capture: bool,
-    pub can_use_item: bool,
-    pub can_change_spirit: bool,
-    pub can_escape: bool,
-    pub can_use_any_skill: bool,
-    pub can_change_to_any_spirit: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatSpiritState {
-    pub position: i64,
-    pub spirit_id: i64,
-    pub level: i64,
-    pub hp: i64,
-    pub max_hp: i64,
-    pub skills: Vec<SpiritSkillInfo>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatSideState {
-    pub uin: i64,
-    pub active_position: i64,
-    pub spirits: Vec<CombatSpiritState>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatState {
-    pub round: i64,
-    pub weather: i64,
-    pub weather_round: i64,
-    pub my_side: CombatSideState,
-    pub rival_side: CombatSideState,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatActionSnapshot {
-    pub is_finished: bool,
-    pub state: CombatState,
-    pub actions: CombatActions,
-}
-
-/// Standard result shape for operation-style `try_*` APIs.
-///
-/// `try_*` functions should not raise expected business failures such as
-/// unavailable actions or server rejections. They should return `ok = false`
-/// with a non-zero `code` and a readable `message`. Programming errors such as
-/// invalid argument types may still be raised by the script engine.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ActionResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub error: Option<RocoErrorInfo>,
-}
-
-impl ActionResult {
-    pub fn ok() -> Self {
-        Self {
-            ok: true,
-            code: 0,
-            message: String::new(),
-            error: None,
-        }
-    }
-
-    pub fn unavailable(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 1,
-            message: message.into(),
-            error: None,
-        }
-    }
-
-    pub fn failed(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 2,
-            message: message.into(),
-            error: None,
-        }
-    }
-
-    pub fn failed_with_error(error: RocoError) -> Self {
-        Self {
-            ok: false,
-            code: 2,
-            message: error.message(),
-            error: Some(error.info()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CombatActionResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub error: Option<RocoErrorInfo>,
-    pub ack_received: bool,
-    pub combat_finished: bool,
-    pub next_action_ready: bool,
-}
-
-impl CombatActionResult {
-    pub fn ok(combat_finished: bool, next_action_ready: bool) -> Self {
-        Self {
-            ok: true,
-            code: 0,
-            message: String::new(),
-            error: None,
-            ack_received: true,
-            combat_finished,
-            next_action_ready,
-        }
-    }
-
-    pub fn unavailable(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 1,
-            message: message.into(),
-            error: None,
-            ack_received: false,
-            combat_finished: false,
-            next_action_ready: false,
-        }
-    }
-
-    pub fn unavailable_error(error: impl Into<RocoError>) -> Self {
-        let error = error.into();
-        Self {
-            ok: false,
-            code: 1,
-            message: error.message(),
-            error: Some(error.info()),
-            ack_received: false,
-            combat_finished: false,
-            next_action_ready: false,
-        }
-    }
-
-    pub fn failed(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 2,
-            message: message.into(),
-            error: None,
-            ack_received: false,
-            combat_finished: false,
-            next_action_ready: false,
-        }
-    }
-
-    pub fn failed_error(error: impl Into<RocoError>) -> Self {
-        let error = error.into();
-        Self {
-            ok: false,
-            code: 2,
-            message: error.message(),
-            error: Some(error.info()),
-            ack_received: false,
-            combat_finished: false,
-            next_action_ready: false,
-        }
-    }
-
-    pub fn from_action_result(action: ActionResult) -> Self {
-        Self {
-            ok: false,
-            code: action.code,
-            message: action.message,
-            error: action.error,
-            ack_received: false,
-            combat_finished: false,
-            next_action_ready: false,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MiniGameRewardItem {
-    pub id: i64,
-    pub count: i64,
-    pub item_type: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MiniGameExtraField {
-    pub key: String,
-    pub value: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MiniGameSubmitResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub game_id: i64,
-    pub score: i64,
-    pub game_type: i64,
-    pub items: Vec<MiniGameRewardItem>,
-    pub extra_fields: Vec<MiniGameExtraField>,
-}
-
-impl MiniGameSubmitResult {
-    pub fn failed(message: impl Into<String>) -> Self {
-        Self {
-            ok: false,
-            code: 2,
-            message: message.into(),
-            game_id: 0,
-            score: 0,
-            game_type: 0,
-            items: Vec::new(),
-            extra_fields: Vec::new(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MiniGameSubmitTryResult {
-    pub ok: bool,
-    pub code: i64,
-    pub message: String,
-    pub error: Option<RocoErrorInfo>,
-    pub result: MiniGameSubmitResult,
-}
-
-impl MiniGameSubmitTryResult {
-    pub const CODE_NETWORK_ERROR: i64 = 1001;
-
-    pub fn ok(result: MiniGameSubmitResult) -> Self {
-        Self {
-            ok: true,
-            code: 0,
-            message: String::new(),
-            error: None,
-            result,
-        }
-    }
-
-    pub fn failed(message: impl Into<String>) -> Self {
-        Self::failed_with_code(2, message)
-    }
-
-    pub fn network_error_with_error(error: RocoError) -> Self {
-        let message = error.message();
-        Self::failed_with_code_and_error(Self::CODE_NETWORK_ERROR, message, Some(error.info()))
-    }
-
-    pub fn failed_with_error(error: RocoError) -> Self {
-        let message = error.message();
-        Self::failed_with_code_and_error(2, message, Some(error.info()))
-    }
-
-    fn failed_with_code(code: i64, message: impl Into<String>) -> Self {
-        Self::failed_with_code_and_error(code, message, None)
-    }
-
-    fn failed_with_code_and_error(
-        code: i64,
-        message: impl Into<String>,
-        error: Option<RocoErrorInfo>,
-    ) -> Self {
-        let message = message.into();
-        Self {
-            ok: false,
-            code,
-            error,
-            result: MiniGameSubmitResult::failed(message.clone()),
-            message,
-        }
-    }
 }
 
 /// Result returned after refreshing a spirit's talent values.

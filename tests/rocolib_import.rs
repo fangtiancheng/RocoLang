@@ -8,18 +8,18 @@ use roco_lang::{
     RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
     RocoDebugHooks, RocoDisplayItem, RocoEngine, RocoError, RocoErrorDetail, RocoErrorInfo,
     RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoHttpBridgeErrorKind,
-    RocoHttpBusinessRejection, RocoInvalidParamError, RocoLeoActivityStdLib,
-    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
-    RocoManorActivityStdLib, RocoNetResponseParseSource, RocoNetResponseParseTarget,
-    RocoNetworkError, RocoNewsActivityStdLib, RocoPetTrainingActivityStdLib,
-    RocoPiscesActivityStdLib, RocoProtocolParseErrorType, RocoProtocolParseFailureKind,
-    RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection, RocoRewardKind,
-    RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
-    RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib,
-    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
-    SceneRoleInfo, ScriptActivityName, ScriptActivityOperationError, ScriptActivityOptionField,
-    ScriptBridgeError, ScriptBridgeFailure, ScriptCombatActionError,
+    RocoHttpBusinessRejection, RocoIncubativeMachineStdLib, RocoInvalidParamError,
+    RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNetResponseParseSource,
+    RocoNetResponseParseTarget, RocoNetworkError, RocoNewsActivityStdLib, RocoPetEggStdLib,
+    RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib, RocoProtocolParseErrorType,
+    RocoProtocolParseFailureKind, RocoRemoteStateStdLib, RocoRequestContext, RocoReturnCodeKind,
+    RocoReturnCodeRejection, RocoRewardKind, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError,
+    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
+    RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib,
+    RocoVirgoActivityStdLib, SceneRoleInfo, ScriptActivityName, ScriptActivityOperationError,
+    ScriptActivityOptionField, ScriptBridgeError, ScriptBridgeFailure, ScriptCombatActionError,
     ScriptCombatCommandFailureKind, ScriptCombatIntentKind, ScriptCombatPhase,
     ScriptCombatProtocolError, ScriptCombatRuntimeError, ScriptCombatWaitError,
     ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity, ScriptLookupError,
@@ -30,7 +30,7 @@ use roco_lang::{
     ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
     SpiritBookInfo, SpiritBookStates, SpiritBookSummary, SpiritInfo, SpiritSkillInfo,
     StarTowerInfo, StarTowerTop, StaticSkillInfo, StorageSpiritDetailInfo, StorageSpiritInfo,
-    UnicornBossInfo, UnicornInfo,
+    TaskInfo, TaskInfoList, UnicornBossInfo, UnicornInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -598,7 +598,7 @@ fn imports_built_in_role_cache_helpers() {
 }
 
 #[test]
-fn optional_i64_is_script_readable_without_has_value_pair() {
+fn optional_values_expose_present_and_value() {
     let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
     let mut engine = RocoEngine::new(stdlib);
 
@@ -611,31 +611,27 @@ fn optional_i64_is_script_readable_without_has_value_pair() {
                 let candidate = info.bag_candidates[0];
 
                 system::assert(present_reward.item_type.present, "item_type should be present");
-                system::assert(present_reward.item_type.value == 7, "present value mismatch");
-                system::assert(present_reward.item_type.value_or_missing == 7, "present missing fallback mismatch");
+                system::assert(present_reward.item_type.value == 7, "present optional value mismatch");
                 system::assert(!missing_reward.item_type.present, "item_type should be missing");
-                system::assert(missing_reward.item_type.value == 0, "missing default value mismatch");
-                system::assert(missing_reward.item_type.value_or_missing == -1, "missing sentinel value mismatch");
+                system::assert(missing_reward.item_type.value == (), "missing value should be unit");
                 system::assert(candidate.bag_index.present, "bag_index should be present");
                 system::assert(candidate.bag_index.value == 3, "bag_index value mismatch");
                 system::assert(candidate.catch_time.present, "catch_time should be present");
                 system::assert(candidate.catch_time.value == 99, "catch_time value mismatch");
                 system::assert(!candidate.level.present, "level should be missing");
-                system::assert(candidate.level.value_or_missing == -1, "level missing sentinel mismatch");
                 system::assert(candidate.need_money.present, "need_money should be present");
                 system::assert(candidate.need_money.value == 1200, "need_money value mismatch");
 
                 let exchange = aquarius::second_exchange_item(1);
                 system::assert(exchange.item.present, "display item should be present");
-                system::assert(exchange.item.item.item_id == 2001, "display item id mismatch");
-                system::assert(exchange.item.item.item_count == 4, "display item count mismatch");
-                system::assert(exchange.item.item.item_type == 8, "display item type mismatch");
+                system::assert(exchange.item.value.item_id == 2001, "display item id mismatch");
+                system::assert(exchange.item.value.item_count == 4, "display item count mismatch");
+                system::assert(exchange.item.value.item_type == 8, "display item type mismatch");
 
                 let evolved = multi_evolution::fire_evolve(1, 3092, 99, 3, 10);
                 system::assert(evolved.pet_id.present, "multi evolution pet_id should be present");
                 system::assert(evolved.pet_id.value == 3092, "multi evolution pet_id mismatch");
                 system::assert(!evolved.result_side.present, "multi evolution result_side should be missing");
-                system::assert(evolved.result_side.value_or_missing == -1, "multi evolution result_side sentinel mismatch");
                 system::assert(!evolved.item_id.present, "multi evolution item_id should be missing");
 
                 let ice = ice_crystal::query();
@@ -644,8 +640,8 @@ fn optional_i64_is_script_readable_without_has_value_pair() {
                 system::assert(!ice.battle_times.present, "ice crystal battle_times should be missing");
                 system::assert(ice.battle_index.value == 2, "ice crystal battle_index mismatch");
                 system::assert(ice.current_battle.present, "ice crystal current battle should be present");
-                system::assert(ice.current_battle.battle.battle_index == 2, "ice crystal current battle index mismatch");
-                system::assert(ice.current_battle.battle.fight_id == 9001, "ice crystal fight id mismatch");
+                system::assert(ice.current_battle.value.battle_index == 2, "ice crystal current battle index mismatch");
+                system::assert(ice.current_battle.value.fight_id == 9001, "ice crystal fight id mismatch");
 
                 let cap2 = capricorn::second_query();
                 system::assert(cap2.finish.present, "capricorn second finish should be present");
@@ -653,8 +649,8 @@ fn optional_i64_is_script_readable_without_has_value_pair() {
                 system::assert(!cap2.current.present, "capricorn second current should be missing");
                 system::assert(cap2.position.value == 4, "capricorn second position mismatch");
                 system::assert(cap2.second_task.present, "capricorn second task should be present");
-                system::assert(cap2.second_task.task.task_type == 2, "capricorn second task type mismatch");
-                system::assert(cap2.second_task.task.data1 == 11, "capricorn second task data1 mismatch");
+                system::assert(cap2.second_task.value.task_type == 2, "capricorn second task type mismatch");
+                system::assert(cap2.second_task.value.data1 == 11, "capricorn second task data1 mismatch");
 
                 let cap3 = capricorn::third_query();
                 system::assert(!cap3.finish.present, "capricorn third finish should be missing");
@@ -690,13 +686,13 @@ fn optional_i64_is_script_readable_without_has_value_pair() {
 
                 let tower = star_tower::query();
                 system::assert(tower.top.present, "star tower top should be present");
-                system::assert(tower.top.top.star == 5, "star tower top star mismatch");
-                system::assert(tower.top.top.fight_id == 7001, "star tower top fight mismatch");
+                system::assert(tower.top.value.star == 5, "star tower top star mismatch");
+                system::assert(tower.top.value.fight_id == 7001, "star tower top fight mismatch");
 
                 let team_op = capricorn::invite_player(470926678);
                 system::assert(team_op.team.present, "capricorn team should be present");
-                system::assert(team_op.team.team.ticks == 123, "capricorn team ticks mismatch");
-                system::assert(team_op.team.team.players[0].uin == 470926678, "capricorn team player mismatch");
+                system::assert(team_op.team.value.ticks == 123, "capricorn team ticks mismatch");
+                system::assert(team_op.team.value.players[0].uin == 470926678, "capricorn team player mismatch");
             "#,
         )
         .expect("structured optional int should be readable from script");
@@ -718,8 +714,8 @@ fn stdlib_runtime_error_reports_call_location() {
     let RocoError::ScriptError(error) = error else {
         panic!("expected script error");
     };
-    assert_eq!(error.kind, RocoScriptErrorKind::Runtime);
-    assert!(error.message.contains("profile::get_user_info"));
+    assert_eq!(error.kind(), RocoScriptErrorKind::Runtime);
+    assert!(error.message().contains("profile::get_user_info"));
     let RocoScriptLocation::Anonymous { position } = error.location else {
         panic!("expected anonymous script error location");
     };
@@ -958,8 +954,8 @@ fn server_http_business_rejection_exposes_structured_fields() {
         .request_context
         .expect("http business request context should be structured");
     assert_eq!(context.raw, "aquarius.first");
-    assert_eq!(context.domain, "aquarius");
-    assert_eq!(context.action, "first");
+    assert_eq!(context.domain(), "aquarius");
+    assert_eq!(context.action(), "first");
 }
 
 #[test]
@@ -1688,7 +1684,45 @@ impl RocoPetTrainingActivityStdLib for MockStdLib {}
 
 impl RocoNewsActivityStdLib for MockStdLib {}
 
-impl RocoTaskStdLib for MockStdLib {}
+impl RocoTaskStdLib for MockStdLib {
+    fn task_query_info_list(&mut self) -> Result<TaskInfoList> {
+        Ok(TaskInfoList {
+            result_code: 0,
+            message: String::new(),
+            tasks: vec![TaskInfo {
+                story_id: 10,
+                task_id: 20,
+                status: 1,
+                task_type: 2,
+                task_type_sub: 3,
+                theme_id: 4,
+            }],
+        })
+    }
+}
+
+#[test]
+fn task_results_expose_domain_getters() {
+    let stdlib = Arc::new(Mutex::new(MockStdLib::default()));
+    let mut engine = RocoEngine::new(stdlib);
+
+    let result = engine
+        .eval(
+            r#"
+                let info = task::query_info_list();
+                info.result_code + info.tasks[0].task_id
+            "#,
+        )
+        .expect("task DTO getters should be registered");
+
+    assert_eq!(result.as_int().expect("int result"), 20);
+}
+
+impl RocoIncubativeMachineStdLib for MockStdLib {}
+
+impl RocoPetEggStdLib for MockStdLib {}
+
+impl RocoRemoteStateStdLib for MockStdLib {}
 
 impl RocoTowerActivityStdLib for MockStdLib {
     fn star_tower_query(&mut self) -> Result<StarTowerInfo> {

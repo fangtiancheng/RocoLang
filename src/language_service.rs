@@ -4,7 +4,10 @@ use serde::{Deserialize, Serialize};
 mod metadata;
 mod semantic;
 
-pub use metadata::{RocoLanguageFunctionDoc, RocoLanguageKeywordDoc, RocoLanguageMetadata};
+pub use metadata::{
+    RocoLanguageFunctionDoc, RocoLanguageKeywordDoc, RocoLanguageMetadata,
+    RocoLanguageModuleConstantDoc,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

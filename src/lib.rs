@@ -46,7 +46,8 @@ pub use error::{
 pub use language_service::{
     analyze_script, builtin_module_function_docs, rhai_language_metadata,
     RocoBuiltinModuleFunctionDoc, RocoLanguageFunctionDoc, RocoLanguageKeywordDoc,
-    RocoLanguageMetadata, RocoScriptDiagnostic, RocoScriptDiagnosticSeverity,
+    RocoLanguageMetadata, RocoLanguageModuleConstantDoc, RocoScriptDiagnostic,
+    RocoScriptDiagnosticSeverity,
 };
 pub use stdlib::{
     documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,

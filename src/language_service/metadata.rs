@@ -25,9 +25,18 @@ pub struct RocoLanguageKeywordDoc {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct RocoLanguageModuleConstantDoc {
+    pub module: String,
+    pub name: String,
+    pub type_name: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RocoLanguageMetadata {
     pub functions: Vec<RocoLanguageFunctionDoc>,
     pub keywords: Vec<RocoLanguageKeywordDoc>,
+    pub module_constants: Vec<RocoLanguageModuleConstantDoc>,
     pub types: Vec<StdlibReturnDoc>,
 }
 
@@ -41,8 +50,27 @@ pub(super) fn rhai_language_metadata() -> RocoLanguageMetadata {
     RocoLanguageMetadata {
         functions: language_function_docs(metadata.functions),
         keywords: keyword_docs(),
+        module_constants: module_constant_docs(),
         types: crate::stdlib_type_docs(),
     }
+}
+
+fn module_constant_docs() -> Vec<RocoLanguageModuleConstantDoc> {
+    let mut docs = crate::stdlib::registered_value_modules()
+        .into_iter()
+        .flat_map(|(module_name, module)| {
+            module
+                .iter_var()
+                .map(move |(name, value)| RocoLanguageModuleConstantDoc {
+                    module: module_name.to_string(),
+                    name: name.to_string(),
+                    type_name: normalize_type_name(value.type_name()),
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    docs.sort_by(|left, right| (&left.module, &left.name).cmp(&(&right.module, &right.name)));
+    docs
 }
 
 #[derive(Deserialize)]
@@ -208,5 +236,8 @@ mod tests {
             .iter()
             .any(|doc| doc.name == "len" && doc.return_type == "int"));
         assert!(metadata.functions.iter().any(|doc| doc.name == "print"));
+        assert!(metadata.module_constants.iter().any(|doc| {
+            doc.module == "evolution_edge_kind" && doc.name == "ORDINARY" && doc.type_name == "int"
+        }));
     }
 }

@@ -13,11 +13,22 @@ macro_rules! register_stdlib_module {
 }
 
 macro_rules! register_value_module {
-    ($engine:expr, $module:ident) => {{
+    ($modules:expr, $module:ident) => {{
         let mut rhai_module = Module::new();
         $module::register(&mut rhai_module);
-        $engine.register_static_module(stringify!($module), rhai_module.into());
+        $modules.push((stringify!($module), rhai_module));
     }};
+}
+
+pub(crate) fn registered_value_modules() -> Vec<(&'static str, Module)> {
+    let mut modules = Vec::new();
+    register_value_module!(modules, spirit_book_state);
+    register_value_module!(modules, evolution_edge_kind);
+    register_value_module!(modules, personality);
+    register_value_module!(modules, weather);
+    register_value_module!(modules, combat_status);
+    register_value_module!(modules, combat_result);
+    modules
 }
 
 pub(crate) fn register_modules<T: RocoStdLib + 'static>(
@@ -35,12 +46,9 @@ pub(crate) fn register_modules<T: RocoStdLib + 'static>(
     register_stdlib_module!(engine, stdlib, type_ladder);
     register_stdlib_module!(engine, stdlib, spirit);
     register_stdlib_module!(engine, stdlib, spirit_book);
-    register_value_module!(engine, spirit_book_state);
-    register_value_module!(engine, evolution_edge_kind);
-    register_value_module!(engine, personality);
-    register_value_module!(engine, weather);
-    register_value_module!(engine, combat_status);
-    register_value_module!(engine, combat_result);
+    for (name, module) in registered_value_modules() {
+        engine.register_static_module(name, module.into());
+    }
     register_stdlib_module!(engine, stdlib, manor);
     register_stdlib_module!(engine, stdlib, pet_training);
     register_stdlib_module!(engine, stdlib, news);

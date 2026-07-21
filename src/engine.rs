@@ -169,7 +169,11 @@ impl RocoEngine {
         crate::stdlib::register_modules(engine, stdlib);
     }
     pub fn eval(&mut self, script: &str) -> Result<Dynamic> {
-        self.engine.eval(script).map_err(Self::map_eval_error)
+        let ast = self
+            .engine
+            .compile(script)
+            .map_err(|error| Self::map_parse_error(error, None))?;
+        self.engine.eval_ast(&ast).map_err(Self::map_eval_error)
     }
 
     pub fn compile(&self, script: &str) -> Result<AST> {
@@ -3558,5 +3562,28 @@ impl RocoEngine {
         engine.register_get("result", |value: &mut StaticSpiritInfoLookupResult| {
             value.result.clone()
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::RocoEngine;
+    use crate::{RocoError, RocoScriptErrorSource};
+    use rhai::Engine;
+
+    #[test]
+    fn eval_classifies_compile_failures_as_parse_errors() {
+        let mut engine = RocoEngine {
+            engine: Engine::new(),
+            print_callback: None,
+        };
+
+        let error = engine.eval("let x = ;").expect_err("script should fail");
+
+        assert!(matches!(
+            error,
+            RocoError::ScriptError(error)
+                if matches!(error.source, RocoScriptErrorSource::Parse(_))
+        ));
     }
 }

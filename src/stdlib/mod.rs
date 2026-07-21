@@ -70,7 +70,7 @@ pub use metadata::{
     StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration,
     StdlibParamDoc, StdlibReturnDoc,
 };
-pub(crate) use registration::register_modules;
+pub(crate) use registration::{register_modules, registered_value_modules};
 pub use traits::*;
 
 fn unsupported<T>(name: &str) -> Result<T> {

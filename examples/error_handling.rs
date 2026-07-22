@@ -1,13 +1,17 @@
 use roco_lang::{
     BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
-    RocoAlchemyActivityStdLib, RocoCombatStdLib, RocoEngine, RocoError,
-    RocoEvolutionActivityStdLib, RocoHomeActivityStdLib, RocoIncubativeMachineStdLib,
-    RocoLookupStdLib, RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib,
-    RocoNewsActivityStdLib, RocoOptionalI64, RocoPetEggStdLib, RocoPetTrainingActivityStdLib,
-    RocoRemoteStateStdLib, RocoRuntimeStdLib, RocoServerRejectedError, RocoSpiritBookStdLib,
-    RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTowerActivityStdLib,
-    RocoZodiacActivityStdLib, RoundResult, ScriptLookupEntity, ScriptLookupError, ScriptQueryError,
-    SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
+    RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
+    RocoCancerActivityStdLib, RocoCapricornActivityStdLib, RocoCombatStdLib, RocoEngine, RocoError,
+    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoHomeActivityStdLib,
+    RocoIncubativeMachineStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
+    RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
+    RocoOptionalI64, RocoPetEggStdLib, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib,
+    RocoRemoteStateStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoServerRejectedError, RocoSpiritBookStdLib, RocoSpiritStdLib,
+    RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult, ScriptLookupEntity,
+    ScriptLookupError, ScriptQueryError, SkillInfo, SpiritBagInfo, SpiritInfo, StaticItemInfo,
+    StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -381,7 +385,19 @@ impl RocoEvolutionActivityStdLib for ErrorTestStdLib {}
 
 impl RocoMagicPioneerActivityStdLib for ErrorTestStdLib {}
 
-impl RocoZodiacActivityStdLib for ErrorTestStdLib {}
+impl RocoAriesActivityStdLib for ErrorTestStdLib {}
+impl RocoLibraActivityStdLib for ErrorTestStdLib {}
+impl RocoLeoActivityStdLib for ErrorTestStdLib {}
+impl RocoCancerActivityStdLib for ErrorTestStdLib {}
+impl RocoVirgoActivityStdLib for ErrorTestStdLib {}
+impl RocoPiscesActivityStdLib for ErrorTestStdLib {}
+impl RocoTaurusActivityStdLib for ErrorTestStdLib {}
+impl RocoThreeStartersActivityStdLib for ErrorTestStdLib {}
+impl RocoGeminiActivityStdLib for ErrorTestStdLib {}
+impl RocoSagittariusActivityStdLib for ErrorTestStdLib {}
+impl RocoScorpioActivityStdLib for ErrorTestStdLib {}
+impl RocoAquariusActivityStdLib for ErrorTestStdLib {}
+impl RocoCapricornActivityStdLib for ErrorTestStdLib {}
 
 impl RocoAdventureActivityStdLib for ErrorTestStdLib {}
 

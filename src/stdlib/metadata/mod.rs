@@ -150,7 +150,7 @@ pub fn documented_stdlib_function_keys() -> Vec<(String, String)> {
 }
 
 pub fn registered_stdlib_function_keys() -> &'static [StdlibFunctionKey] {
-    registered::FUNCTION_KEYS
+    registered::function_keys()
 }
 
 pub fn registered_stdlib_function_registrations() -> &'static [StdlibFunctionRegistration] {

@@ -1,11 +1,15 @@
 use roco_lang::{
     BattleInfo, BattleResult, CombatActions, Result, RocoAdventureActivityStdLib,
-    RocoAlchemyActivityStdLib, RocoCombatStdLib, RocoEngine, RocoEvolutionActivityStdLib,
-    RocoHomeActivityStdLib, RocoIncubativeMachineStdLib, RocoLookupStdLib,
+    RocoAlchemyActivityStdLib, RocoAquariusActivityStdLib, RocoAriesActivityStdLib,
+    RocoCancerActivityStdLib, RocoCapricornActivityStdLib, RocoCombatStdLib, RocoEngine,
+    RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib, RocoHomeActivityStdLib,
+    RocoIncubativeMachineStdLib, RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,
-    RocoOptionalI64, RocoPetEggStdLib, RocoPetTrainingActivityStdLib, RocoRemoteStateStdLib,
-    RocoRuntimeStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
-    RocoTowerActivityStdLib, RocoZodiacActivityStdLib, RoundResult, SkillInfo, SpiritBagInfo,
+    RocoOptionalI64, RocoPetEggStdLib, RocoPetTrainingActivityStdLib, RocoPiscesActivityStdLib,
+    RocoRemoteStateStdLib, RocoRuntimeStdLib, RocoSagittariusActivityStdLib,
+    RocoScorpioActivityStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib,
+    RocoTaskStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
+    RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RoundResult, SkillInfo, SpiritBagInfo,
     SpiritInfo, StaticItemInfo, StaticSkillInfo, StaticSpiritInfo,
 };
 use std::sync::{Arc, Mutex};
@@ -459,7 +463,19 @@ impl RocoEvolutionActivityStdLib for MockStdLib {}
 
 impl RocoMagicPioneerActivityStdLib for MockStdLib {}
 
-impl RocoZodiacActivityStdLib for MockStdLib {}
+impl RocoAriesActivityStdLib for MockStdLib {}
+impl RocoLibraActivityStdLib for MockStdLib {}
+impl RocoLeoActivityStdLib for MockStdLib {}
+impl RocoCancerActivityStdLib for MockStdLib {}
+impl RocoVirgoActivityStdLib for MockStdLib {}
+impl RocoPiscesActivityStdLib for MockStdLib {}
+impl RocoTaurusActivityStdLib for MockStdLib {}
+impl RocoThreeStartersActivityStdLib for MockStdLib {}
+impl RocoGeminiActivityStdLib for MockStdLib {}
+impl RocoSagittariusActivityStdLib for MockStdLib {}
+impl RocoScorpioActivityStdLib for MockStdLib {}
+impl RocoAquariusActivityStdLib for MockStdLib {}
+impl RocoCapricornActivityStdLib for MockStdLib {}
 
 impl RocoAdventureActivityStdLib for MockStdLib {}
 

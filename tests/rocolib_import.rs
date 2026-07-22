@@ -4,24 +4,28 @@ use roco_lang::{
     CapricornTeamOperationInfo, CapricornTeamPlayer, CapricornTeamSnapshot, CapricornThirdInfo,
     DiamondTearInfo, FourSeasonsInfo, IceCrystalBattleInfo, IceCrystalInfo, MultiEvolutionInfo,
     MultiEvolutionRewardItem, Result, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
-    RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
-    RocoDebugHooks, RocoDisplayItem, RocoEngine, RocoError, RocoErrorDetail, RocoErrorInfo,
-    RocoEvolutionActivityStdLib, RocoHomeActivityStdLib, RocoHttpBridgeErrorKind,
-    RocoHttpBusinessRejection, RocoIncubativeMachineStdLib, RocoInvalidParamError,
-    RocoLookupStdLib, RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib,
-    RocoNetResponseParseSource, RocoNetResponseParseTarget, RocoNetworkError,
-    RocoNewsActivityStdLib, RocoPetEggStdLib, RocoPetTrainingActivityStdLib,
-    RocoProtocolParseErrorType, RocoProtocolParseFailureKind, RocoRemoteStateStdLib,
-    RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection, RocoRewardKind,
-    RocoRuntimeStdLib, RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError,
-    RocoSpiritBookStdLib, RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib,
-    RocoTowerActivityStdLib, RocoZodiacActivityStdLib, SceneRoleInfo, ScriptActivityName,
-    ScriptActivityOperationError, ScriptActivityOptionField, ScriptBridgeError,
-    ScriptBridgeFailure, ScriptCombatActionError, ScriptCombatCommandFailureKind,
-    ScriptCombatIntentKind, ScriptCombatPhase, ScriptCombatProtocolError, ScriptCombatRuntimeError,
-    ScriptCombatWaitError, ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity,
-    ScriptLookupError, ScriptModuleName, ScriptPendingResponseError, ScriptQueryError,
-    ScriptRequestError, ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
+    RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
+    RocoCapricornActivityStdLib, RocoCombatStdLib, RocoDebugBreakpoint, RocoDebugCommand,
+    RocoDebugConfig, RocoDebugEvent, RocoDebugHooks, RocoDisplayItem, RocoEngine, RocoError,
+    RocoErrorDetail, RocoErrorInfo, RocoEvolutionActivityStdLib, RocoGeminiActivityStdLib,
+    RocoHomeActivityStdLib, RocoHttpBridgeErrorKind, RocoHttpBusinessRejection,
+    RocoIncubativeMachineStdLib, RocoInvalidParamError, RocoLeoActivityStdLib,
+    RocoLibraActivityStdLib, RocoLookupStdLib, RocoMagicPioneerActivityStdLib,
+    RocoManorActivityStdLib, RocoNetResponseParseSource, RocoNetResponseParseTarget,
+    RocoNetworkError, RocoNewsActivityStdLib, RocoPetEggStdLib, RocoPetTrainingActivityStdLib,
+    RocoPiscesActivityStdLib, RocoProtocolParseErrorType, RocoProtocolParseFailureKind,
+    RocoRemoteStateStdLib, RocoRequestContext, RocoReturnCodeKind, RocoReturnCodeRejection,
+    RocoRewardKind, RocoRuntimeStdLib, RocoSagittariusActivityStdLib, RocoScorpioActivityStdLib,
+    RocoScriptErrorKind, RocoScriptLocation, RocoServerRejectedError, RocoSpiritBookStdLib,
+    RocoSpiritStdLib, RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib,
+    RocoThreeStartersActivityStdLib, RocoTowerActivityStdLib, RocoVirgoActivityStdLib,
+    SceneRoleInfo, ScriptActivityName, ScriptActivityOperationError, ScriptActivityOptionField,
+    ScriptBridgeError, ScriptBridgeFailure, ScriptCombatActionError,
+    ScriptCombatCommandFailureKind, ScriptCombatIntentKind, ScriptCombatPhase,
+    ScriptCombatProtocolError, ScriptCombatRuntimeError, ScriptCombatWaitError,
+    ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity, ScriptLookupError,
+    ScriptModuleName, ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
+    ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
     ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
     ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
     ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
@@ -1885,57 +1889,18 @@ impl RocoMagicPioneerActivityStdLib for MockStdLib {}
 
 impl RocoAdventureActivityStdLib for MockStdLib {}
 
-impl RocoZodiacActivityStdLib for MockStdLib {
-    fn capricorn_invite_player(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
-        Ok(CapricornTeamOperationInfo {
-            result_code: 0,
-            message: String::new(),
-            team: roco_lang::RocoOptionalCapricornTeamSnapshot::present(CapricornTeamSnapshot {
-                players: vec![CapricornTeamPlayer {
-                    uin: 470926678,
-                    nick: "Target".to_string(),
-                }],
-                ticks: 123,
-            }),
-        })
-    }
-
-    fn capricorn_second_query(&mut self) -> Result<CapricornSecondInfo> {
-        Ok(CapricornSecondInfo {
-            result_code: 0,
-            message: String::new(),
-            request_context: RocoRequestContext::from_raw("capricorn.second_query"),
-            finish: roco_lang::RocoOptionalI64::present(1),
-            current: roco_lang::RocoOptionalI64::missing(),
-            position: roco_lang::RocoOptionalI64::present(4),
-            second_task: roco_lang::RocoOptionalCapricornSecondTask::present(CapricornSecondTask {
-                task_type: 2,
-                data1: 11,
-                data2: 12,
-                step: 3,
-                current: 1,
-            }),
-            bag_candidates: Vec::new(),
-        })
-    }
-
-    fn capricorn_third_query(&mut self) -> Result<CapricornThirdInfo> {
-        Ok(CapricornThirdInfo {
-            result_code: 0,
-            message: String::new(),
-            request_context: RocoRequestContext::from_raw("capricorn.third_query"),
-            finish: roco_lang::RocoOptionalI64::missing(),
-            current: roco_lang::RocoOptionalI64::present(5),
-            remain: roco_lang::RocoOptionalI64::present(6),
-            price: roco_lang::RocoOptionalI64::missing(),
-            limit: roco_lang::RocoOptionalI64::present(7),
-            progress_percent: roco_lang::RocoOptionalI64::present(80),
-            reward_num: roco_lang::RocoOptionalI64::missing(),
-            tips: roco_lang::RocoOptionalI64::present(9),
-            bag_candidates: Vec::new(),
-        })
-    }
-
+impl RocoAriesActivityStdLib for MockStdLib {}
+impl RocoLibraActivityStdLib for MockStdLib {}
+impl RocoLeoActivityStdLib for MockStdLib {}
+impl RocoCancerActivityStdLib for MockStdLib {}
+impl RocoVirgoActivityStdLib for MockStdLib {}
+impl RocoPiscesActivityStdLib for MockStdLib {}
+impl RocoTaurusActivityStdLib for MockStdLib {}
+impl RocoThreeStartersActivityStdLib for MockStdLib {}
+impl RocoGeminiActivityStdLib for MockStdLib {}
+impl RocoSagittariusActivityStdLib for MockStdLib {}
+impl RocoScorpioActivityStdLib for MockStdLib {}
+impl RocoAquariusActivityStdLib for MockStdLib {
     fn aquarius_first_query(&mut self) -> Result<AquariusFirstInfo> {
         Ok(AquariusFirstInfo {
             result_code: 0,
@@ -1986,6 +1951,57 @@ impl RocoZodiacActivityStdLib for MockStdLib {
             tail_num: 2,
             exchange_count0: 3,
             exchange_count1: 4,
+        })
+    }
+}
+impl RocoCapricornActivityStdLib for MockStdLib {
+    fn capricorn_invite_player(&mut self, _uin: i64) -> Result<CapricornTeamOperationInfo> {
+        Ok(CapricornTeamOperationInfo {
+            result_code: 0,
+            message: String::new(),
+            team: roco_lang::RocoOptionalCapricornTeamSnapshot::present(CapricornTeamSnapshot {
+                players: vec![CapricornTeamPlayer {
+                    uin: 470926678,
+                    nick: "Target".to_string(),
+                }],
+                ticks: 123,
+            }),
+        })
+    }
+
+    fn capricorn_second_query(&mut self) -> Result<CapricornSecondInfo> {
+        Ok(CapricornSecondInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("capricorn.second_query"),
+            finish: roco_lang::RocoOptionalI64::present(1),
+            current: roco_lang::RocoOptionalI64::missing(),
+            position: roco_lang::RocoOptionalI64::present(4),
+            second_task: roco_lang::RocoOptionalCapricornSecondTask::present(CapricornSecondTask {
+                task_type: 2,
+                data1: 11,
+                data2: 12,
+                step: 3,
+                current: 1,
+            }),
+            bag_candidates: Vec::new(),
+        })
+    }
+
+    fn capricorn_third_query(&mut self) -> Result<CapricornThirdInfo> {
+        Ok(CapricornThirdInfo {
+            result_code: 0,
+            message: String::new(),
+            request_context: RocoRequestContext::from_raw("capricorn.third_query"),
+            finish: roco_lang::RocoOptionalI64::missing(),
+            current: roco_lang::RocoOptionalI64::present(5),
+            remain: roco_lang::RocoOptionalI64::present(6),
+            price: roco_lang::RocoOptionalI64::missing(),
+            limit: roco_lang::RocoOptionalI64::present(7),
+            progress_percent: roco_lang::RocoOptionalI64::present(80),
+            reward_num: roco_lang::RocoOptionalI64::missing(),
+            tips: roco_lang::RocoOptionalI64::present(9),
+            bag_candidates: Vec::new(),
         })
     }
 }

@@ -155,7 +155,7 @@ fn try_recover_all_spirits_hospital() {
 
     let current_scene = scene::get_current_scene();
     if current_scene == HOSPITAL_SCENE_ID {
-        return try_recover_all_spirits_money();
+        return spirit::try_recover_all_spirits_at_hospital();
     }
 
     let move_result = scene::try_move_to_scene(HOSPITAL_SCENE_ID, MOVE_TIMEOUT_MS);
@@ -163,7 +163,7 @@ fn try_recover_all_spirits_hospital() {
         return move_result;
     }
 
-    let recover_result = try_recover_all_spirits_money();
+    let recover_result = spirit::try_recover_all_spirits_at_hospital();
     let restore_result = scene::try_move_to_scene(current_scene, MOVE_TIMEOUT_MS);
     if !restore_result.ok {
         return #{

@@ -32,10 +32,6 @@ pub trait RocoSpiritStdLib: Send {
         unsupported("combat::start_combat")
     }
 
-    fn clear_lineup(&mut self) -> Result<bool> {
-        unsupported("spirit::clear_lineup")
-    }
-
     fn store_spirit(&mut self, _position: i64) -> Result<bool> {
         unsupported("spirit::store_spirit")
     }
@@ -80,6 +76,10 @@ pub trait RocoSpiritStdLib: Send {
         unsupported("spirit::recover_all_spirits")
     }
 
+    fn recover_all_spirits_at_hospital(&mut self) -> Result<bool> {
+        unsupported("spirit::recover_all_spirits_at_hospital")
+    }
+
     fn get_auto_recover_enabled(&mut self) -> Result<bool> {
         unsupported("spirit::get_auto_recover_enabled")
     }
@@ -92,6 +92,16 @@ pub trait RocoSpiritStdLib: Send {
         match self.recover_all_spirits() {
             Ok(true) => Ok(ActionResult::ok()),
             Ok(false) => Ok(ActionResult::failed("recover_all_spirits returned false")),
+            Err(error) => Ok(ActionResult::failed_with_error(error)),
+        }
+    }
+
+    fn try_recover_all_spirits_at_hospital(&mut self) -> Result<ActionResult> {
+        match self.recover_all_spirits_at_hospital() {
+            Ok(true) => Ok(ActionResult::ok()),
+            Ok(false) => Ok(ActionResult::failed(
+                "recover_all_spirits_at_hospital returned false",
+            )),
             Err(error) => Ok(ActionResult::failed_with_error(error)),
         }
     }
@@ -222,16 +232,22 @@ pub trait RocoSpiritStdLib: Send {
         unsupported("spirit::save_strive_add")
     }
 
-    fn query_skill_pool(&mut self, _position: i64) -> Result<SkillPoolInfo> {
+    fn query_skill_pool(&mut self, _spirit_id: i64, _position: i64) -> Result<SkillPoolInfo> {
         unsupported("spirit::query_skill_pool")
     }
 
-    fn add_skill_from_pool(&mut self, _position: i64, _skill_id: i64) -> Result<SkillSwitchResult> {
+    fn add_skill_from_pool(
+        &mut self,
+        _spirit_id: i64,
+        _position: i64,
+        _skill_id: i64,
+    ) -> Result<SkillSwitchResult> {
         unsupported("spirit::add_skill_from_pool")
     }
 
     fn switch_skill(
         &mut self,
+        _spirit_id: i64,
         _position: i64,
         _skill_slot: i64,
         _skill_id: i64,

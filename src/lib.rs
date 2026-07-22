@@ -39,9 +39,9 @@ pub use error::{
     ScriptFunctionName, ScriptHttpResponseName, ScriptIntegerType, ScriptLookupEntity,
     ScriptLookupError, ScriptModuleName, ScriptPendingResponseError, ScriptQueryError,
     ScriptRequestError, ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
-    ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
-    ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
-    ScriptSystemOperation, ScriptUnsupportedError, ScriptWaitContext,
+    ScriptSessionMemoryError, ScriptSessionValueKind, ScriptStaticDataError, ScriptSystemError,
+    ScriptSystemFailure, ScriptSystemFailureSource, ScriptSystemOperation, ScriptUnsupportedError,
+    ScriptWaitContext,
 };
 pub use language_service::{
     analyze_script, builtin_module_function_docs, rhai_language_metadata,

@@ -48,6 +48,12 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     register_stdlib_fn_0!(
         module,
         stdlib,
+        "recover_all_spirits_at_hospital",
+        recover_all_spirits_at_hospital
+    );
+    register_stdlib_fn_0!(
+        module,
+        stdlib,
         "get_auto_recover_enabled",
         get_auto_recover_enabled
     );
@@ -57,6 +63,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         module.set_native_fn("try_recover_all_spirits", move || {
             let mut lib = lock_stdlib(&stdlib)?;
             lib.try_recover_all_spirits().map_err(to_rhai_error)
+        });
+    }
+    {
+        let stdlib = stdlib.clone();
+        module.set_native_fn("try_recover_all_spirits_at_hospital", move || {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.try_recover_all_spirits_at_hospital()
+                .map_err(to_rhai_error)
         });
     }
     register_stdlib_fn_4!(
@@ -175,13 +189,6 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         sp: i64,
         hp: i64
     );
-    {
-        let stdlib = stdlib.clone();
-        module.set_native_fn("clear_lineup", move || {
-            let mut lib = lock_stdlib(&stdlib)?;
-            lib.clear_lineup().map_err(to_rhai_error)
-        });
-    }
     register_stdlib_fn_1!(
         module,
         stdlib,
@@ -237,26 +244,29 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
                 .map_err(to_rhai_error)
         });
     }
-    register_stdlib_fn_1!(
+    register_stdlib_fn_2!(
         module,
         stdlib,
         "query_skill_pool",
         query_skill_pool,
+        spirit_id: i64,
         position: i64
-    );
-    register_stdlib_fn_2!(
-        module,
-        stdlib,
-        "add_skill_from_pool",
-        add_skill_from_pool,
-        position: i64,
-        skill_id: i64
     );
     register_stdlib_fn_3!(
         module,
         stdlib,
+        "add_skill_from_pool",
+        add_skill_from_pool,
+        spirit_id: i64,
+        position: i64,
+        skill_id: i64
+    );
+    register_stdlib_fn_4!(
+        module,
+        stdlib,
         "switch_skill",
         switch_skill,
+        spirit_id: i64,
         position: i64,
         skill_slot: i64,
         skill_id: i64

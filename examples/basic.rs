@@ -68,11 +68,6 @@ impl RocoSpiritStdLib for MockStdLib {
         Ok(true)
     }
 
-    fn clear_lineup(&mut self) -> Result<bool> {
-        println!("Clearing lineup");
-        Ok(true)
-    }
-
     fn store_spirit(&mut self, position: i64) -> Result<bool> {
         println!("Storing spirit at position {}", position);
         Ok(true)

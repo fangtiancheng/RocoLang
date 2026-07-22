@@ -9,7 +9,7 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
             "按宠物 ID 和捕获时间取回精灵。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。"],
             returns: "取回成功返回 true。",
-            examples: ["spirit::fetch_spirit(1, 0);"]
+            examples: ["spirit::fetch_spirit(3361, 1721116800);"]
         ),
         super::stdlib_doc!(
             "spirit",
@@ -49,6 +49,15 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
         ),
         super::stdlib_doc!(
             "spirit",
+            "recover_all_spirits_at_hospital",
+            return_type: "bool",
+            "在宠物医院恢复背包全部精灵体力，并等待医院恢复回包。",
+            params: [],
+            returns: "恢复成功返回 true。",
+            examples: ["spirit::recover_all_spirits_at_hospital();"]
+        ),
+        super::stdlib_doc!(
+            "spirit",
             "get_auto_recover_enabled",
             return_type: "bool",
             "查询 PVE 战斗后自动恢复开关状态。",
@@ -73,6 +82,15 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
             params: [],
             returns: "结构化操作结果。",
             examples: ["let result = spirit::try_recover_all_spirits();"]
+        ),
+        super::stdlib_doc!(
+            "spirit",
+            "try_recover_all_spirits_at_hospital",
+            return_type: "ActionResult",
+            "尝试在宠物医院恢复背包全部精灵体力，失败时返回结构化结果。",
+            params: [],
+            returns: "结构化操作结果。",
+            examples: ["let result = spirit::try_recover_all_spirits_at_hospital();"]
         ),
         super::stdlib_doc!(
             "spirit",
@@ -193,15 +211,6 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
         ),
         super::stdlib_doc!(
             "spirit",
-            "clear_lineup",
-            return_type: "bool",
-            "清空当前背包阵容。",
-            params: [],
-            returns: "清空成功返回 true。",
-            examples: ["spirit::clear_lineup();"]
-        ),
-        super::stdlib_doc!(
-            "spirit",
             "store_spirit",
             return_type: "bool",
             "将背包指定位置精灵放入仓库。",
@@ -268,27 +277,27 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
             "query_skill_pool",
             return_type: "SkillPoolInfo",
             "查询指定背包精灵的技能池。",
-            params: ["position" => "背包位置，从 1 开始。"],
+            params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。"],
             returns: "技能池信息。",
-            examples: ["let pool = spirit::query_skill_pool(1);"]
+            examples: ["let pool = spirit::query_skill_pool(3361, 1);"]
         ),
         super::stdlib_doc!(
             "spirit",
             "add_skill_from_pool",
             return_type: "SkillSwitchResult",
             "从技能池给指定精灵添加技能。",
-            params: ["position" => "背包位置，从 1 开始。", "skill_id" => "技能 ID。"],
+            params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "skill_id" => "技能 ID。"],
             returns: "技能切换结果。",
-            examples: ["let result = spirit::add_skill_from_pool(1, 497);"]
+            examples: ["let result = spirit::add_skill_from_pool(3361, 1, 497);"]
         ),
         super::stdlib_doc!(
             "spirit",
             "switch_skill",
             return_type: "SkillSwitchResult",
             "替换指定精灵技能槽中的技能。",
-            params: ["position" => "背包位置，从 1 开始。", "skill_slot" => "技能槽位，从 1 开始。", "skill_id" => "新技能 ID。"],
+            params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "skill_slot" => "技能槽位，从 1 开始。", "skill_id" => "新技能 ID。"],
             returns: "技能切换结果。",
-            examples: ["let result = spirit::switch_skill(1, 1, 497);"]
+            examples: ["let result = spirit::switch_skill(3361, 1, 1, 497);"]
         ),
         super::stdlib_doc!(
             "spirit",

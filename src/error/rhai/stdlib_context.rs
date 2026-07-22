@@ -23,9 +23,6 @@ pub(super) fn register(engine: &mut Engine) {
     engine.register_get("kind_code", |value: &mut ScriptStaticDataError| {
         value.kind_code()
     });
-    engine.register_get("position", |value: &mut ScriptStaticDataError| {
-        value.position()
-    });
     engine.register_get("function_name", |value: &mut ScriptStaticDataError| {
         value.function_name()
     });

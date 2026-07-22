@@ -130,11 +130,6 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                     "脚本静态数据错误类型代码；非 static_data 详情为空。",
                 ),
                 field(
-                    "static_data_position",
-                    "int",
-                    "脚本静态数据错误涉及的背包位置；无对应位置时为 -1。",
-                ),
-                field(
                     "static_data_function_name",
                     "string",
                     "脚本静态数据未实现函数名；仅 not_implemented 非空。",
@@ -398,21 +393,6 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                     "lookup_key",
                     "string",
                     "脚本 lookup 涉及的查询键；非 lookup 详情为空。",
-                ),
-                field(
-                    "spirit_operation_kind_code",
-                    "string",
-                    "脚本精灵操作错误类型代码；非 spirit_operation 详情为空。",
-                ),
-                field(
-                    "spirit_operation_spirit_id",
-                    "int",
-                    "脚本精灵操作涉及的精灵 ID；无对应精灵 ID 时为 -1。",
-                ),
-                field(
-                    "spirit_operation_catch_time",
-                    "int",
-                    "脚本精灵操作涉及的 catch_time；无对应 catch_time 时为 -1。",
                 ),
                 field(
                     "bridge_channel_code",

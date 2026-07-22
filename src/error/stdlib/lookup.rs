@@ -86,9 +86,6 @@ impl ScriptLookupEntity {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ScriptStaticDataError {
-    BagSpiritNotFound {
-        position: u8,
-    },
     StaticGameDataNotInitialized,
     ActiveConfigNotAvailable {
         source: ScriptActiveConfigUnavailableSource,
@@ -129,17 +126,9 @@ impl ScriptActiveConfigUnavailableSource {
 impl ScriptStaticDataError {
     pub const fn kind_code(&self) -> &'static str {
         match self {
-            Self::BagSpiritNotFound { .. } => "bag_spirit_not_found",
             Self::StaticGameDataNotInitialized => "static_game_data_not_initialized",
             Self::ActiveConfigNotAvailable { .. } => "active_config_not_available",
             Self::NotImplemented { .. } => "not_implemented",
-        }
-    }
-
-    pub const fn position(&self) -> i64 {
-        match self {
-            Self::BagSpiritNotFound { position } => *position as i64,
-            _ => -1,
         }
     }
 
@@ -168,9 +157,6 @@ impl ScriptStaticDataError {
 impl fmt::Display for ScriptStaticDataError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::BagSpiritNotFound { position } => {
-                write!(f, "bag spirit not found at position {position}")
-            }
             Self::StaticGameDataNotInitialized => f.write_str("static game data not initialized"),
             Self::ActiveConfigNotAvailable { message, .. } => {
                 write!(f, "active config not available: {message}")

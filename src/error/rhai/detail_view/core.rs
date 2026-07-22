@@ -112,13 +112,6 @@ impl RocoErrorDetailScriptView<'_> {
         }
     }
 
-    pub(in crate::error::rhai) fn static_data_position(&self) -> i64 {
-        match self.0 {
-            RocoErrorDetail::StaticData(error) => error.position(),
-            _ => -1,
-        }
-    }
-
     pub(in crate::error::rhai) fn static_data_function_name(&self) -> String {
         match self.0 {
             RocoErrorDetail::StaticData(error) => error.function_name(),

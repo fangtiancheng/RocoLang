@@ -196,9 +196,6 @@ impl RocoError {
                 RocoErrorDetail::SessionMemory(error.clone())
             }
             Self::StdLib(RocoStdLibError::Lookup(error)) => RocoErrorDetail::Lookup(error.clone()),
-            Self::StdLib(RocoStdLibError::SpiritOperation(error)) => {
-                RocoErrorDetail::SpiritOperation(error.clone())
-            }
             Self::NetworkError(error) => error.info().detail,
             Self::ServerRejected(RocoServerRejectedError::ReturnCode { rejection }) => {
                 RocoErrorDetail::ReturnCode(rejection.clone())

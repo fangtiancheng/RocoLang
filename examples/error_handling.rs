@@ -60,10 +60,6 @@ impl RocoSpiritStdLib for ErrorTestStdLib {
         Ok(true)
     }
 
-    fn clear_lineup(&mut self) -> Result<bool> {
-        Ok(true)
-    }
-
     fn store_spirit(&mut self, _position: i64) -> Result<bool> {
         Ok(true)
     }

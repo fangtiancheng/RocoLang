@@ -34,7 +34,6 @@ impl_stdlib_error_conversion! {
     ScriptLookupError => Lookup,
     ScriptSessionMemoryError => SessionMemory,
     ScriptStaticDataError => StaticData,
-    ScriptSpiritOperationError => SpiritOperation,
     ScriptSystemError => System,
     ScriptActivityOperationError => ActivityOperation,
     ScriptBridgeError => Bridge,

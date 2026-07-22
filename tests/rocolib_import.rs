@@ -26,12 +26,12 @@ use roco_lang::{
     ScriptFunctionContextError, ScriptHttpResponseName, ScriptLookupEntity, ScriptLookupError,
     ScriptModuleName, ScriptPendingResponseError, ScriptQueryError, ScriptRequestError,
     ScriptRequestSystemFailureKind, ScriptResponseError, ScriptResponseName,
-    ScriptSessionMemoryError, ScriptSessionValueKind, ScriptSpiritOperationError,
-    ScriptStaticDataError, ScriptSystemError, ScriptSystemFailure, ScriptSystemFailureSource,
-    ScriptSystemOperation, ScriptWaitContext, SpiritBagInfo, SpiritBookEntry, SpiritBookGroup,
-    SpiritBookInfo, SpiritBookStates, SpiritBookSummary, SpiritInfo, SpiritSkillInfo,
-    StarTowerInfo, StarTowerTop, StaticSkillInfo, StorageSpiritDetailInfo, StorageSpiritInfo,
-    TaskInfo, TaskInfoList, UnicornBossInfo, UnicornInfo,
+    ScriptSessionMemoryError, ScriptSessionValueKind, ScriptStaticDataError, ScriptSystemError,
+    ScriptSystemFailure, ScriptSystemFailureSource, ScriptSystemOperation, ScriptWaitContext,
+    SpiritBagInfo, SpiritBookEntry, SpiritBookGroup, SpiritBookInfo, SpiritBookStates,
+    SpiritBookSummary, SpiritInfo, SpiritSkillInfo, StarTowerInfo, StarTowerTop, StaticSkillInfo,
+    StorageSpiritDetailInfo, StorageSpiritInfo, TaskInfo, TaskInfoList, UnicornBossInfo,
+    UnicornInfo,
 };
 use std::sync::{Arc, Mutex};
 
@@ -1158,7 +1158,7 @@ fn query_error_exposes_structured_detail() {
 
 #[test]
 fn static_data_error_exposes_structured_detail() {
-    let error = RocoError::from(ScriptStaticDataError::BagSpiritNotFound { position: 4 });
+    let error = RocoError::from(ScriptStaticDataError::StaticGameDataNotInitialized);
     let info = error.info();
 
     assert_eq!(info.kind_code(), "stdlib");
@@ -1166,8 +1166,7 @@ fn static_data_error_exposes_structured_detail() {
     let RocoErrorDetail::StaticData(static_data) = info.detail else {
         panic!("static data error should be structured in detail");
     };
-    assert_eq!(static_data.kind_code(), "bag_spirit_not_found");
-    assert_eq!(static_data.position(), 4);
+    assert_eq!(static_data.kind_code(), "static_game_data_not_initialized");
     assert_eq!(static_data.function_name(), "");
     assert_eq!(static_data.message(), "");
     assert_eq!(static_data.active_config_source_code(), "");
@@ -1243,24 +1242,6 @@ fn combat_wait_error_exposes_structured_detail() {
     assert_eq!(wait.kind_code(), "timeout_waiting_combat_action");
     assert_eq!(wait.combat_phase_code(), "waiting_player_action");
     assert_eq!(wait.elapsed_ms(), 12_345);
-}
-
-#[test]
-fn spirit_operation_error_exposes_structured_detail() {
-    let error = RocoError::from(ScriptSpiritOperationError::StorageSpiritNotFound {
-        spirit_id: 3092,
-        catch_time: 123456,
-    });
-    let info = error.info();
-
-    assert_eq!(info.kind_code(), "stdlib");
-    assert_eq!(info.code, "stdlib.spirit_operation");
-    let RocoErrorDetail::SpiritOperation(operation) = info.detail else {
-        panic!("spirit operation error should be structured in detail");
-    };
-    assert_eq!(operation.kind_code(), "storage_spirit_not_found");
-    assert_eq!(operation.spirit_id(), 3092);
-    assert_eq!(operation.catch_time(), 123456);
 }
 
 #[test]

@@ -9,7 +9,6 @@ mod names;
 mod pending;
 mod request;
 mod session;
-mod spirit;
 mod system;
 
 pub use activity::*;
@@ -21,7 +20,6 @@ pub use names::*;
 pub use pending::*;
 pub use request::*;
 pub use session::*;
-pub use spirit::*;
 pub use system::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -35,7 +33,6 @@ pub enum RocoStdLibError {
     Lookup(ScriptLookupError),
     SessionMemory(ScriptSessionMemoryError),
     StaticData(ScriptStaticDataError),
-    SpiritOperation(ScriptSpiritOperationError),
     System(ScriptSystemError),
     ActivityOperation(ScriptActivityOperationError),
     Bridge(ScriptBridgeError),
@@ -56,7 +53,6 @@ impl fmt::Display for RocoStdLibError {
             Self::Lookup(error) => write!(f, "{error}"),
             Self::SessionMemory(error) => write!(f, "{error}"),
             Self::StaticData(error) => write!(f, "{error}"),
-            Self::SpiritOperation(error) => write!(f, "{error}"),
             Self::System(error) => write!(f, "{error}"),
             Self::ActivityOperation(error) => write!(f, "{error}"),
             Self::Bridge(error) => write!(f, "{error}"),
@@ -79,7 +75,6 @@ impl RocoStdLibError {
             Self::Lookup(_) => "stdlib.lookup",
             Self::SessionMemory(_) => "stdlib.session_memory",
             Self::StaticData(_) => "stdlib.static_data",
-            Self::SpiritOperation(_) => "stdlib.spirit_operation",
             Self::System(_) => "stdlib.system",
             Self::ActivityOperation(_) => "stdlib.activity_operation",
             Self::Bridge(_) => "stdlib.bridge",

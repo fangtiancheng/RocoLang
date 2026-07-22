@@ -21,7 +21,6 @@ mod invalid_param;
 mod network;
 mod request;
 mod script;
-mod spirit;
 mod stdlib_context;
 mod type_names;
 
@@ -32,7 +31,6 @@ pub(crate) fn register_rhai_types(engine: &mut Engine) {
     activity::register(engine);
     combat_action::register(engine);
     request::register(engine);
-    spirit::register(engine);
     identity::register(engine);
     classification::register(engine);
     invalid_param::register(engine);

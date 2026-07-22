@@ -16,7 +16,6 @@ pub enum ScriptRequestError {
     NoRunningScriptForCombatCommand,
     PauseStateUnknown,
     EquipItemPositionMustBeOneBased,
-    ClearLineupRequiresBatchSupport,
     PendingReplyRefreshFailed {
         context: ScriptWaitContext,
         kind: ScriptRequestSystemFailureKind,
@@ -53,7 +52,6 @@ impl ScriptRequestError {
             Self::NoRunningScriptForCombatCommand => "no_running_script_for_combat_command",
             Self::PauseStateUnknown => "pause_state_unknown",
             Self::EquipItemPositionMustBeOneBased => "equip_item_position_must_be_one_based",
-            Self::ClearLineupRequiresBatchSupport => "clear_lineup_requires_batch_support",
             Self::PendingReplyRefreshFailed { .. } => "pending_reply_refresh_failed",
             Self::WaitStateRejected { .. } => "wait_state_rejected",
             Self::InvalidCombatIntent { .. } => "invalid_combat_intent",
@@ -149,9 +147,6 @@ impl fmt::Display for ScriptRequestError {
             ),
             Self::EquipItemPositionMustBeOneBased => {
                 f.write_str("equip_item position must be 1-based")
-            }
-            Self::ClearLineupRequiresBatchSupport => {
-                f.write_str("clear_lineup requires confirmed batch request support")
             }
             Self::PendingReplyRefreshFailed { context, kind } => {
                 write!(f, "{context} failed to refresh pending script reply: {kind}")

@@ -49,25 +49,4 @@ impl RocoErrorDetailScriptView<'_> {
             _ => String::new(),
         }
     }
-
-    pub(in crate::error::rhai) fn spirit_operation_kind_code(&self) -> String {
-        match self.0 {
-            RocoErrorDetail::SpiritOperation(error) => error.kind_code().to_string(),
-            _ => String::new(),
-        }
-    }
-
-    pub(in crate::error::rhai) fn spirit_operation_spirit_id(&self) -> i64 {
-        match self.0 {
-            RocoErrorDetail::SpiritOperation(error) => error.spirit_id(),
-            _ => -1,
-        }
-    }
-
-    pub(in crate::error::rhai) fn spirit_operation_catch_time(&self) -> i64 {
-        match self.0 {
-            RocoErrorDetail::SpiritOperation(error) => error.catch_time(),
-            _ => -1,
-        }
-    }
 }

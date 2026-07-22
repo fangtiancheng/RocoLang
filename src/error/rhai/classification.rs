@@ -1,6 +1,7 @@
 use ::rhai::Engine;
 
 use super::super::*;
+use super::detail_view::{register_error_detail_getters, RocoErrorDetailScriptView};
 pub(super) fn register(engine: &mut Engine) {
     register_getters!(engine, RocoErrorInfo, kind, code, message, detail);
     engine.register_get("kind_code", |value: &mut RocoErrorInfo| {
@@ -10,309 +11,96 @@ pub(super) fn register(engine: &mut Engine) {
         value.detail_kind_code()
     });
     engine.register_get("kind_code", |value: &mut RocoErrorDetail| value.kind_code());
-    engine.register_get("general_lock_target", |value: &mut RocoErrorDetail| {
-        value.general_lock_target()
-    });
-    engine.register_get("general_lock_target_code", |value: &mut RocoErrorDetail| {
-        value.general_lock_target_code()
-    });
-    engine.register_get("invalid_param_kind_code", |value: &mut RocoErrorDetail| {
-        value.invalid_param_kind_code()
-    });
-    engine.register_get("invalid_param_name", |value: &mut RocoErrorDetail| {
-        value.invalid_param_name()
-    });
-    engine.register_get("invalid_param_value", |value: &mut RocoErrorDetail| {
-        value.invalid_param_value()
-    });
-    engine.register_get("invalid_param_message", |value: &mut RocoErrorDetail| {
-        value.invalid_param_message()
-    });
-    engine.register_get("invalid_param_expected", |value: &mut RocoErrorDetail| {
-        value.invalid_param_expected()
-    });
-    engine.register_get(
-        "invalid_param_protocol_field",
-        |value: &mut RocoErrorDetail| value.invalid_param_protocol_field(),
+    register_error_detail_getters!(
+        engine;
+        general_lock_target,
+        general_lock_target_code,
+        invalid_param_kind_code,
+        invalid_param_name,
+        invalid_param_value,
+        invalid_param_message,
+        invalid_param_expected,
+        invalid_param_protocol_field,
+        invalid_param_rejected_source_code,
+        bridge_channel_code,
+        bridge_operation_code,
+        bridge_message,
+        net_response_parse_target,
+        net_response_parse_source_kind_code,
+        net_response_parse_protocol_message,
+        net_response_parse_protocol_error_type,
+        net_response_parse_unexpected_cmd_id,
+        unsupported_module,
+        unsupported_function_name,
+        function_context_kind_code,
+        function_context_combat_phase_code,
+        query_kind_code,
+        query_skill_index,
+        static_data_kind_code,
+        static_data_position,
+        static_data_function_name,
+        static_data_message,
+        static_data_active_config_source_code,
+        system_operation_code,
+        system_source_code,
+        system_message,
+        stdlib_bridge_operation_code,
+        stdlib_bridge_message,
+        activity_operation_kind_code,
+        activity_operation_activity_code,
+        activity_operation_field_code,
+        activity_operation_count,
+        activity_operation_limit,
+        activity_operation_value,
+        combat_action_kind_code,
+        combat_action_position,
+        combat_action_skill_id,
+        combat_action_item_id,
+        combat_wait_kind_code,
+        combat_wait_combat_phase_code,
+        combat_wait_elapsed_ms,
+        combat_runtime_message,
+        combat_command_failure_kind,
+        combat_command_failure_kind_code,
+        pending_response_kind_code,
+        pending_http_response_code,
+        expected_http_response_code,
+        actual_http_response_code,
+        pending_response_combat_phase_code,
+        pending_response_net_target_code,
+        pending_response_expected_action_kind,
+        pending_response_expected_spirit_index,
+        pending_response_actual_action_kind,
+        pending_response_actual_spirit_index,
+        response_kind_code,
+        expected_response_code,
+        actual_response_code,
+        request_kind_code,
+        request_wait_context_code,
+        request_system_failure_kind_code,
+        request_combat_intent_kind_code,
+        request_combat_validation_kind_code,
+        request_spirit_index,
+        request_value,
+        request_combat_protocol_error_kind_code,
+        request_combat_protocol_error_value,
+        session_memory_kind_code,
+        session_memory_key,
+        session_memory_expected_kind_code,
+        session_memory_actual_kind_code,
+        lookup_kind_code,
+        lookup_entity_code,
+        lookup_key,
+        spirit_operation_kind_code,
+        spirit_operation_spirit_id,
+        spirit_operation_catch_time,
+        return_code_kind_code,
+        return_code_value,
+        return_code_message,
+        http_business_result_code,
+        http_business_request_context,
+        http_business_message,
     );
-    engine.register_get(
-        "invalid_param_rejected_source_code",
-        |value: &mut RocoErrorDetail| value.invalid_param_rejected_source_code(),
-    );
-    engine.register_get("bridge_channel_code", |value: &mut RocoErrorDetail| {
-        value.bridge_channel_code()
-    });
-    engine.register_get("bridge_operation_code", |value: &mut RocoErrorDetail| {
-        value.bridge_operation_code()
-    });
-    engine.register_get("bridge_message", |value: &mut RocoErrorDetail| {
-        value.bridge_message()
-    });
-    engine.register_get(
-        "net_response_parse_target",
-        |value: &mut RocoErrorDetail| value.net_response_parse_target(),
-    );
-    engine.register_get(
-        "net_response_parse_source_kind_code",
-        |value: &mut RocoErrorDetail| value.net_response_parse_source_kind_code(),
-    );
-    engine.register_get(
-        "net_response_parse_protocol_message",
-        |value: &mut RocoErrorDetail| value.net_response_parse_protocol_message(),
-    );
-    engine.register_get(
-        "net_response_parse_protocol_error_type",
-        |value: &mut RocoErrorDetail| value.net_response_parse_protocol_error_type(),
-    );
-    engine.register_get(
-        "net_response_parse_unexpected_cmd_id",
-        |value: &mut RocoErrorDetail| value.net_response_parse_unexpected_cmd_id(),
-    );
-    engine.register_get("unsupported_module", |value: &mut RocoErrorDetail| {
-        value.unsupported_module()
-    });
-    engine.register_get(
-        "unsupported_function_name",
-        |value: &mut RocoErrorDetail| value.unsupported_function_name(),
-    );
-    engine.register_get(
-        "function_context_kind_code",
-        |value: &mut RocoErrorDetail| value.function_context_kind_code(),
-    );
-    engine.register_get(
-        "function_context_combat_phase_code",
-        |value: &mut RocoErrorDetail| value.function_context_combat_phase_code(),
-    );
-    engine.register_get("query_kind_code", |value: &mut RocoErrorDetail| {
-        value.query_kind_code()
-    });
-    engine.register_get("query_skill_index", |value: &mut RocoErrorDetail| {
-        value.query_skill_index()
-    });
-    engine.register_get("static_data_kind_code", |value: &mut RocoErrorDetail| {
-        value.static_data_kind_code()
-    });
-    engine.register_get("static_data_position", |value: &mut RocoErrorDetail| {
-        value.static_data_position()
-    });
-    engine.register_get(
-        "static_data_function_name",
-        |value: &mut RocoErrorDetail| value.static_data_function_name(),
-    );
-    engine.register_get("static_data_message", |value: &mut RocoErrorDetail| {
-        value.static_data_message()
-    });
-    engine.register_get(
-        "static_data_active_config_source_code",
-        |value: &mut RocoErrorDetail| value.static_data_active_config_source_code(),
-    );
-    engine.register_get("system_operation_code", |value: &mut RocoErrorDetail| {
-        value.system_operation_code()
-    });
-    engine.register_get("system_source_code", |value: &mut RocoErrorDetail| {
-        value.system_source_code()
-    });
-    engine.register_get("system_message", |value: &mut RocoErrorDetail| {
-        value.system_message()
-    });
-    engine.register_get(
-        "stdlib_bridge_operation_code",
-        |value: &mut RocoErrorDetail| value.stdlib_bridge_operation_code(),
-    );
-    engine.register_get("stdlib_bridge_message", |value: &mut RocoErrorDetail| {
-        value.stdlib_bridge_message()
-    });
-    engine.register_get(
-        "activity_operation_kind_code",
-        |value: &mut RocoErrorDetail| value.activity_operation_kind_code(),
-    );
-    engine.register_get(
-        "activity_operation_activity_code",
-        |value: &mut RocoErrorDetail| value.activity_operation_activity_code(),
-    );
-    engine.register_get(
-        "activity_operation_field_code",
-        |value: &mut RocoErrorDetail| value.activity_operation_field_code(),
-    );
-    engine.register_get("activity_operation_count", |value: &mut RocoErrorDetail| {
-        value.activity_operation_count()
-    });
-    engine.register_get("activity_operation_limit", |value: &mut RocoErrorDetail| {
-        value.activity_operation_limit()
-    });
-    engine.register_get("activity_operation_value", |value: &mut RocoErrorDetail| {
-        value.activity_operation_value()
-    });
-    engine.register_get("combat_action_kind_code", |value: &mut RocoErrorDetail| {
-        value.combat_action_kind_code()
-    });
-    engine.register_get("combat_action_position", |value: &mut RocoErrorDetail| {
-        value.combat_action_position()
-    });
-    engine.register_get("combat_action_skill_id", |value: &mut RocoErrorDetail| {
-        value.combat_action_skill_id()
-    });
-    engine.register_get("combat_action_item_id", |value: &mut RocoErrorDetail| {
-        value.combat_action_item_id()
-    });
-    engine.register_get("combat_wait_kind_code", |value: &mut RocoErrorDetail| {
-        value.combat_wait_kind_code()
-    });
-    engine.register_get(
-        "combat_wait_combat_phase_code",
-        |value: &mut RocoErrorDetail| value.combat_wait_combat_phase_code(),
-    );
-    engine.register_get("combat_wait_elapsed_ms", |value: &mut RocoErrorDetail| {
-        value.combat_wait_elapsed_ms()
-    });
-    engine.register_get("combat_runtime_message", |value: &mut RocoErrorDetail| {
-        value.combat_runtime_message()
-    });
-    engine.register_get(
-        "combat_command_failure_kind",
-        |value: &mut RocoErrorDetail| value.combat_command_failure_kind(),
-    );
-    engine.register_get(
-        "combat_command_failure_kind_code",
-        |value: &mut RocoErrorDetail| value.combat_command_failure_kind_code(),
-    );
-    engine.register_get(
-        "pending_response_kind_code",
-        |value: &mut RocoErrorDetail| value.pending_response_kind_code(),
-    );
-    engine.register_get(
-        "pending_http_response_code",
-        |value: &mut RocoErrorDetail| value.pending_http_response_code(),
-    );
-    engine.register_get(
-        "expected_http_response_code",
-        |value: &mut RocoErrorDetail| value.expected_http_response_code(),
-    );
-    engine.register_get(
-        "actual_http_response_code",
-        |value: &mut RocoErrorDetail| value.actual_http_response_code(),
-    );
-    engine.register_get(
-        "pending_response_combat_phase_code",
-        |value: &mut RocoErrorDetail| value.pending_response_combat_phase_code(),
-    );
-    engine.register_get(
-        "pending_response_net_target_code",
-        |value: &mut RocoErrorDetail| value.pending_response_net_target_code(),
-    );
-    engine.register_get(
-        "pending_response_expected_action_kind",
-        |value: &mut RocoErrorDetail| value.pending_response_expected_action_kind(),
-    );
-    engine.register_get(
-        "pending_response_expected_spirit_index",
-        |value: &mut RocoErrorDetail| value.pending_response_expected_spirit_index(),
-    );
-    engine.register_get(
-        "pending_response_actual_action_kind",
-        |value: &mut RocoErrorDetail| value.pending_response_actual_action_kind(),
-    );
-    engine.register_get(
-        "pending_response_actual_spirit_index",
-        |value: &mut RocoErrorDetail| value.pending_response_actual_spirit_index(),
-    );
-    engine.register_get("response_kind_code", |value: &mut RocoErrorDetail| {
-        value.response_kind_code()
-    });
-    engine.register_get("expected_response_code", |value: &mut RocoErrorDetail| {
-        value.expected_response_code()
-    });
-    engine.register_get("actual_response_code", |value: &mut RocoErrorDetail| {
-        value.actual_response_code()
-    });
-    engine.register_get("request_kind_code", |value: &mut RocoErrorDetail| {
-        value.request_kind_code()
-    });
-    engine.register_get(
-        "request_wait_context_code",
-        |value: &mut RocoErrorDetail| value.request_wait_context_code(),
-    );
-    engine.register_get(
-        "request_system_failure_kind_code",
-        |value: &mut RocoErrorDetail| value.request_system_failure_kind_code(),
-    );
-    engine.register_get(
-        "request_combat_intent_kind_code",
-        |value: &mut RocoErrorDetail| value.request_combat_intent_kind_code(),
-    );
-    engine.register_get(
-        "request_combat_validation_kind_code",
-        |value: &mut RocoErrorDetail| value.request_combat_validation_kind_code(),
-    );
-    engine.register_get("request_spirit_index", |value: &mut RocoErrorDetail| {
-        value.request_spirit_index()
-    });
-    engine.register_get("request_value", |value: &mut RocoErrorDetail| {
-        value.request_value()
-    });
-    engine.register_get(
-        "request_combat_protocol_error_kind_code",
-        |value: &mut RocoErrorDetail| value.request_combat_protocol_error_kind_code(),
-    );
-    engine.register_get(
-        "request_combat_protocol_error_value",
-        |value: &mut RocoErrorDetail| value.request_combat_protocol_error_value(),
-    );
-    engine.register_get("session_memory_kind_code", |value: &mut RocoErrorDetail| {
-        value.session_memory_kind_code()
-    });
-    engine.register_get("session_memory_key", |value: &mut RocoErrorDetail| {
-        value.session_memory_key()
-    });
-    engine.register_get(
-        "session_memory_expected_kind_code",
-        |value: &mut RocoErrorDetail| value.session_memory_expected_kind_code(),
-    );
-    engine.register_get(
-        "session_memory_actual_kind_code",
-        |value: &mut RocoErrorDetail| value.session_memory_actual_kind_code(),
-    );
-    engine.register_get("lookup_kind_code", |value: &mut RocoErrorDetail| {
-        value.lookup_kind_code()
-    });
-    engine.register_get("lookup_entity_code", |value: &mut RocoErrorDetail| {
-        value.lookup_entity_code()
-    });
-    engine.register_get("lookup_key", |value: &mut RocoErrorDetail| {
-        value.lookup_key()
-    });
-    engine.register_get(
-        "spirit_operation_kind_code",
-        |value: &mut RocoErrorDetail| value.spirit_operation_kind_code(),
-    );
-    engine.register_get(
-        "spirit_operation_spirit_id",
-        |value: &mut RocoErrorDetail| value.spirit_operation_spirit_id(),
-    );
-    engine.register_get(
-        "spirit_operation_catch_time",
-        |value: &mut RocoErrorDetail| value.spirit_operation_catch_time(),
-    );
-    engine.register_get("return_code_kind_code", |value: &mut RocoErrorDetail| {
-        value.return_code_kind_code()
-    });
-    engine.register_get("return_code_value", |value: &mut RocoErrorDetail| {
-        value.return_code_value()
-    });
-    engine.register_get("return_code_message", |value: &mut RocoErrorDetail| {
-        value.return_code_message()
-    });
-    engine.register_get(
-        "http_business_result_code",
-        |value: &mut RocoErrorDetail| value.http_business_result_code(),
-    );
-    engine.register_get(
-        "http_business_request_context",
-        |value: &mut RocoErrorDetail| value.http_business_request_context(),
-    );
-    engine.register_get("http_business_message", |value: &mut RocoErrorDetail| {
-        value.http_business_message()
-    });
     engine.register_get("network_kind_code", |value: &mut RocoErrorInfo| {
         value.network_kind_code()
     });

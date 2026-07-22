@@ -59,8 +59,12 @@ function New-Registration {
 }
 
 $registrations = @()
-$sourceFiles = Get-ChildItem -Path $stdlibDir -Filter "*.rs" |
-  Where-Object { $_.BaseName -notin @("mod", "traits", "util") }
+$sourceFiles = Get-ChildItem -Path $stdlibDir -Recurse -Filter "*.rs" |
+  Where-Object {
+    $_.BaseName -notin @("mod", "registration", "util") -and
+    $_.FullName -notmatch "[\\/]metadata[\\/]" -and
+    $_.FullName -notmatch "[\\/]traits[\\/]"
+  }
 
 foreach ($file in $sourceFiles) {
   $moduleName = $file.BaseName
@@ -79,17 +83,11 @@ $registrations = $registrations |
   Sort-Object Module, Name -Unique
 
 $lines = @()
-$lines += "use super::{StdlibFunctionKey, StdlibFunctionRegistration};"
+$lines += "use super::StdlibFunctionRegistration;"
 $lines += ""
 $lines += "pub const FUNCTIONS: &[StdlibFunctionRegistration] = &["
 foreach ($registration in $registrations) {
   $lines += "    StdlibFunctionRegistration::new(`"$($registration.Module)`", `"$($registration.Name)`", `"$($registration.Signature)`"),"
-}
-$lines += "];"
-$lines += ""
-$lines += "pub const FUNCTION_KEYS: &[StdlibFunctionKey] = &["
-foreach ($registration in $registrations) {
-  $lines += "    StdlibFunctionKey::new(`"$($registration.Module)`", `"$($registration.Name)`"),"
 }
 $lines += "];"
 $content = ($lines -join "`n") + "`n"

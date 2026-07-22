@@ -50,9 +50,8 @@ pub use language_service::{
     RocoScriptDiagnosticSeverity,
 };
 pub use stdlib::{
-    documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
-    registered_stdlib_function_registrations, stdlib_function_docs, stdlib_type_docs,
-    RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
+    find_stdlib_function_doc, registered_stdlib_function_registrations, stdlib_function_docs,
+    stdlib_type_docs, RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
     RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
     RocoCapricornActivityStdLib, RocoCombatStdLib, RocoEvolutionActivityStdLib,
     RocoGeminiActivityStdLib, RocoHomeActivityStdLib, RocoIncubativeMachineStdLib,
@@ -63,7 +62,6 @@ pub use stdlib::{
     RocoScorpioActivityStdLib, RocoSpiritBookStdLib, RocoSpiritStdLib, RocoStdLib,
     RocoSystemStdLib, RocoTaskStdLib, RocoTaurusActivityStdLib, RocoThreeStartersActivityStdLib,
     RocoTowerActivityStdLib, RocoVirgoActivityStdLib, RocoZodiacActivityStdLib, StdlibFieldDoc,
-    StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration, StdlibParamDoc,
-    StdlibReturnDoc,
+    StdlibFunctionDoc, StdlibFunctionRegistration, StdlibParamDoc, StdlibReturnDoc,
 };
 pub use types::*;

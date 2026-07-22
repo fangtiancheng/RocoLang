@@ -1,11 +1,11 @@
-use super::StdlibFunctionDoc;
+use super::StdlibFunctionDetails;
 
-pub fn docs() -> Vec<StdlibFunctionDoc> {
+pub fn docs() -> Vec<StdlibFunctionDetails> {
     vec![
         super::stdlib_doc!(
             "spirit",
             "fetch_spirit",
-            "spirit::fetch_spirit(spirit_id: int, catch_time: int) -> bool",
+            return_type: "bool",
             "按宠物 ID 和捕获时间取回精灵。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。"],
             returns: "取回成功返回 true。",
@@ -14,7 +14,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "list_storage_spirits",
-            "spirit::list_storage_spirits() -> StorageSpiritInfo[]",
+            return_type: "StorageSpiritInfo[]",
             "查询仓库精灵列表。",
             params: [],
             returns: "仓库精灵列表。",
@@ -23,7 +23,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "list_abandoned_storage_spirits",
-            "spirit::list_abandoned_storage_spirits() -> StorageSpiritInfo[]",
+            return_type: "StorageSpiritInfo[]",
             "查询放生仓库精灵列表。",
             params: [],
             returns: "放生仓库精灵列表。",
@@ -32,7 +32,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_storage_spirit_detail",
-            "spirit::get_storage_spirit_detail(spirit_id: int, catch_time: int) -> StorageSpiritDetailInfo",
+            return_type: "StorageSpiritDetailInfo",
             "查询仓库中指定精灵的详细信息。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。"],
             returns: "仓库精灵详细信息，包含真实能力值。",
@@ -41,7 +41,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "recover_all_spirits",
-            "spirit::recover_all_spirits() -> bool",
+            return_type: "bool",
             "恢复背包全部精灵体力。",
             params: [],
             returns: "恢复成功返回 true。",
@@ -50,7 +50,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_auto_recover_enabled",
-            "spirit::get_auto_recover_enabled() -> bool",
+            return_type: "bool",
             "查询 PVE 战斗后自动恢复开关状态。",
             params: [],
             returns: "已开启返回 true，未开启返回 false。",
@@ -59,7 +59,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "toggle_auto_recover",
-            "spirit::toggle_auto_recover() -> bool",
+            return_type: "bool",
             "切换 PVE 战斗后自动恢复开关，并返回切换后的状态。",
             params: [],
             returns: "切换后的开关状态。",
@@ -68,7 +68,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "try_recover_all_spirits",
-            "spirit::try_recover_all_spirits() -> ActionResult",
+            return_type: "ActionResult",
             "尝试恢复背包全部精灵体力，失败时返回结构化结果。",
             params: [],
             returns: "结构化操作结果。",
@@ -77,7 +77,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_spirit_item",
-            "spirit::use_spirit_item(spirit_id: int, position: int, item_id: int, count: int) -> bool",
+            return_type: "bool",
             "对指定背包精灵使用精灵道具。",
             params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "item_id" => "道具 ID。", "count" => "使用数量。"],
             returns: "使用成功返回 true。",
@@ -86,7 +86,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "restore_spirit",
-            "spirit::restore_spirit(spirit_id: int, position: int) -> bool",
+            return_type: "bool",
             "将指定精灵恢复到背包位置。",
             params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。"],
             returns: "恢复成功返回 true。",
@@ -95,7 +95,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "try_restore_spirit",
-            "spirit::try_restore_spirit(spirit_id: int, position: int) -> ActionResult",
+            return_type: "ActionResult",
             "尝试恢复指定精灵，失败时返回结构化结果。",
             params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。"],
             returns: "结构化操作结果。",
@@ -104,7 +104,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_talent_refresh_item",
-            "spirit::use_talent_refresh_item(spirit_id: int, position: int, item_id: int) -> TalentRefreshResult",
+            return_type: "TalentRefreshResult",
             "对指定精灵使用天赋刷新道具。",
             params: ["spirit_id" => "宠物 ID。", "position" => "背包位置，从 1 开始。", "item_id" => "道具 ID。"],
             returns: "天赋刷新结果。",
@@ -113,7 +113,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_blood_gift_info",
-            "spirit::get_blood_gift_info(position: int) -> BloodGiftInfo",
+            return_type: "BloodGiftInfo",
             "查询指定背包精灵的血脉天赋信息。",
             params: ["position" => "背包位置，从 1 开始。"],
             returns: "血脉天赋信息。",
@@ -122,7 +122,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "awaken_blood_gift",
-            "spirit::awaken_blood_gift(position: int, blood_index: int) -> BloodGiftInfo",
+            return_type: "BloodGiftInfo",
             "觉醒指定背包精灵的血脉天赋。",
             params: ["position" => "背包位置，从 1 开始。", "blood_index" => "血脉槽位。"],
             returns: "更新后的血脉天赋信息。",
@@ -131,7 +131,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "equip_blood_gift",
-            "spirit::equip_blood_gift(position: int, blood_index: int) -> BloodGiftInfo",
+            return_type: "BloodGiftInfo",
             "装备指定背包精灵的血脉天赋。",
             params: ["position" => "背包位置，从 1 开始。", "blood_index" => "血脉槽位。"],
             returns: "更新后的血脉天赋信息。",
@@ -140,7 +140,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "amend_nature_query_eligible_spirit_ids",
-            "spirit::amend_nature_query_eligible_spirit_ids() -> int[]",
+            return_type: "int[]",
             "查询可进行性格修正的精灵 ID 列表。",
             params: [],
             returns: "宠物 ID 数组。",
@@ -149,7 +149,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "amend_nature_query_candidates",
-            "spirit::amend_nature_query_candidates() -> AmendNatureInfo",
+            return_type: "AmendNatureInfo",
             "查询当前可选的性格修正候选信息。",
             params: [],
             returns: "性格修正候选信息。",
@@ -158,7 +158,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "random_amend_nature",
-            "spirit::random_amend_nature(spirit_id: int, catch_time: int) -> AmendNatureInfo",
+            return_type: "AmendNatureInfo",
             "随机修正指定精灵性格。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。"],
             returns: "性格修正结果。",
@@ -167,7 +167,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "choose_amend_nature",
-            "spirit::choose_amend_nature(spirit_id: int, catch_time: int, personality: int) -> AmendNatureInfo",
+            return_type: "AmendNatureInfo",
             "选择指定性格修正精灵。",
             params: ["spirit_id" => "宠物 ID。", "catch_time" => "捕获时间。", "personality" => "目标性格枚举值。"],
             returns: "性格修正结果。",
@@ -176,7 +176,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "allocate_exp",
-            "spirit::allocate_exp(position: int, exp: int) -> bool",
+            return_type: "bool",
             "给指定背包位置精灵分配经验。",
             params: ["position" => "背包位置，从 1 开始。", "exp" => "分配经验值。"],
             returns: "分配成功返回 true。",
@@ -185,7 +185,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "save_strive_add",
-            "spirit::save_strive_add(position: int, pa: int, pd: int, ma: int, md: int, sp: int, hp: int) -> bool",
+            return_type: "bool",
             "保存指定精灵的努力值加点。",
             params: ["position" => "背包位置，从 1 开始。", "pa" => "物攻努力值。", "pd" => "物防努力值。", "ma" => "魔攻努力值。", "md" => "魔防努力值。", "sp" => "速度努力值。", "hp" => "精力努力值。"],
             returns: "保存成功返回 true。",
@@ -194,7 +194,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "clear_lineup",
-            "spirit::clear_lineup() -> bool",
+            return_type: "bool",
             "清空当前背包阵容。",
             params: [],
             returns: "清空成功返回 true。",
@@ -203,7 +203,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "store_spirit",
-            "spirit::store_spirit(position: int) -> bool",
+            return_type: "bool",
             "将背包指定位置精灵放入仓库。",
             params: ["position" => "背包位置，从 1 开始。"],
             returns: "入库成功返回 true。",
@@ -212,7 +212,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "swap_spirits",
-            "spirit::swap_spirits(first_position: int, second_position: int) -> bool",
+            return_type: "bool",
             "交换两个背包位置的精灵。",
             params: ["first_position" => "第一个背包位置。", "second_position" => "第二个背包位置。"],
             returns: "交换成功返回 true。",
@@ -221,7 +221,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "try_swap_spirits",
-            "spirit::try_swap_spirits(first_position: int, second_position: int) -> ActionResult",
+            return_type: "ActionResult",
             "尝试交换两个背包位置的精灵，失败时返回结构化结果。",
             params: ["first_position" => "第一个背包位置。", "second_position" => "第二个背包位置。"],
             returns: "结构化操作结果。",
@@ -230,7 +230,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "try_store_spirit",
-            "spirit::try_store_spirit(position: int) -> ActionResult",
+            return_type: "ActionResult",
             "尝试将背包指定位置精灵放入仓库，失败时返回结构化结果。",
             params: ["position" => "背包位置，从 1 开始。"],
             returns: "结构化操作结果。",
@@ -239,7 +239,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_spirit_bag",
-            "spirit::get_spirit_bag() -> SpiritBagInfo",
+            return_type: "SpiritBagInfo",
             "查询当前背包精灵。",
             params: [],
             returns: "背包精灵信息。",
@@ -248,7 +248,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_bag_items",
-            "spirit::get_bag_items() -> BagItemInfo[]",
+            return_type: "BagItemInfo[]",
             "查询背包道具列表。",
             params: [],
             returns: "背包道具列表。",
@@ -257,7 +257,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "take_pushed_drops",
-            "spirit::take_pushed_drops() -> BagItemInfo[]",
+            return_type: "BagItemInfo[]",
             "取出当前会话缓存的推送掉落道具列表。",
             params: [],
             returns: "掉落道具列表；调用后会消费缓存。",
@@ -266,7 +266,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "query_skill_pool",
-            "spirit::query_skill_pool(position: int) -> SkillPoolInfo",
+            return_type: "SkillPoolInfo",
             "查询指定背包精灵的技能池。",
             params: ["position" => "背包位置，从 1 开始。"],
             returns: "技能池信息。",
@@ -275,7 +275,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "add_skill_from_pool",
-            "spirit::add_skill_from_pool(position: int, skill_id: int) -> SkillSwitchResult",
+            return_type: "SkillSwitchResult",
             "从技能池给指定精灵添加技能。",
             params: ["position" => "背包位置，从 1 开始。", "skill_id" => "技能 ID。"],
             returns: "技能切换结果。",
@@ -284,7 +284,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "switch_skill",
-            "spirit::switch_skill(position: int, skill_slot: int, skill_id: int) -> SkillSwitchResult",
+            return_type: "SkillSwitchResult",
             "替换指定精灵技能槽中的技能。",
             params: ["position" => "背包位置，从 1 开始。", "skill_slot" => "技能槽位，从 1 开始。", "skill_id" => "新技能 ID。"],
             returns: "技能切换结果。",
@@ -293,7 +293,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_skill_stone_preview",
-            "spirit::use_skill_stone_preview(position: int, item_id: int) -> SkillStoneResult",
+            return_type: "SkillStoneResult",
             "预览指定精灵使用技能石后的候选技能。",
             params: ["position" => "背包位置，从 1 开始。", "item_id" => "技能石道具 ID。"],
             returns: "技能石预览结果。",
@@ -302,7 +302,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_skill_stone_apply",
-            "spirit::use_skill_stone_apply(position: int, item_id: int) -> SkillStoneResult",
+            return_type: "SkillStoneResult",
             "对指定精灵应用技能石。",
             params: ["position" => "背包位置，从 1 开始。", "item_id" => "技能石道具 ID。"],
             returns: "技能石应用结果。",
@@ -311,7 +311,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "use_skill_stone_replace",
-            "spirit::use_skill_stone_replace(position: int, item_id: int, old_skill_id: int, new_skill_id: int) -> SkillStoneResult",
+            return_type: "SkillStoneResult",
             "用技能石结果替换指定旧技能。",
             params: ["position" => "背包位置，从 1 开始。", "item_id" => "技能石道具 ID。", "old_skill_id" => "要替换的旧技能 ID。", "new_skill_id" => "要学习的新技能 ID。"],
             returns: "技能石替换结果。",
@@ -320,7 +320,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "get_skills",
-            "spirit::get_skills(position: int) -> SpiritSkillInfo[]",
+            return_type: "SpiritSkillInfo[]",
             "查询指定背包精灵当前技能。",
             params: ["position" => "背包位置，从 1 开始。"],
             returns: "技能数组。",
@@ -329,7 +329,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "equip_item",
-            "spirit::equip_item(position: int, equipment_server_id: int, equipment_catch_time: int, spirit_id: int, spirit_catch_time: int) -> bool",
+            return_type: "bool",
             "给指定精灵装备道具。",
             params: ["position" => "背包位置，从 1 开始。", "equipment_server_id" => "装备服务器 ID。", "equipment_catch_time" => "装备捕获时间。", "spirit_id" => "宠物 ID。", "spirit_catch_time" => "宠物捕获时间。"],
             returns: "装备成功返回 true。",
@@ -338,7 +338,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "list_equipment_bag",
-            "spirit::list_equipment_bag() -> SpiritEquipmentBagInfo",
+            return_type: "SpiritEquipmentBagInfo",
             "查询精灵装备背包。",
             params: [],
             returns: "装备背包信息。",
@@ -347,7 +347,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "unequip_item",
-            "spirit::unequip_item(equipment_server_id: int, equipment_catch_time: int, spirit_id: int, spirit_catch_time: int) -> bool",
+            return_type: "bool",
             "卸下指定精灵装备。",
             params: ["equipment_server_id" => "装备服务器 ID。", "equipment_catch_time" => "装备捕获时间。", "spirit_id" => "宠物 ID。", "spirit_catch_time" => "宠物捕获时间。"],
             returns: "卸下成功返回 true。",
@@ -356,7 +356,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "spirit",
             "unequip_all_items",
-            "spirit::unequip_all_items(spirit_id: int, spirit_catch_time: int) -> bool",
+            return_type: "bool",
             "卸下指定精灵全部装备。",
             params: ["spirit_id" => "宠物 ID。", "spirit_catch_time" => "宠物捕获时间。"],
             returns: "卸下成功返回 true。",

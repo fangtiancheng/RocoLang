@@ -15,6 +15,7 @@ mod bridge;
 mod classification;
 mod combat_action;
 mod combat_runtime;
+mod detail_view;
 mod identity;
 mod invalid_param;
 mod network;

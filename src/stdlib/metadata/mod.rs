@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use serde::Serialize;
 
 mod combat;
@@ -40,6 +42,16 @@ pub struct StdlibParamDoc {
     pub description: String,
 }
 
+#[derive(Debug, Clone)]
+struct StdlibFunctionDetails {
+    key: StdlibFunctionKey,
+    return_type: &'static str,
+    description: String,
+    params: Vec<StdlibParamDoc>,
+    returns: String,
+    examples: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StdlibReturnDoc {
@@ -57,13 +69,13 @@ pub struct StdlibFieldDoc {
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
-pub struct StdlibFunctionKey {
+pub(crate) struct StdlibFunctionKey {
     pub module: &'static str,
     pub name: &'static str,
 }
 
 impl StdlibFunctionKey {
-    pub const fn new(module: &'static str, name: &'static str) -> Self {
+    pub(crate) const fn new(module: &'static str, name: &'static str) -> Self {
         Self { module, name }
     }
 }
@@ -84,8 +96,33 @@ impl StdlibFunctionRegistration {
         }
     }
 
-    pub const fn key(self) -> StdlibFunctionKey {
+    const fn key(self) -> StdlibFunctionKey {
         StdlibFunctionKey::new(self.module, self.name)
+    }
+
+    pub fn parameter_names(self) -> Vec<String> {
+        let Some(open) = self.signature.find('(') else {
+            return Vec::new();
+        };
+        let Some(close) = self.signature.rfind(')') else {
+            return Vec::new();
+        };
+        if close <= open {
+            return Vec::new();
+        }
+
+        let params = self.signature[open + 1..close].trim();
+        if params.is_empty() || params == "..." {
+            return Vec::new();
+        }
+
+        params
+            .split(',')
+            .filter_map(|param| {
+                let name = param.split(':').next()?.trim();
+                (!name.is_empty()).then(|| name.to_string())
+            })
+            .collect()
     }
 }
 
@@ -93,23 +130,21 @@ macro_rules! stdlib_doc {
     (
         $module:literal,
         $name:literal,
-        $signature:literal,
+        return_type: $return_type:literal,
         $description:literal,
         params: [$($param_name:literal => $param_desc:literal),* $(,)?],
         returns: $returns:literal,
         examples: [$($example:literal),* $(,)?]
     ) => {
-        StdlibFunctionDoc {
-            module: $module.to_string(),
-            name: $name.to_string(),
-            signature: $signature.to_string(),
+        StdlibFunctionDetails {
+            key: $crate::stdlib::metadata::StdlibFunctionKey::new($module, $name),
+            return_type: $return_type,
             description: $description.to_string(),
             params: vec![$($crate::stdlib::metadata::StdlibParamDoc {
                 name: $param_name.to_string(),
                 description: $param_desc.to_string(),
             }),*],
             returns: $returns.to_string(),
-            return_doc: None,
             examples: vec![$($example.to_string()),*],
         }
     };
@@ -118,16 +153,19 @@ macro_rules! stdlib_doc {
 pub(crate) use stdlib_doc;
 
 pub fn stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
-    let mut docs = detailed_stdlib_function_docs();
+    let mut details = detailed_stdlib_function_details_by_key();
+    let mut docs = Vec::with_capacity(registered_stdlib_function_registrations().len());
     for registration in registered_stdlib_function_registrations() {
-        if docs
-            .iter()
-            .any(|doc| doc.module == registration.module && doc.name == registration.name)
-        {
-            continue;
-        }
-        docs.push(fallback_stdlib_function_doc(*registration));
+        docs.push(match details.remove(&registration.key()) {
+            Some(details) => detailed_stdlib_function_doc(*registration, details),
+            None => fallback_stdlib_function_doc(*registration),
+        });
     }
+    assert!(
+        details.is_empty(),
+        "stdlib details reference unregistered functions: {:?}",
+        details.keys().collect::<Vec<_>>()
+    );
     enrich_return_docs(&mut docs);
     docs
 }
@@ -142,41 +180,71 @@ pub fn find_stdlib_function_doc(module: &str, name: &str) -> Option<StdlibFuncti
         .find(|doc| doc.module == module && doc.name == name)
 }
 
-pub fn documented_stdlib_function_keys() -> Vec<(String, String)> {
-    stdlib_function_docs()
-        .into_iter()
-        .map(|doc| (doc.module, doc.name))
-        .collect()
-}
-
-pub fn registered_stdlib_function_keys() -> &'static [StdlibFunctionKey] {
-    registered::function_keys()
-}
-
 pub fn registered_stdlib_function_registrations() -> &'static [StdlibFunctionRegistration] {
     registered::FUNCTIONS
 }
 
-fn detailed_stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
-    let mut docs = Vec::new();
-    docs.extend(system::docs());
-    docs.extend(profile::docs());
-    docs.extend(scene::docs());
-    docs.extend(remote_state::docs());
-    docs.extend(game::docs());
-    docs.extend(role::docs());
-    docs.extend(home::docs());
-    docs.extend(manor::docs());
-    docs.extend(memory::docs());
-    docs.extend(pet_training::docs());
-    docs.extend(news::docs());
-    docs.extend(spirit::docs());
-    docs.extend(combat::docs());
-    docs.extend(lookup::docs());
-    docs.extend(spirit_book::docs());
-    docs.extend(session::docs());
-    docs.extend(enum_helpers::docs());
-    docs
+fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
+    let mut details = Vec::new();
+    details.extend(system::docs());
+    details.extend(profile::docs());
+    details.extend(scene::docs());
+    details.extend(remote_state::docs());
+    details.extend(game::docs());
+    details.extend(role::docs());
+    details.extend(home::docs());
+    details.extend(manor::docs());
+    details.extend(memory::docs());
+    details.extend(pet_training::docs());
+    details.extend(news::docs());
+    details.extend(spirit::docs());
+    details.extend(combat::docs());
+    details.extend(lookup::docs());
+    details.extend(spirit_book::docs());
+    details.extend(session::docs());
+    details.extend(enum_helpers::docs());
+    details
+}
+
+fn detailed_stdlib_function_details_by_key() -> BTreeMap<StdlibFunctionKey, StdlibFunctionDetails> {
+    let mut by_key = BTreeMap::new();
+    for details in detailed_stdlib_function_details() {
+        let key = details.key;
+        assert!(
+            by_key.insert(key, details).is_none(),
+            "duplicate stdlib details for {}::{}",
+            key.module,
+            key.name
+        );
+    }
+    by_key
+}
+
+fn detailed_stdlib_function_doc(
+    registration: StdlibFunctionRegistration,
+    details: StdlibFunctionDetails,
+) -> StdlibFunctionDoc {
+    let expected_params = registration.parameter_names();
+    let documented_params = details
+        .params
+        .iter()
+        .map(|param| param.name.clone())
+        .collect::<Vec<_>>();
+    assert_eq!(
+        documented_params, expected_params,
+        "stdlib parameter docs do not match the registration for {}::{}",
+        registration.module, registration.name
+    );
+    StdlibFunctionDoc {
+        module: registration.module.to_string(),
+        name: registration.name.to_string(),
+        signature: format!("{} -> {}", registration.signature, details.return_type),
+        description: details.description,
+        params: details.params,
+        returns: details.returns,
+        return_doc: None,
+        examples: details.examples,
+    }
 }
 
 fn fallback_stdlib_function_doc(registration: StdlibFunctionRegistration) -> StdlibFunctionDoc {
@@ -189,7 +257,14 @@ fn fallback_stdlib_function_doc(registration: StdlibFunctionRegistration) -> Std
             "`{}` 模块的脚本接口。该接口已注册到 RocoLang；详细参数语义后续应补充为专门文档。",
             registration.module
         ),
-        params: fallback_param_docs(&signature),
+        params: registration
+            .parameter_names()
+            .into_iter()
+            .map(|name| StdlibParamDoc {
+                name,
+                description: "参数语义请参考接口名和调用场景；详细文档待补充。".to_string(),
+            })
+            .collect(),
         returns: "返回值取决于具体接口；请结合脚本示例或调用结果使用。".to_string(),
         return_doc: None,
         examples: vec![format!("let result = {};", signature)],
@@ -209,38 +284,6 @@ fn enrich_return_docs(docs: &mut [StdlibFunctionDoc]) {
     }
 }
 
-fn fallback_param_docs(signature: &str) -> Vec<StdlibParamDoc> {
-    let Some(open) = signature.find('(') else {
-        return Vec::new();
-    };
-    let Some(close) = signature.rfind(')') else {
-        return Vec::new();
-    };
-    if close <= open {
-        return Vec::new();
-    }
-
-    let params = signature[open + 1..close].trim();
-    if params.is_empty() || params == "..." {
-        return Vec::new();
-    }
-
-    params
-        .split(',')
-        .filter_map(|param| {
-            let name = param.split(':').next()?.trim();
-            if name.is_empty() {
-                return None;
-            }
-
-            Some(StdlibParamDoc {
-                name: name.to_string(),
-                description: "参数语义请参考接口名和调用场景；详细文档待补充。".to_string(),
-            })
-        })
-        .collect()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -254,12 +297,22 @@ mod tests {
     #[test]
     fn registered_stdlib_functions_have_exactly_one_doc() {
         let registered = sorted_unique_keys(
-            registered_stdlib_function_keys()
+            registered_stdlib_function_registrations()
                 .iter()
-                .map(|key| (key.module.to_string(), key.name.to_string()))
+                .map(|registration| {
+                    (
+                        registration.module.to_string(),
+                        registration.name.to_string(),
+                    )
+                })
                 .collect(),
         );
-        let documented = sorted_unique_keys(documented_stdlib_function_keys());
+        let documented = sorted_unique_keys(
+            stdlib_function_docs()
+                .into_iter()
+                .map(|doc| (doc.module, doc.name))
+                .collect(),
+        );
 
         let missing_docs: Vec<_> = registered
             .iter()
@@ -278,7 +331,10 @@ mod tests {
 
     #[test]
     fn stdlib_function_docs_do_not_contain_duplicates() {
-        let docs = documented_stdlib_function_keys();
+        let docs = stdlib_function_docs()
+            .into_iter()
+            .map(|doc| (doc.module, doc.name))
+            .collect::<Vec<_>>();
         let unique_docs = sorted_unique_keys(docs.clone());
 
         assert_eq!(docs.len(), unique_docs.len(), "duplicate stdlib docs found");
@@ -286,14 +342,28 @@ mod tests {
 
     #[test]
     fn fallback_docs_parse_signature_params() {
-        let doc = fallback_stdlib_function_doc(StdlibFunctionRegistration::new(
+        let registration = StdlibFunctionRegistration::new(
             "demo",
             "call",
             "demo::call(first_id: int, enabled: bool)",
-        ));
+        );
+        let doc = fallback_stdlib_function_doc(registration);
 
         let names: Vec<_> = doc.params.iter().map(|param| param.name.as_str()).collect();
         assert_eq!(names, ["first_id", "enabled"]);
+    }
+
+    #[test]
+    fn registration_parameter_names_handle_empty_and_variadic_signatures() {
+        assert_eq!(
+            StdlibFunctionRegistration::new("demo", "empty", "demo::empty()").parameter_names(),
+            Vec::<String>::new()
+        );
+        assert_eq!(
+            StdlibFunctionRegistration::new("demo", "variadic", "demo::variadic(...)")
+                .parameter_names(),
+            Vec::<String>::new()
+        );
     }
 
     #[test]

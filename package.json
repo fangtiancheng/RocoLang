@@ -14,7 +14,7 @@
     "metadata:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-stdlib-metadata.ps1 -Check",
     "lint": "cargo clippy --all-targets --all-features -- -D warnings",
     "lint:fix": "cargo clippy --all-targets --all-features --fix --allow-dirty -- -D warnings",
-    "check": "npm run fmt:check && npm run lint",
+    "check": "npm run metadata:check && npm run fmt:check && npm run lint",
     "prepare": "husky"
   },
   "repository": {

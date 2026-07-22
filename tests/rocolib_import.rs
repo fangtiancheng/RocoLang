@@ -782,10 +782,6 @@ fn system_error_exposes_structured_failure() {
     assert_eq!(failure.operation_code(), "parse_time_format");
     assert_eq!(failure.source_code(), "time_format_description");
     assert_eq!(failure.message(), "invalid format");
-
-    let info = error.info();
-    assert_eq!(info.detail.system_operation_code(), "parse_time_format");
-    assert_eq!(info.detail.system_source_code(), "time_format_description");
 }
 
 #[test]

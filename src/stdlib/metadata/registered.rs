@@ -1,6 +1,4 @@
-use std::sync::OnceLock;
-
-use super::{StdlibFunctionKey, StdlibFunctionRegistration};
+﻿use super::StdlibFunctionRegistration;
 
 pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
     StdlibFunctionRegistration::new("alchemy_furnace", "monkey_cultivation_get_gift", "alchemy_furnace::monkey_cultivation_get_gift()"),
@@ -361,7 +359,7 @@ pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
     StdlibFunctionRegistration::new("manor", "apply_friend_coco_tree_feed", "manor::apply_friend_coco_tree_feed(friend_uin: int)"),
     StdlibFunctionRegistration::new("manor", "claim_strawman_gift", "manor::claim_strawman_gift()"),
     StdlibFunctionRegistration::new("manor", "claim_strawman_reward", "manor::claim_strawman_reward()"),
-    StdlibFunctionRegistration::new("manor", "get_friend_details", "manor::get_friend_details(friend_uins: int[])"),
+    StdlibFunctionRegistration::new("manor", "get_friend_details", "manor::get_friend_details(friend_uins: array)"),
     StdlibFunctionRegistration::new("manor", "get_friend_list", "manor::get_friend_list(version: int)"),
     StdlibFunctionRegistration::new("manor", "get_ground_info", "manor::get_ground_info()"),
     StdlibFunctionRegistration::new("manor", "get_plant_status", "manor::get_plant_status()"),
@@ -699,16 +697,3 @@ pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
     StdlibFunctionRegistration::new("weather", "name", "weather::name(weather: int)"),
     StdlibFunctionRegistration::new("weather", "names", "weather::names()"),
 ];
-
-static FUNCTION_KEYS: OnceLock<Vec<StdlibFunctionKey>> = OnceLock::new();
-
-pub fn function_keys() -> &'static [StdlibFunctionKey] {
-    FUNCTION_KEYS
-        .get_or_init(|| {
-            FUNCTIONS
-                .iter()
-                .map(|registration| StdlibFunctionKey::new(registration.module, registration.name))
-                .collect()
-        })
-        .as_slice()
-}

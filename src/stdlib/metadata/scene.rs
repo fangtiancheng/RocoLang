@@ -1,11 +1,11 @@
-use super::StdlibFunctionDoc;
+use super::StdlibFunctionDetails;
 
-pub fn docs() -> Vec<StdlibFunctionDoc> {
+pub fn docs() -> Vec<StdlibFunctionDetails> {
     vec![
         super::stdlib_doc!(
             "scene",
             "get_current_scene",
-            "scene::get_current_scene() -> int",
+            return_type: "int",
             "返回当前场景 ID。",
             params: [],
             returns: "当前场景 ID。",
@@ -14,7 +14,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "scene",
             "move_to_scene",
-            "scene::move_to_scene(scene_id: int, timeout_ms: int = 30000) -> bool",
+            return_type: "bool",
             "移动到指定场景，并等待场景切换完成。",
             params: ["scene_id" => "目标场景 ID。", "timeout_ms" => "等待超时时间，单位毫秒。"],
             returns: "移动成功返回 true。",
@@ -23,7 +23,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "scene",
             "try_move_to_scene",
-            "scene::try_move_to_scene(scene_id: int, timeout_ms: int = 30000) -> ActionResult",
+            return_type: "ActionResult",
             "尝试移动到指定场景，失败时返回结构化结果。",
             params: ["scene_id" => "目标场景 ID。", "timeout_ms" => "等待超时时间，单位毫秒。"],
             returns: "操作结果。",
@@ -32,7 +32,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "scene",
             "get_scene_spirits",
-            "scene::get_scene_spirits() -> SceneSpiritInfo[]",
+            return_type: "SceneSpiritInfo[]",
             "查询当前场景宠物刷新信息。",
             params: [],
             returns: "当前场景宠物列表。",

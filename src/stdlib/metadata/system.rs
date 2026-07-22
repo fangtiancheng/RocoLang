@@ -1,11 +1,11 @@
-use super::StdlibFunctionDoc;
+use super::StdlibFunctionDetails;
 
-pub fn docs() -> Vec<StdlibFunctionDoc> {
+pub fn docs() -> Vec<StdlibFunctionDetails> {
     vec![
         super::stdlib_doc!(
             "system",
             "log",
-            "system::log(message: string) -> ()",
+            return_type: "()",
             "向脚本输出面板追加一行日志。",
             params: ["message" => "要输出的文本。"],
             returns: "无返回值。",
@@ -14,7 +14,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "status",
-            "system::status(message: string) -> ()",
+            return_type: "()",
             "更新脚本运行状态栏，用于显示当前正在执行的阶段。",
             params: ["message" => "状态文本。"],
             returns: "无返回值。",
@@ -23,7 +23,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "sleep",
-            "system::sleep(ms: int) -> ()",
+            return_type: "()",
             "暂停脚本指定毫秒数。",
             params: ["ms" => "等待毫秒数。"],
             returns: "无返回值。",
@@ -32,7 +32,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "now_ms",
-            "system::now_ms() -> int",
+            return_type: "int",
             "返回当前 Unix 时间戳，单位毫秒。",
             params: [],
             returns: "当前时间戳毫秒数。",
@@ -41,7 +41,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "random_int",
-            "system::random_int(min_inclusive: int, max_inclusive: int) -> int",
+            return_type: "int",
             "在闭区间内均匀生成一个随机整数。",
             params: [
                 "min_inclusive" => "允许返回的最小整数。",
@@ -53,7 +53,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "sleep_until_ms",
-            "system::sleep_until_ms(target_ms: int) -> ()",
+            return_type: "()",
             "暂停脚本直到指定 Unix 毫秒时间戳。",
             params: ["target_ms" => "目标 Unix 毫秒时间戳。"],
             returns: "无返回值。",
@@ -62,7 +62,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "format_time",
-            "system::format_time(timestamp: int) -> string",
+            return_type: "string",
             "将 Unix 秒级时间戳格式化为北京时间字符串。",
             params: ["timestamp" => "Unix 秒级时间戳。"],
             returns: "格式化后的时间文本。",
@@ -71,7 +71,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "system",
             "assert",
-            "system::assert(condition: bool, message: string) -> ()",
+            return_type: "()",
             "断言条件为真，否则中止脚本并抛出错误。",
             params: ["condition" => "需要满足的条件。", "message" => "断言失败时显示的错误信息。"],
             returns: "无返回值。",

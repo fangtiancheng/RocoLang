@@ -1,5 +1,3 @@
-mod detail_accessors;
-
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

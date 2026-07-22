@@ -2,8 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{RocoError, RocoErrorInfo};
 
-use super::{to_array, Engine};
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MiniGameRewardItem {
     pub id: i64,
@@ -98,30 +96,4 @@ impl MiniGameSubmitTryResult {
             message,
         }
     }
-}
-
-pub(super) fn register_rhai_getters(engine: &mut Engine) {
-    register_getters!(engine, MiniGameRewardItem, id, count, item_type);
-    register_getters!(engine, MiniGameExtraField, key, value);
-    register_getters!(
-        engine,
-        MiniGameSubmitResult,
-        ok,
-        code,
-        message,
-        game_id,
-        score,
-        game_type
-    );
-    engine.register_get("items", |value: &mut MiniGameSubmitResult| {
-        to_array(&value.items)
-    });
-    engine.register_get("extra_fields", |value: &mut MiniGameSubmitResult| {
-        to_array(&value.extra_fields)
-    });
-    register_getters!(engine, MiniGameSubmitTryResult, ok, code, message, error);
-    register_error_info_getters!(engine, MiniGameSubmitTryResult);
-    engine.register_get("result", |value: &mut MiniGameSubmitTryResult| {
-        value.result.clone()
-    });
 }

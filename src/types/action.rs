@@ -2,8 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{RocoError, RocoErrorInfo};
 
-use super::Engine;
-
 /// Standard result shape for operation-style `try_*` APIs.
 ///
 /// `try_*` functions should not raise expected business failures such as
@@ -54,9 +52,4 @@ impl ActionResult {
             error: Some(error.info()),
         }
     }
-}
-
-pub(super) fn register_rhai_getters(engine: &mut Engine) {
-    register_getters!(engine, ActionResult, ok, code, message, error);
-    register_error_info_getters!(engine, ActionResult);
 }

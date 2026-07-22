@@ -133,6 +133,55 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("rewards", "ManorRewardInfo[]", "奖励列表。"),
             ],
         ),
+        "ManorRewardInfo" => (
+            "农场奖励物品。",
+            vec![
+                field("item_id", "int", "奖励物品 ID。"),
+                field("count", "int", "奖励数量。"),
+            ],
+        ),
+        "ManorSowResult" => (
+            "播种结果。",
+            vec![
+                field("exp", "int", "获得经验。"),
+                field("ground", "ManorGroundInfo", "播种后的土地状态。"),
+            ],
+        ),
+        "ManorReapResult" => (
+            "收获结果。",
+            vec![
+                field("qq_uin", "int", "角色 UIN。"),
+                field("seed_id", "int", "种子 ID。"),
+                field("result", "int", "服务端结果值。"),
+                field("exp", "int", "获得经验。"),
+                field("fruit_num", "int", "收获数量。"),
+                field("ground", "ManorGroundInfo", "收获后的土地状态。"),
+                field("event_id", "int", "事件 ID。"),
+                field("rewards", "ManorRewardInfo[]", "奖励列表。"),
+            ],
+        ),
+        "ManorUprootResult" => (
+            "铲除结果。",
+            vec![field("ground", "ManorGroundInfo", "铲除后的土地状态。")],
+        ),
+        "ManorWeedResult" => (
+            "除草结果。",
+            vec![
+                field("qq_uin", "int", "角色 UIN。"),
+                field("exp", "int", "获得经验。"),
+                field("ground", "ManorGroundInfo", "除草后的土地状态。"),
+            ],
+        ),
+        "ManorFertilizerResult" => (
+            "施肥结果。",
+            vec![
+                field("can_fertilizer", "bool", "是否可以继续施肥。"),
+                field("deduce_time_in_second", "int", "减少的生长时间，单位为秒。"),
+                field("fertilizer", "int", "肥料数量或类型。"),
+                field("uin", "int", "角色 UIN。"),
+                field("ground", "ManorGroundInfo", "施肥后的土地状态。"),
+            ],
+        ),
         "ManorStrawmanPlayResult" => (
             "稻草人游戏结算。",
             vec![
@@ -155,6 +204,13 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("can_pick_fruit", "bool", "是否可采摘。"),
                 field("watered", "bool", "是否已浇水。"),
                 field("time_past", "int", "已过去时间。"),
+            ],
+        ),
+        "ManorCocoTreeReward" => (
+            "可可树操作奖励。",
+            vec![
+                field("item_id", "int", "奖励物品 ID。"),
+                field("item_count", "int", "奖励数量。"),
             ],
         ),
         "ManorCocoTreeFeedResult" => (

@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use super::super::{to_array, Engine};
 use super::super::{RocoOptionalI64, RocoRequestContext, RocoRewardKind};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -32,42 +31,4 @@ pub struct MultiEvolutionInfo {
     pub item_id: RocoOptionalI64,
     pub count: i64,
     pub available: bool,
-}
-
-pub(super) fn register_rhai_getters(engine: &mut Engine) {
-    register_getters!(
-        engine,
-        MultiEvolutionCandidate,
-        candidate_index,
-        spirit_id,
-        catch_time,
-        condition_code,
-        condition_name
-    );
-    register_getters!(
-        engine,
-        MultiEvolutionRewardItem,
-        reward_id,
-        reward_kind,
-        raw_reward_type,
-        count
-    );
-    register_getters!(
-        engine,
-        MultiEvolutionInfo,
-        result_code,
-        message,
-        request_context,
-        pet_id,
-        result_side,
-        item_id,
-        count,
-        available
-    );
-    engine.register_get("candidates", |value: &mut MultiEvolutionInfo| {
-        to_array(&value.candidates)
-    });
-    engine.register_get("rewards", |value: &mut MultiEvolutionInfo| {
-        to_array(&value.rewards)
-    });
 }

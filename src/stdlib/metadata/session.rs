@@ -1,11 +1,11 @@
-use super::StdlibFunctionDoc;
+use super::StdlibFunctionDetails;
 
-pub fn docs() -> Vec<StdlibFunctionDoc> {
+pub fn docs() -> Vec<StdlibFunctionDetails> {
     vec![
         super::stdlib_doc!(
             "session",
             "session_get_int",
-            "session::session_get_int(key: string, default_value: int) -> int",
+            return_type: "int",
             "读取脚本会话级整数值。",
             params: ["key" => "键名。", "default_value" => "不存在时返回的默认值。"],
             returns: "整数值。",
@@ -14,7 +14,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_set_int",
-            "session::session_set_int(key: string, value: int) -> bool",
+            return_type: "bool",
             "写入脚本会话级整数值。",
             params: ["key" => "键名。", "value" => "要写入的整数值。"],
             returns: "写入成功返回 true。",
@@ -23,7 +23,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_get_string",
-            "session::session_get_string(key: string, default_value: string) -> string",
+            return_type: "string",
             "读取脚本会话级字符串值。",
             params: ["key" => "键名。", "default_value" => "不存在时返回的默认值。"],
             returns: "字符串值。",
@@ -32,7 +32,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_set_string",
-            "session::session_set_string(key: string, value: string) -> bool",
+            return_type: "bool",
             "写入脚本会话级字符串值。",
             params: ["key" => "键名。", "value" => "要写入的字符串值。"],
             returns: "写入成功返回 true。",
@@ -41,7 +41,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_get_bool",
-            "session::session_get_bool(key: string, default_value: bool) -> bool",
+            return_type: "bool",
             "读取脚本会话级布尔值。",
             params: ["key" => "键名。", "default_value" => "不存在时返回的默认值。"],
             returns: "布尔值。",
@@ -50,7 +50,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_set_bool",
-            "session::session_set_bool(key: string, value: bool) -> bool",
+            return_type: "bool",
             "写入脚本会话级布尔值。",
             params: ["key" => "键名。", "value" => "要写入的布尔值。"],
             returns: "写入成功返回 true。",
@@ -59,7 +59,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_delete",
-            "session::session_delete(key: string) -> bool",
+            return_type: "bool",
             "删除脚本会话级键值。",
             params: ["key" => "键名。"],
             returns: "删除成功返回 true。",
@@ -68,7 +68,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_clear",
-            "session::session_clear() -> bool",
+            return_type: "bool",
             "清空当前脚本会话级存储。",
             params: [],
             returns: "清空成功返回 true。",
@@ -77,7 +77,7 @@ pub fn docs() -> Vec<StdlibFunctionDoc> {
         super::stdlib_doc!(
             "session",
             "session_list_keys",
-            "session::session_list_keys() -> map",
+            return_type: "map",
             "列出当前脚本会话级存储中的键及其值类型。",
             params: [],
             returns: "键名到值类型的映射。",

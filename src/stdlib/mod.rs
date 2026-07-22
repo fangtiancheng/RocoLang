@@ -21,9 +21,8 @@ pub use values::*;
 pub use zodiac::*;
 
 pub use metadata::{
-    documented_stdlib_function_keys, find_stdlib_function_doc, registered_stdlib_function_keys,
-    registered_stdlib_function_registrations, stdlib_function_docs, stdlib_type_docs,
-    StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionKey, StdlibFunctionRegistration,
+    find_stdlib_function_doc, registered_stdlib_function_registrations, stdlib_function_docs,
+    stdlib_type_docs, StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionRegistration,
     StdlibParamDoc, StdlibReturnDoc,
 };
 pub(crate) use registration::{register_modules, registered_value_modules};

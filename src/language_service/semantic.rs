@@ -199,16 +199,17 @@ fn collect_imports(ast: &rhai::AST) -> HashMap<String, Option<&'static str>> {
 
 fn build_semantic_catalog() -> SemanticCatalog {
     let mut stdlib_modules: HashMap<String, FunctionCatalog> = HashMap::new();
-    for doc in crate::stdlib_function_docs() {
+    for registration in crate::registered_stdlib_function_registrations() {
+        let params = registration.parameter_names();
         stdlib_modules
-            .entry(doc.module.clone())
+            .entry(registration.module.to_string())
             .or_default()
-            .entry(doc.name.clone())
+            .entry(registration.name.to_string())
             .or_default()
             .push(Callable {
-                parameter_count: doc.params.len(),
-                params: doc.params.into_iter().map(|param| param.name).collect(),
-                signature: doc.signature,
+                parameter_count: params.len(),
+                params,
+                signature: registration.signature.to_string(),
             });
     }
 

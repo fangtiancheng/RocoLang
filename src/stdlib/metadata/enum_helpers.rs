@@ -1,6 +1,6 @@
-use super::{StdlibFunctionDoc, StdlibParamDoc};
+use super::{StdlibFunctionDetails, StdlibParamDoc};
 
-pub fn docs() -> Vec<StdlibFunctionDoc> {
+pub fn docs() -> Vec<StdlibFunctionDetails> {
     let mut docs = Vec::new();
 
     docs.extend(enum_docs(
@@ -41,12 +41,11 @@ fn enum_docs(
     param_name: &'static str,
     param_description: &'static str,
     example_const: &'static str,
-) -> Vec<StdlibFunctionDoc> {
+) -> Vec<StdlibFunctionDetails> {
     vec![
-        StdlibFunctionDoc {
-            module: module.to_string(),
-            name: "name".to_string(),
-            signature: format!("{module}::name({param_name}: int) -> string"),
+        StdlibFunctionDetails {
+            key: super::StdlibFunctionKey::new(module, "name"),
+            return_type: "string",
             description: format!(
                 "将 {module_description} 的数字 ID 转换为中文名称；未知 ID 返回空字符串。"
             ),
@@ -55,17 +54,14 @@ fn enum_docs(
                 description: param_description.to_string(),
             }],
             returns: "对应的中文名称，未知时为空字符串。".to_string(),
-            return_doc: None,
             examples: vec![format!("let name = {module}::name({example_const});")],
         },
-        StdlibFunctionDoc {
-            module: module.to_string(),
-            name: "names".to_string(),
-            signature: format!("{module}::names() -> Array"),
+        StdlibFunctionDetails {
+            key: super::StdlibFunctionKey::new(module, "names"),
+            return_type: "Array",
             description: format!("列出 {module_description} 的所有已知枚举项。"),
             params: Vec::new(),
             returns: "枚举项数组；不同模块的元素结构跟运行时模块保持一致。".to_string(),
-            return_doc: None,
             examples: vec![format!("let names = {module}::names();")],
         },
     ]

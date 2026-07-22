@@ -98,7 +98,7 @@ impl RocoEngine {
                             .iter()
                             .map(|frame| RocoDebugStackFrame {
                                 function_name: frame.fn_name.to_string(),
-                                location: Self::script_location(
+                                location: script_error::location(
                                     frame.source.as_ref().map(ToString::to_string),
                                     frame.pos,
                                 ),
@@ -118,7 +118,7 @@ impl RocoEngine {
 
                         (hooks.on_event)(RocoDebugEvent::Paused {
                             reason,
-                            location: Self::script_location(source.map(ToString::to_string), pos),
+                            location: script_error::location(source.map(ToString::to_string), pos),
                             stack,
                             locals,
                         });
@@ -174,11 +174,11 @@ impl RocoEngine {
         let mut ast = self
             .engine
             .compile(script)
-            .map_err(|error| Self::map_parse_error(error, config.source.clone()))?;
+            .map_err(|error| script_error::map_parse(error, config.source.clone()))?;
         if let Some(source) = config.source {
             ast.set_source(source);
         }
 
-        self.engine.eval_ast(&ast).map_err(Self::map_eval_error)
+        self.engine.eval_ast(&ast).map_err(script_error::map_eval)
     }
 }

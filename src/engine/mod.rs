@@ -8,11 +8,7 @@ use crate::debugger::{
     dynamic_preview, RocoDebugBreakpoint, RocoDebugCommand, RocoDebugConfig, RocoDebugEvent,
     RocoDebugHooks, RocoDebugLocalVariable, RocoDebugStackFrame,
 };
-use crate::error::{
-    Result, RocoError, RocoScriptError, RocoScriptErrorSource, RocoScriptEvalErrorSource,
-    RocoScriptLocation, RocoScriptParseErrorSource, RocoScriptPosition,
-    RocoScriptRuntimeErrorValue,
-};
+use crate::error::{Result, RocoScriptRuntimeErrorValue};
 use crate::stdlib::RocoStdLib;
 use crate::types::{
     IncubativeMachineActionResult, IncubativeMachineEggInfo, IncubativeMachineEggListResult,
@@ -85,18 +81,18 @@ impl RocoEngine {
         let ast = self
             .engine
             .compile(script)
-            .map_err(|error| Self::map_parse_error(error, None))?;
-        self.engine.eval_ast(&ast).map_err(Self::map_eval_error)
+            .map_err(|error| script_error::map_parse(error, None))?;
+        self.engine.eval_ast(&ast).map_err(script_error::map_eval)
     }
 
     pub fn compile(&self, script: &str) -> Result<AST> {
         self.engine
             .compile(script)
-            .map_err(|error| Self::map_parse_error(error, None))
+            .map_err(|error| script_error::map_parse(error, None))
     }
 
     pub fn eval_ast(&mut self, ast: &AST) -> Result<Dynamic> {
-        self.engine.eval_ast(ast).map_err(Self::map_eval_error)
+        self.engine.eval_ast(ast).map_err(script_error::map_eval)
     }
 
     pub fn call_fn<T: Clone + 'static>(
@@ -108,7 +104,7 @@ impl RocoEngine {
         let mut scope = rhai::Scope::new();
         self.engine
             .call_fn(&mut scope, ast, fn_name, args)
-            .map_err(Self::map_eval_error)
+            .map_err(script_error::map_eval)
     }
 }
 

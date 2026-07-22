@@ -1,6 +1,13 @@
-﻿use super::StdlibFunctionRegistration;
+use super::StdlibFunctionRegistration;
 
 pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
+    StdlibFunctionRegistration::new("adventure", "begin", "adventure::begin(point: int)"),
+    StdlibFunctionRegistration::new("adventure", "begin_auto", "adventure::begin_auto(point: int, count: int)"),
+    StdlibFunctionRegistration::new("adventure", "claim_daily", "adventure::claim_daily()"),
+    StdlibFunctionRegistration::new("adventure", "claim_reward", "adventure::claim_reward(point: int)"),
+    StdlibFunctionRegistration::new("adventure", "end_auto", "adventure::end_auto(point: int)"),
+    StdlibFunctionRegistration::new("adventure", "end_auto_vip", "adventure::end_auto_vip(point: int)"),
+    StdlibFunctionRegistration::new("adventure", "query_status", "adventure::query_status()"),
     StdlibFunctionRegistration::new("alchemy_furnace", "monkey_cultivation_get_gift", "alchemy_furnace::monkey_cultivation_get_gift()"),
     StdlibFunctionRegistration::new("alchemy_furnace", "monkey_cultivation_query", "alchemy_furnace::monkey_cultivation_query()"),
     StdlibFunctionRegistration::new("alchemy_furnace", "monkey_cultivation_submit_default", "alchemy_furnace::monkey_cultivation_submit_default()"),

@@ -36,6 +36,7 @@ pub fn registered_stdlib_function_registrations() -> &'static [StdlibFunctionReg
 
 fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     let mut details = Vec::new();
+    details.extend(adventure::docs());
     details.extend(system::docs());
     details.extend(profile::docs());
     details.extend(scene::docs());

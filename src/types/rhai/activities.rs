@@ -1,5 +1,6 @@
 use ::rhai::Engine;
 
+mod adventure;
 mod alchemy_furnace;
 mod dark_city;
 mod diamond_tear;
@@ -17,6 +18,7 @@ mod unicorn;
 
 pub(super) fn register_rhai_getters(engine: &mut Engine) {
     alchemy_furnace::register_rhai_getters(engine);
+    adventure::register_rhai_getters(engine);
     dark_city::register_rhai_getters(engine);
     diamond_tear::register_rhai_getters(engine);
     four_seasons::register_rhai_getters(engine);

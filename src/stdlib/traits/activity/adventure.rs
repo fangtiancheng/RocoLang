@@ -1,6 +1,28 @@
 use super::super::*;
 
 pub trait RocoAdventureActivityStdLib: Send {
+    fn adventure_query_status(&mut self) -> Result<AdventureStatus> {
+        unsupported("adventure::query_status")
+    }
+    fn adventure_begin(&mut self, _point: i64) -> Result<()> {
+        unsupported("adventure::begin")
+    }
+    fn adventure_claim_reward(&mut self, _point: i64) -> Result<AdventureRewards> {
+        unsupported("adventure::claim_reward")
+    }
+    fn adventure_begin_auto(&mut self, _point: i64, _count: i64) -> Result<()> {
+        unsupported("adventure::begin_auto")
+    }
+    fn adventure_end_auto(&mut self, _point: i64) -> Result<()> {
+        unsupported("adventure::end_auto")
+    }
+    fn adventure_claim_daily(&mut self) -> Result<AdventureRewards> {
+        unsupported("adventure::claim_daily")
+    }
+    fn adventure_end_auto_vip(&mut self, _point: i64) -> Result<()> {
+        unsupported("adventure::end_auto_vip")
+    }
+
     fn dark_city_expedition_query(&mut self) -> Result<DarkCityExpeditionInfo> {
         unsupported("dark_city::expedition_query")
     }

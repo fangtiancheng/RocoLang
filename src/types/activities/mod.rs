@@ -1,3 +1,4 @@
+mod adventure;
 mod alchemy_furnace;
 mod dark_city;
 mod diamond_tear;
@@ -13,6 +14,7 @@ mod three_starters;
 mod treasure_realm;
 mod unicorn;
 
+pub use adventure::*;
 pub use alchemy_furnace::*;
 pub use dark_city::*;
 pub use diamond_tear::*;

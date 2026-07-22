@@ -1,3 +1,4 @@
+mod adventure;
 mod combat;
 mod docs;
 mod enum_helpers;

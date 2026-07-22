@@ -62,6 +62,7 @@ pub(crate) fn register_modules<T: RocoStdLib + 'static>(
     register_stdlib_module!(engine, stdlib, mountain_sea);
     register_stdlib_module!(engine, stdlib, magic_pioneer);
     register_stdlib_module!(engine, stdlib, alchemy_furnace);
+    register_stdlib_module!(engine, stdlib, adventure);
     register_stdlib_module!(engine, stdlib, unicorn);
     register_stdlib_module!(engine, stdlib, four_seasons);
     register_stdlib_module!(engine, stdlib, ice_crystal);

@@ -2,6 +2,30 @@ use super::{bag_candidate_fields, exchange_display_item_fields, field, StdlibFie
 
 pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)> {
     Some(match type_name {
+        "AdventureItem" => (
+            "冒险系统奖励物品。",
+            vec![
+                field("item_id", "int", "物品 ID。"),
+                field("count", "int", "物品数量。"),
+            ],
+        ),
+        "AdventureStatus" => (
+            "冒险系统当前状态。",
+            vec![
+                field("last_point", "int", "当前可挑战的最后关卡。"),
+                field("got_daily", "bool", "是否已经领取每日奖励。"),
+                field("props", "int[]", "三种冒险消耗品的数量。"),
+                field("auto_running", "bool", "是否正在自动挑战。"),
+                field("vip", "bool", "冒险系统返回的 VIP 状态。"),
+                field("guide_level", "int", "冒险引导等级。"),
+                field("medal_bits", "int", "已获得勋章的位图。"),
+                field("first", "int", "首次进入状态。"),
+            ],
+        ),
+        "AdventureRewards" => (
+            "冒险系统奖励结果。",
+            vec![field("items", "AdventureItem[]", "奖励物品列表。")],
+        ),
         "StarTowerInfo" => ("星辰塔返回信息。", {
             vec![
                 field("result_code", "int", "服务器返回结果码。"),

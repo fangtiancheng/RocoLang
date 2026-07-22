@@ -1,3 +1,4 @@
+pub mod adventure;
 pub mod alchemy_furnace;
 pub mod dark_city;
 pub mod diamond_tear;

@@ -177,15 +177,45 @@ fn special_function(name: &str, params: &[&str], return_type: &str) -> RhaiFunct
 }
 
 fn normalize_type_name(type_name: &str) -> String {
+    let type_name = script_value_type(type_name.trim());
     match type_name {
         "INT" | "i64" => "int".to_string(),
         "FLOAT" | "f64" => "float".to_string(),
-        "String" | "ImmutableString" => "string".to_string(),
+        "str" | "String" | "ImmutableString" => "string".to_string(),
         "Array" => "dynamic[]".to_string(),
         "Map" => "map".to_string(),
         "Dynamic" | "?" | "" => "dynamic".to_string(),
         other => other.to_string(),
     }
+}
+
+fn script_value_type(type_name: &str) -> &str {
+    let without_reference = type_name
+        .strip_prefix("&mut ")
+        .or_else(|| type_name.strip_prefix('&'))
+        .unwrap_or(type_name)
+        .trim();
+    let Some(result_body) = without_reference
+        .strip_prefix("Result<")
+        .and_then(|body| body.strip_suffix('>'))
+    else {
+        return without_reference;
+    };
+
+    first_generic_argument(result_body).trim()
+}
+
+fn first_generic_argument(arguments: &str) -> &str {
+    let mut depth = 0usize;
+    for (index, character) in arguments.char_indices() {
+        match character {
+            '<' => depth += 1,
+            '>' => depth = depth.saturating_sub(1),
+            ',' if depth == 0 => return &arguments[..index],
+            _ => {}
+        }
+    }
+    arguments
 }
 
 fn is_identifier(value: &str) -> bool {
@@ -235,6 +265,17 @@ mod tests {
             .functions
             .iter()
             .any(|doc| doc.name == "len" && doc.return_type == "int"));
+        assert!(metadata.functions.iter().any(|doc| {
+            doc.name == "push"
+                && doc
+                    .parameter_types
+                    .first()
+                    .is_some_and(|ty| ty == "dynamic[]")
+        }));
+        assert!(metadata
+            .functions
+            .iter()
+            .any(|doc| { doc.parameter_types.first().is_some_and(|ty| ty == "map") }));
         assert!(metadata.functions.iter().any(|doc| doc.name == "print"));
         assert!(metadata.module_constants.iter().any(|doc| {
             doc.module == "evolution_edge_kind" && doc.name == "ORDINARY" && doc.type_name == "int"

@@ -91,6 +91,10 @@ impl RocoEngine {
             .map_err(|error| script_error::map_parse(error, None))
     }
 
+    pub fn registered_function_signatures(&self) -> Vec<String> {
+        self.engine.gen_fn_signatures(false)
+    }
+
     pub fn eval_ast(&mut self, ast: &AST) -> Result<Dynamic> {
         self.engine.eval_ast(ast).map_err(script_error::map_eval)
     }

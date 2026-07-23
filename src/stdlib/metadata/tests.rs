@@ -1,5 +1,6 @@
 use super::docs::fallback_stdlib_function_doc;
 use super::*;
+use std::collections::BTreeSet;
 
 fn sorted_unique_keys(mut keys: Vec<(String, String)>) -> Vec<(String, String)> {
     keys.sort();
@@ -39,6 +40,26 @@ fn registered_stdlib_functions_have_exactly_one_doc() {
     assert!(
         missing_docs.is_empty() && stale_docs.is_empty(),
         "stdlib doc mismatch: missing_docs={missing_docs:?}, stale_docs={stale_docs:?}"
+    );
+}
+
+#[test]
+fn modules_with_detailed_docs_are_fully_documented() {
+    let details = super::docs::detailed_stdlib_function_details_by_key();
+    let detailed_modules = details
+        .keys()
+        .map(|key| key.module)
+        .collect::<BTreeSet<_>>();
+    let missing = registered_stdlib_function_registrations()
+        .iter()
+        .filter(|registration| detailed_modules.contains(registration.module))
+        .filter(|registration| !details.contains_key(&registration.key()))
+        .map(|registration| format!("{}::{}", registration.module, registration.name))
+        .collect::<Vec<_>>();
+
+    assert!(
+        missing.is_empty(),
+        "modules with detailed docs may not fall back to generic docs: {missing:?}"
     );
 }
 

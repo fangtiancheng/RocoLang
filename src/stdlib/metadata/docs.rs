@@ -59,7 +59,8 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details
 }
 
-fn detailed_stdlib_function_details_by_key() -> BTreeMap<StdlibFunctionKey, StdlibFunctionDetails> {
+pub(super) fn detailed_stdlib_function_details_by_key(
+) -> BTreeMap<StdlibFunctionKey, StdlibFunctionDetails> {
     let mut by_key = BTreeMap::new();
     for details in detailed_stdlib_function_details() {
         let key = details.key;

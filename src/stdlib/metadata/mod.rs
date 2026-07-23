@@ -3,6 +3,7 @@ mod alchemy_furnace;
 mod aquarius;
 mod aries;
 mod cancer;
+mod capricorn;
 mod combat;
 mod dark_city;
 mod diamond_tear;
@@ -17,8 +18,10 @@ mod ice_crystal;
 mod incubative_machine;
 mod jump_machine;
 mod ladder;
+mod leo;
 mod libra;
 mod lookup;
+mod magic_pioneer;
 mod manor;
 mod memory;
 mod model;
@@ -35,9 +38,9 @@ mod profile;
 mod registered;
 mod remote_state;
 mod role;
+mod sagittarius;
 mod scene;
 mod scorpio;
-mod semantic;
 mod sentinel_intelligence;
 mod session;
 mod spirit;
@@ -52,6 +55,7 @@ mod treasure_realm;
 mod type_ladder;
 mod types;
 mod unicorn;
+mod virgo;
 
 pub use docs::{
     find_stdlib_function_doc, registered_stdlib_function_registrations, stdlib_function_docs,

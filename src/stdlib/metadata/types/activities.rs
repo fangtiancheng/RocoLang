@@ -516,6 +516,61 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("left_fight_count", "int", "剩余战斗次数。"),
             ]
         }),
+        "CapricornPalaceNotesInfo" => ("摩羯宫宫殿笔记信息。", {
+            vec![
+                field("items", "CapricornPalaceNoteItem[]", "笔记物品列表。"),
+                field("can_summon", "bool", "是否可以召唤。"),
+            ]
+        }),
+        "CapricornPalaceNoteItem" => ("摩羯宫宫殿笔记物品。", {
+            vec![
+                field("item_index", "int", "物品索引。"),
+                field("item_id", "int", "物品 ID。"),
+                field("count", "int", "当前数量。"),
+                field("need", "int", "所需数量。"),
+            ]
+        }),
+        "CapricornInviteListInfo" => ("摩羯宫邀请列表。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("players", "CapricornTeamPlayer[]", "队伍成员列表。"),
+                field("ticks", "int", "队伍状态时间标记。"),
+            ]
+        }),
+        "CapricornTeamPlayer" => ("摩羯宫队伍成员。", {
+            vec![
+                field("uin", "int", "成员 UIN。"),
+                field("nick", "string", "成员昵称。"),
+            ]
+        }),
+        "LeoFirstStatusInfo" => ("狮子宫一阶状态。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("light_num", "int", "当前光能数量。"),
+                field("tail_num", "int", "当前尾部资源数量。"),
+                field("exchange_count0", "int", "兑换项 0 次数。"),
+                field("exchange_count1", "int", "兑换项 1 次数。"),
+                field("boss_left_hp", "int", "首领剩余生命值。"),
+                field("left_fight_count", "int", "剩余战斗次数。"),
+            ]
+        }),
+        "VirgoBellFoxStatusInfo" => ("处女宫铃狐状态。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("light_num", "int", "当前光能数量。"),
+                field("tail_num", "int", "当前尾部资源数量。"),
+                field("boss_left_hp", "int", "首领剩余生命值。"),
+                field("boss_full_hp", "int", "首领最大生命值。"),
+                field("left_fight_count", "int", "剩余战斗次数。"),
+                field("add_hit_level", "int", "新增命中等级。"),
+                field("today_sum_hit", "int", "今日累计命中次数。"),
+                field("exchange_count0", "int", "兑换项 0 次数。"),
+                field("exchange_count1", "int", "兑换项 1 次数。"),
+            ]
+        }),
         "SummonInfo" => ("召唤活动返回信息。", {
             vec![
                 field("result_code", "int", "服务器返回结果码。"),

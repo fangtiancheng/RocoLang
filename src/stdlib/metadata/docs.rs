@@ -6,10 +6,13 @@ pub fn stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     let mut details = detailed_stdlib_function_details_by_key();
     let mut docs = Vec::with_capacity(registered_stdlib_function_registrations().len());
     for registration in registered_stdlib_function_registrations() {
-        docs.push(match details.remove(&registration.key()) {
-            Some(details) => detailed_stdlib_function_doc(*registration, details),
-            None => inferred_stdlib_function_doc(*registration),
+        let details = details.remove(&registration.key()).unwrap_or_else(|| {
+            panic!(
+                "missing explicit stdlib details for {}::{}",
+                registration.module, registration.name
+            )
         });
+        docs.push(detailed_stdlib_function_doc(*registration, details));
     }
     assert!(
         details.is_empty(),
@@ -41,6 +44,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(aquarius::docs());
     details.extend(aries::docs());
     details.extend(cancer::docs());
+    details.extend(capricorn::docs());
     details.extend(dark_city::docs());
     details.extend(diamond_tear::docs());
     details.extend(system::docs());
@@ -54,7 +58,9 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(ice_crystal::docs());
     details.extend(incubative_machine::docs());
     details.extend(jump_machine::docs());
+    details.extend(leo::docs());
     details.extend(ladder::docs());
+    details.extend(magic_pioneer::docs());
     details.extend(friend::docs());
     details.extend(four_seasons::docs());
     details.extend(manor::docs());
@@ -76,6 +82,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(spirit_book::docs());
     details.extend(star_tower::docs());
     details.extend(session::docs());
+    details.extend(sagittarius::docs());
     details.extend(summon::docs());
     details.extend(task::docs());
     details.extend(taurus::docs());
@@ -83,6 +90,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(treasure_realm::docs());
     details.extend(type_ladder::docs());
     details.extend(unicorn::docs());
+    details.extend(virgo::docs());
     details.extend(sentinel_intelligence::docs());
     details.extend(enum_helpers::docs());
     details
@@ -134,35 +142,6 @@ fn detailed_stdlib_function_doc(
         returns: details.returns,
         return_doc: None,
         examples: details.examples,
-    }
-}
-
-pub(in crate::stdlib::metadata) fn inferred_stdlib_function_doc(
-    registration: StdlibFunctionRegistration,
-) -> StdlibFunctionDoc {
-    let call_signature = registration.signature.to_string();
-    let generated_return_type =
-        generated_stdlib_return_type(registration.module, registration.name)
-            .filter(|return_type| types::has_complete_return_doc(return_type));
-    let signature = generated_return_type
-        .map(|return_type| format!("{} -> {}", registration.signature, return_type))
-        .unwrap_or_else(|| call_signature.clone());
-    StdlibFunctionDoc {
-        module: registration.module.to_string(),
-        name: registration.name.to_string(),
-        signature: signature.clone(),
-        description: semantic::function_description(registration),
-        params: registration
-            .parameter_names()
-            .into_iter()
-            .map(|name| StdlibParamDoc {
-                description: semantic::parameter_description(&name),
-                name,
-            })
-            .collect(),
-        returns: semantic::return_description(registration.name, generated_return_type),
-        return_doc: None,
-        examples: vec![format!("let result = {};", call_signature)],
     }
 }
 

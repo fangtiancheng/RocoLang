@@ -1,0 +1,27 @@
+use super::StdlibFunctionDetails;
+
+pub fn docs() -> Vec<StdlibFunctionDetails> {
+    vec![
+        super::stdlib_doc!("virgo", "bell_fox_buy_tail", return_type: "VirgoBellFoxInfo", "购买处女宫的 bell_fox_buy_tail 操作。", params: ["count" => "数量。"], returns: "返回 VirgoBellFoxInfo。", examples: ["let result = virgo::bell_fox_buy_tail(0);"]),
+        super::stdlib_doc!("virgo", "bell_fox_buy_wish", return_type: "VirgoBellFoxInfo", "购买处女宫的 bell_fox_buy_wish 操作。", params: [], returns: "返回 VirgoBellFoxInfo。", examples: ["let result = virgo::bell_fox_buy_wish();"]),
+        super::stdlib_doc!("virgo", "bell_fox_exchange_item", return_type: "VirgoBellFoxExchangeInfo", "兑换处女宫的 bell_fox_exchange_item 操作。", params: ["exchange_position" => "兑换项位置。"], returns: "返回 VirgoBellFoxExchangeInfo。", examples: ["let result = virgo::bell_fox_exchange_item(0);"]),
+        super::stdlib_doc!("virgo", "bell_fox_exchange_pet", return_type: "VirgoBellFoxInfo", "兑换处女宫的 bell_fox_exchange_pet 操作。", params: [], returns: "返回 VirgoBellFoxInfo。", examples: ["let result = virgo::bell_fox_exchange_pet();"]),
+        super::stdlib_doc!("virgo", "bell_fox_query_status", return_type: "VirgoBellFoxStatusInfo", "查询处女宫的 bell_fox_query_status 操作。", params: [], returns: "返回 VirgoBellFoxStatusInfo。", examples: ["let result = virgo::bell_fox_query_status();"]),
+        super::stdlib_doc!("virgo", "find_halidom_buy_pass", return_type: "VirgoFindHalidomInfo", "购买处女宫的 find_halidom_buy_pass 操作。", params: [], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_buy_pass();"]),
+        super::stdlib_doc!("virgo", "find_halidom_buy_search_count", return_type: "VirgoFindHalidomInfo", "购买处女宫的 find_halidom_buy_search_count 操作。", params: [], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_buy_search_count();"]),
+        super::stdlib_doc!("virgo", "find_halidom_buy_top_level", return_type: "VirgoFindHalidomInfo", "购买处女宫的 find_halidom_buy_top_level 操作。", params: ["spirit_id" => "宠物 ID。", "catch_time" => "宠物捕获时间。"], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_buy_top_level(0, 0);"]),
+        super::stdlib_doc!("virgo", "find_halidom_clean", return_type: "VirgoFindHalidomInfo", "执行处女宫圣物净化。", params: ["relic_index" => "圣物索引。"], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_clean(0);"]),
+        super::stdlib_doc!("virgo", "find_halidom_list_pet", return_type: "VirgoFindHalidomInfo", "查询处女宫的 find_halidom_list_pet 操作。", params: [], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_list_pet();"]),
+        super::stdlib_doc!("virgo", "find_halidom_put_pet", return_type: "VirgoFindHalidomInfo", "更新处女宫的 find_halidom_put_pet 操作。", params: ["spirit_id" => "宠物 ID。", "catch_time" => "宠物捕获时间。"], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_put_pet(0, 0);"]),
+        super::stdlib_doc!("virgo", "find_halidom_query", return_type: "VirgoFindHalidomInfo", "查询处女宫祭坛状态。", params: ["altar" => "是否查询祭坛状态。"], returns: "返回 VirgoFindHalidomInfo。", examples: ["let result = virgo::find_halidom_query(false);"]),
+        super::stdlib_doc!("virgo", "serve_god_accept_task", return_type: "VirgoServeGodInfo", "执行处女宫的 serve_god_accept_task 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_accept_task();"]),
+        super::stdlib_doc!("virgo", "serve_god_buy_unlock", return_type: "VirgoServeGodInfo", "购买处女宫的 serve_god_buy_unlock 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_buy_unlock();"]),
+        super::stdlib_doc!("virgo", "serve_god_finish_task", return_type: "VirgoServeGodInfo", "执行处女宫的 serve_god_finish_task 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_finish_task();"]),
+        super::stdlib_doc!("virgo", "serve_god_give_up_task", return_type: "VirgoServeGodInfo", "执行处女宫的 serve_god_give_up_task 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_give_up_task();"]),
+        super::stdlib_doc!("virgo", "serve_god_query", return_type: "VirgoServeGodInfo", "查询处女宫的 serve_god_query 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_query();"]),
+        super::stdlib_doc!("virgo", "serve_god_query_bag", return_type: "VirgoServeGodInfo", "查询处女宫的 serve_god_query_bag 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_query_bag();"]),
+        super::stdlib_doc!("virgo", "serve_god_settle_boss_combat", return_type: "VirgoServeGodInfo", "处理战斗处女宫的 serve_god_settle_boss_combat 操作。", params: [], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_settle_boss_combat();"]),
+        super::stdlib_doc!("virgo", "serve_god_upgrade", return_type: "VirgoServeGodInfo", "提升处女宫的 serve_god_upgrade 操作。", params: ["spirit_id" => "宠物 ID。", "catch_time" => "宠物捕获时间。"], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_upgrade(0, 0);"]),
+        super::stdlib_doc!("virgo", "serve_god_upgrade_to_100", return_type: "VirgoServeGodInfo", "提升处女宫的 serve_god_upgrade_to_100 操作。", params: ["spirit_id" => "宠物 ID。", "catch_time" => "宠物捕获时间。"], returns: "返回 VirgoServeGodInfo。", examples: ["let result = virgo::serve_god_upgrade_to_100(0, 0);"]),
+    ]
+}

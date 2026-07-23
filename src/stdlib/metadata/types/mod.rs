@@ -63,41 +63,6 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
     })
 }
 
-pub fn has_complete_return_doc(type_name: &str) -> bool {
-    fn complete(type_name: &str, visiting: &mut std::collections::BTreeSet<String>) -> bool {
-        let normalized = normalize_type_name(type_name);
-        if matches!(
-            normalized.as_str(),
-            "()" | "bool"
-                | "int"
-                | "float"
-                | "char"
-                | "string"
-                | "dynamic"
-                | "map"
-                | "Map"
-                | "blob"
-        ) {
-            return true;
-        }
-        if !visiting.insert(normalized.clone()) {
-            return true;
-        }
-        let Some(document) = return_doc_for(&normalized) else {
-            visiting.remove(&normalized);
-            return false;
-        };
-        let complete = document
-            .fields
-            .iter()
-            .all(|field| complete(&field.type_name, visiting));
-        visiting.remove(&normalized);
-        complete
-    }
-
-    complete(type_name, &mut std::collections::BTreeSet::new())
-}
-
 pub fn infer_return_type(signature: &str) -> Option<String> {
     let return_type = signature.split("->").nth(1)?.trim();
     if return_type.is_empty() || return_type == "()" {
@@ -297,8 +262,14 @@ mod tests {
     }
 
     #[test]
-    fn fallback_info_doc_does_not_invent_request_context() {
-        assert!(return_doc_for("VirgoBellFoxStatusInfo").is_none());
+    fn activity_info_doc_exposes_declared_fields() {
+        let doc = return_doc_for("VirgoBellFoxStatusInfo").expect("return doc");
+
+        assert!(doc.fields.iter().any(|field| field.name == "boss_left_hp"));
+        assert!(doc
+            .fields
+            .iter()
+            .any(|field| field.name == "left_fight_count"));
     }
 
     #[test]

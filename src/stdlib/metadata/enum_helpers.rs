@@ -1,68 +1,78 @@
-use super::{StdlibFunctionDetails, StdlibParamDoc};
+use super::StdlibFunctionDetails;
 
 pub fn docs() -> Vec<StdlibFunctionDetails> {
-    let mut docs = Vec::new();
-
-    docs.extend(enum_docs(
-        "combat_result",
-        "战斗结果枚举辅助。",
-        "result",
-        "战斗结果 ID。",
-        "combat_result::WIN",
-    ));
-    docs.extend(enum_docs(
-        "combat_status",
-        "战斗异常状态枚举辅助。",
-        "status",
-        "异常状态 ID。",
-        "combat_status::SLEEP",
-    ));
-    docs.extend(enum_docs(
-        "personality",
-        "精灵性格枚举辅助。",
-        "personality",
-        "性格 ID。",
-        "personality::ADAMANT",
-    ));
-    docs.extend(enum_docs(
-        "weather",
-        "战斗天气/环境枚举辅助。",
-        "weather",
-        "天气或环境 ID。",
-        "weather::RAIN",
-    ));
-
-    docs
-}
-
-fn enum_docs(
-    module: &'static str,
-    module_description: &'static str,
-    param_name: &'static str,
-    param_description: &'static str,
-    example_const: &'static str,
-) -> Vec<StdlibFunctionDetails> {
     vec![
-        StdlibFunctionDetails {
-            key: super::StdlibFunctionKey::new(module, "name"),
+        super::stdlib_doc!(
+            "combat_result",
+            "name",
             return_type: "string",
-            description: format!(
-                "将 {module_description} 的数字 ID 转换为中文名称；未知 ID 返回空字符串。"
-            ),
-            params: vec![StdlibParamDoc {
-                name: param_name.to_string(),
-                description: param_description.to_string(),
-            }],
-            returns: "对应的中文名称，未知时为空字符串。".to_string(),
-            examples: vec![format!("let name = {module}::name({example_const});")],
-        },
-        StdlibFunctionDetails {
-            key: super::StdlibFunctionKey::new(module, "names"),
+            "将战斗结果 ID 转换为中文名称；未知 ID 返回空字符串。",
+            params: ["result" => "战斗结果 ID。"],
+            returns: "对应的中文名称，未知时为空字符串。",
+            examples: ["let name = combat_result::name(combat_result::WIN);"]
+        ),
+        super::stdlib_doc!(
+            "combat_result",
+            "names",
             return_type: "Array",
-            description: format!("列出 {module_description} 的所有已知枚举项。"),
-            params: Vec::new(),
-            returns: "枚举项数组；不同模块的元素结构跟运行时模块保持一致。".to_string(),
-            examples: vec![format!("let names = {module}::names();")],
-        },
+            "列出所有已知战斗结果枚举项。",
+            params: [],
+            returns: "战斗结果枚举项数组。",
+            examples: ["let names = combat_result::names();"]
+        ),
+        super::stdlib_doc!(
+            "combat_status",
+            "name",
+            return_type: "string",
+            "将异常状态 ID 转换为中文名称；未知 ID 返回空字符串。",
+            params: ["status" => "异常状态 ID。"],
+            returns: "对应的异常状态名称，未知时为空字符串。",
+            examples: ["let name = combat_status::name(combat_status::SLEEP);"]
+        ),
+        super::stdlib_doc!(
+            "combat_status",
+            "names",
+            return_type: "Array",
+            "列出所有已知异常状态枚举项。",
+            params: [],
+            returns: "异常状态枚举项数组。",
+            examples: ["let names = combat_status::names();"]
+        ),
+        super::stdlib_doc!(
+            "personality",
+            "name",
+            return_type: "string",
+            "将宠物性格 ID 转换为中文名称；未知 ID 返回空字符串。",
+            params: ["personality" => "性格 ID。"],
+            returns: "对应的宠物性格名称，未知时为空字符串。",
+            examples: ["let name = personality::name(personality::ADAMANT);"]
+        ),
+        super::stdlib_doc!(
+            "personality",
+            "names",
+            return_type: "Array",
+            "列出所有已知宠物性格枚举项。",
+            params: [],
+            returns: "宠物性格枚举项数组。",
+            examples: ["let names = personality::names();"]
+        ),
+        super::stdlib_doc!(
+            "weather",
+            "name",
+            return_type: "string",
+            "将天气或环境 ID 转换为中文名称；未知 ID 返回空字符串。",
+            params: ["weather" => "天气或环境 ID。"],
+            returns: "对应的天气或环境名称，未知时为空字符串。",
+            examples: ["let name = weather::name(weather::RAIN);"]
+        ),
+        super::stdlib_doc!(
+            "weather",
+            "names",
+            return_type: "Array",
+            "列出所有已知天气和环境枚举项。",
+            params: [],
+            returns: "天气和环境枚举项数组。",
+            examples: ["let names = weather::names();"]
+        ),
     ]
 }

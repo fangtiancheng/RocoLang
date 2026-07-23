@@ -8,7 +8,7 @@ pub fn stdlib_function_docs() -> Vec<StdlibFunctionDoc> {
     for registration in registered_stdlib_function_registrations() {
         docs.push(match details.remove(&registration.key()) {
             Some(details) => detailed_stdlib_function_doc(*registration, details),
-            None => fallback_stdlib_function_doc(*registration),
+            None => inferred_stdlib_function_doc(*registration),
         });
     }
     assert!(
@@ -37,6 +37,11 @@ pub fn registered_stdlib_function_registrations() -> &'static [StdlibFunctionReg
 fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     let mut details = Vec::new();
     details.extend(adventure::docs());
+    details.extend(alchemy_furnace::docs());
+    details.extend(aquarius::docs());
+    details.extend(aries::docs());
+    details.extend(dark_city::docs());
+    details.extend(diamond_tear::docs());
     details.extend(system::docs());
     details.extend(profile::docs());
     details.extend(scene::docs());
@@ -44,17 +49,35 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(game::docs());
     details.extend(role::docs());
     details.extend(home::docs());
+    details.extend(ice_crystal::docs());
+    details.extend(incubative_machine::docs());
+    details.extend(jump_machine::docs());
+    details.extend(ladder::docs());
     details.extend(friend::docs());
+    details.extend(four_seasons::docs());
     details.extend(manor::docs());
     details.extend(memory::docs());
+    details.extend(multi_evolution::docs());
+    details.extend(mountain_sea::docs());
+    details.extend(mystery_fusion::docs());
     details.extend(pet_egg::docs());
     details.extend(pet_training::docs());
+    details.extend(play_guide::docs());
     details.extend(news::docs());
+    details.extend(news_times::docs());
     details.extend(spirit::docs());
     details.extend(combat::docs());
     details.extend(lookup::docs());
     details.extend(spirit_book::docs());
+    details.extend(star_tower::docs());
     details.extend(session::docs());
+    details.extend(summon::docs());
+    details.extend(task::docs());
+    details.extend(three_starters::docs());
+    details.extend(treasure_realm::docs());
+    details.extend(type_ladder::docs());
+    details.extend(unicorn::docs());
+    details.extend(sentinel_intelligence::docs());
     details.extend(enum_helpers::docs());
     details
 }
@@ -108,7 +131,7 @@ fn detailed_stdlib_function_doc(
     }
 }
 
-pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
+pub(in crate::stdlib::metadata) fn inferred_stdlib_function_doc(
     registration: StdlibFunctionRegistration,
 ) -> StdlibFunctionDoc {
     let call_signature = registration.signature.to_string();
@@ -122,21 +145,16 @@ pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
         module: registration.module.to_string(),
         name: registration.name.to_string(),
         signature: signature.clone(),
-        description: format!(
-            "`{}` 模块的标准库接口。函数签名来自 Rust 标准库注册。",
-            registration.module
-        ),
+        description: semantic::function_description(registration),
         params: registration
             .parameter_names()
             .into_iter()
             .map(|name| StdlibParamDoc {
+                description: semantic::parameter_description(&name),
                 name,
-                description: "脚本接口参数；参数类型见函数签名。".to_string(),
             })
             .collect(),
-        returns: generated_return_type
-            .map(|return_type| format!("返回 {return_type}，字段说明见对应返回类型文档。"))
-            .unwrap_or_else(|| "返回服务端接口结果。".to_string()),
+        returns: semantic::return_description(registration.name, generated_return_type),
         return_doc: None,
         examples: vec![format!("let result = {};", call_signature)],
     }

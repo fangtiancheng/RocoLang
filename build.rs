@@ -86,7 +86,9 @@ fn render_struct_docs(docs: &[(String, Vec<(String, String)>)]) -> String {
              Some(match type_name {\n",
     );
     for (name, fields) in docs {
-        output.push_str(&format!("        {name:?} => (\"Rust struct {name}。\", vec![\n"));
+        output.push_str(&format!(
+            "        {name:?} => (\"Rust struct {name}。\", vec![\n"
+        ));
         for (field_name, field_type) in fields {
             output.push_str(&format!(
                 "            field({field_name:?}, {field_type:?}, \"{name} 的 {field_name} 字段。\"),\n"

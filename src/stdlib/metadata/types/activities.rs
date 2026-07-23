@@ -299,6 +299,290 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("rewards", "AlchemyFurnaceRewardItem[]", "奖励列表。"),
             ]
         }),
+        "DarkCityExpeditionInfo" => ("暗黑城远征返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("fight_id", "int", "当前战斗 ID。"),
+                field("fight_index", "int", "当前战斗索引。"),
+                field("vip", "bool", "是否拥有 VIP 状态。"),
+                field("vip_pass_enabled", "bool", "是否启用 VIP 通行。"),
+                field("schedule", "int", "远征进度。"),
+                field("schedule_name", "string", "远征进度名称。"),
+                field("added_reputation", "int", "本次新增声望。"),
+            ]
+        }),
+        "DarkCityReputationInfo" => ("暗黑城声望返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("reputation", "int", "当前声望。"),
+                field("exchanges", "DarkCityExchangeItem[]", "声望兑换项列表。"),
+            ]
+        }),
+        "DarkCityExchangeItem" => ("暗黑城声望兑换项。", {
+            vec![
+                field("index", "int", "兑换项索引。"),
+                field("item_id", "int", "兑换物品 ID。"),
+                field("cost", "int", "兑换所需声望。"),
+            ]
+        }),
+        "MountainSeaInfo" => ("山海秘境返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("fight_id", "int", "当前战斗 ID。"),
+                field("seal_count", "int", "封印数量。"),
+                field("success", "int", "最近操作是否成功。"),
+                field("attrs", "int[]", "秘境属性列表。"),
+                field("bosses", "MountainSeaBossInfo[]", "首领列表。"),
+                field("souls", "MountainSeaSoulInfo[]", "魂魄列表。"),
+            ]
+        }),
+        "MountainSeaBossInfo" => ("山海秘境首领信息。", {
+            vec![
+                field("index", "int", "首领索引。"),
+                field("boss_type", "int", "首领类型。"),
+                field("fight_id", "int", "战斗 ID。"),
+                field("name", "string", "首领名称。"),
+                field("status", "int", "首领状态。"),
+            ]
+        }),
+        "MountainSeaSoulInfo" => ("山海秘境魂魄信息。", {
+            vec![
+                field("soul_type", "int", "魂魄类型。"),
+                field("boss_type", "int", "对应首领类型。"),
+                field("name", "string", "魂魄名称。"),
+                field("count", "int", "魂魄数量。"),
+            ]
+        }),
+        "MysteryFusionInfo" => ("神秘融合返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("times", "int", "已进行的融合次数。"),
+                field("energy", "int", "当前融合能量。"),
+                field("added_energy", "int", "本次新增能量。"),
+                field("battles", "MysteryFusionBattleInfo[]", "可进行的战斗列表。"),
+                field("recipes", "MysteryFusionRecipeInfo[]", "融合配方列表。"),
+            ]
+        }),
+        "MysteryFusionBattleInfo" => ("神秘融合战斗信息。", {
+            vec![
+                field("index", "int", "战斗索引。"),
+                field("battle_id", "int", "战斗 ID。"),
+                field("attr_types", "int[]", "战斗属性类型。"),
+            ]
+        }),
+        "MysteryFusionRecipeInfo" => ("神秘融合配方。", {
+            vec![
+                field("index", "int", "配方索引。"),
+                field("spirit_id", "int", "融合产物宠物 ID。"),
+                field("energy_cost", "int", "所需能量。"),
+                field("required_spirit_ids", "int[]", "所需材料宠物 ID。"),
+            ]
+        }),
+        "MysteryFusionMaterialBag" => ("神秘融合材料背包。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field(
+                    "candidates",
+                    "MysteryFusionMaterialCandidate[]",
+                    "可用材料候选列表。",
+                ),
+            ]
+        }),
+        "MysteryFusionMaterialCandidate" => ("神秘融合材料候选宠物。", {
+            vec![
+                field("candidate_index", "int", "候选索引。"),
+                field("spirit_id", "int", "宠物 ID。"),
+                field("bag_index", "int", "背包位置。"),
+                field("level", "int", "宠物等级。"),
+                field("personality", "int", "宠物性格 ID。"),
+            ]
+        }),
+        "TreasureRealmInfo" => ("珍宝秘境返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("battle", "int", "当前战斗状态。"),
+                field("battle_id", "int", "战斗 ID。"),
+                field("schedule", "int", "秘境进度。"),
+                field("possible", "int", "可操作状态。"),
+                field("time", "int", "剩余时间。"),
+                field("got_box", "bool", "是否已经领取宝箱。"),
+                field("item_counts", "int[]", "物品数量列表。"),
+                field("commits", "int[]", "提交状态列表。"),
+            ]
+        }),
+        "NewsTimesReportsResult" => ("新闻次数查询结果。", {
+            vec![
+                field("reports", "NewsTimesReport[]", "新闻活动次数列表。"),
+                field("gift_gotten", "bool", "是否已经领取今日礼包。"),
+                field("player_status_today", "int[]", "今日玩家状态。"),
+                field("player_status_forever", "int[]", "累计玩家状态。"),
+            ]
+        }),
+        "NewsTimesReport" => ("新闻活动次数信息。", {
+            vec![
+                field("act_id", "int", "活动 ID。"),
+                field("act_begin_time", "int", "活动开始时间。"),
+                field("act_end_time", "int", "活动结束时间。"),
+                field("times", "int", "当前次数。"),
+            ]
+        }),
+        "SentinelIntelligenceInfo" => ("哨兵情报活动返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("fight_id", "int", "当前战斗 ID。"),
+                field("added_bounty", "int", "本次新增悬赏值。"),
+                field("refresh_count", "int", "首领刷新次数。"),
+                field("exchange_refresh_count", "int", "兑换刷新次数。"),
+                field("mission_type", "int", "当前任务类型。"),
+                field("mission_values", "int[]", "任务参数。"),
+                field("fight_times", "int", "剩余战斗次数。"),
+                field("bounty", "int", "当前悬赏值。"),
+                field("intelligence_count", "int", "当前情报数量。"),
+                field("bosses", "SentinelBossInfo[]", "首领列表。"),
+                field("exchanges", "SentinelExchangeInfo[]", "物品兑换列表。"),
+                field("spirits", "SentinelSpiritExchangeInfo[]", "宠物兑换列表。"),
+            ]
+        }),
+        "SentinelBossInfo" => ("哨兵情报活动首领信息。", {
+            vec![
+                field("index", "int", "首领索引。"),
+                field("spirit_id", "int", "首领宠物 ID。"),
+                field("difficulty", "int", "首领难度。"),
+                field("status", "int", "首领状态。"),
+                field("max_intelligence", "int", "情报上限。"),
+                field("intelligence", "int", "当前情报值。"),
+            ]
+        }),
+        "SentinelExchangeInfo" => ("哨兵情报活动物品兑换项。", {
+            vec![
+                field("index", "int", "兑换项索引。"),
+                field("item_id", "int", "物品 ID。"),
+                field("need_bounty", "int", "所需悬赏值。"),
+                field("status", "int", "兑换状态。"),
+            ]
+        }),
+        "SentinelSpiritExchangeInfo" => ("哨兵情报活动宠物兑换项。", {
+            vec![
+                field("index", "int", "兑换项索引。"),
+                field("spirit_id", "int", "兑换宠物 ID。"),
+                field("need_intelligence", "int", "所需情报数量。"),
+                field("evolve_spirit_id", "int", "进化目标宠物 ID。"),
+                field("status", "int", "兑换状态。"),
+            ]
+        }),
+        "AquariusSecondStatusInfo" => ("水瓶宫二阶状态。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("light_num", "int", "当前光能数量。"),
+                field("tail_num", "int", "当前尾部资源数量。"),
+                field("boss_left_hp", "int", "首领剩余生命值。"),
+                field("boss_full_hp", "int", "首领最大生命值。"),
+                field("left_fight_count", "int", "剩余战斗次数。"),
+                field("add_hit_level", "int", "新增命中等级。"),
+                field("today_sum_hit", "int", "今日累计命中次数。"),
+                field("exchange_count0", "int", "兑换项 0 次数。"),
+                field("exchange_count1", "int", "兑换项 1 次数。"),
+            ]
+        }),
+        "AriesThirdStatusInfo" => ("白羊宫三阶状态。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("light_num", "int", "当前光能数量。"),
+                field("tail_num", "int", "当前尾部资源数量。"),
+                field("exchange_count0", "int", "兑换项 0 次数。"),
+                field("exchange_count1", "int", "兑换项 1 次数。"),
+                field("boss_left_hp", "int", "首领剩余生命值。"),
+                field("left_fight_count", "int", "剩余战斗次数。"),
+            ]
+        }),
+        "SummonInfo" => ("召唤活动返回信息。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("vip", "int", "VIP 状态。"),
+                field("magic", "int", "当前召唤魔法值。"),
+                field("count", "int", "当前召唤次数。"),
+                field("show", "int", "展示状态。"),
+                field("pools", "SummonPoolState[]", "召唤池状态列表。"),
+                field("config_pools", "SummonPoolConfig[]", "召唤池配置列表。"),
+                field("exchange_groups", "SummonExchangeGroup[]", "兑换组列表。"),
+                field("rewards", "SummonRewardItem[]", "奖励列表。"),
+                field("records", "SummonRecord[]", "召唤记录列表。"),
+            ]
+        }),
+        "SummonPoolState" => ("召唤池当前状态。", {
+            vec![
+                field("version", "int", "召唤池版本。"),
+                field("token_item_id", "int", "抽取消耗物品 ID。"),
+                field("token_count", "int", "抽取消耗数量。"),
+                field("today_draw_count", "int", "今日抽取次数。"),
+                field("wish_index", "int", "当前祈愿项索引。"),
+                field("succeeded", "bool", "是否已达成召唤目标。"),
+                field("end_time", "int", "召唤池结束时间。"),
+            ]
+        }),
+        "SummonPoolConfig" => ("召唤池配置。", {
+            vec![
+                field("version", "int", "召唤池版本。"),
+                field("title", "string", "召唤池标题。"),
+                field("vip_limit", "int", "VIP 限制。"),
+                field("end_time", "int", "召唤池结束时间。"),
+                field("daily_max", "int", "每日抽取上限。"),
+                field("token_item_id", "int", "抽取消耗物品 ID。"),
+                field("recommend", "string", "推荐说明。"),
+                field("info", "string", "召唤池说明。"),
+                field("reward_text", "string", "奖励说明。"),
+                field("rewards", "SummonRewardItem[]", "奖励列表。"),
+                field("wish_candidates", "SummonRewardItem[]", "祈愿候选列表。"),
+            ]
+        }),
+        "SummonExchangeGroup" => ("召唤兑换组。", {
+            vec![
+                field("kind", "string", "兑换组类型。"),
+                field("items", "SummonExchangeItem[]", "兑换项列表。"),
+            ]
+        }),
+        "SummonExchangeItem" => ("召唤兑换项。", {
+            vec![
+                field("index", "int", "兑换项索引。"),
+                field("reward", "SummonRewardItem", "兑换获得的奖励。"),
+                field("cost", "SummonRewardItem", "兑换消耗。"),
+                field("need", "int", "兑换所需数量。"),
+                field("max", "int", "兑换上限。"),
+                field("day_max", "int", "每日兑换上限。"),
+                field("times", "int", "累计兑换次数。"),
+                field("day_times", "int", "今日兑换次数。"),
+                field("add", "int", "本次增加数量。"),
+            ]
+        }),
+        "SummonRewardItem" => ("召唤奖励物品。", {
+            vec![
+                field("id", "int", "奖励 ID。"),
+                field("item_type", "int", "奖励类型。"),
+                field("count", "int", "奖励数量。"),
+            ]
+        }),
+        "SummonRecord" => ("召唤历史记录。", {
+            vec![
+                field("pool_version", "int", "召唤池版本。"),
+                field("title", "string", "召唤池标题。"),
+                field("id", "int", "奖励 ID。"),
+                field("item_type", "int", "奖励类型。"),
+                field("count", "int", "奖励数量。"),
+                field("year", "int", "年份。"),
+                field("month", "int", "月份。"),
+                field("day", "int", "日期。"),
+            ]
+        }),
         "UnicornBossInfo" => ("独角兽 Boss 信息。", {
             vec![
                 field("slot", "int", "槽位。"),

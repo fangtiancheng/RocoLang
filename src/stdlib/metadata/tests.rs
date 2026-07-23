@@ -1,4 +1,4 @@
-use super::docs::fallback_stdlib_function_doc;
+use super::docs::inferred_stdlib_function_doc;
 use super::*;
 use std::collections::BTreeSet;
 
@@ -100,13 +100,48 @@ fn stdlib_function_docs_do_not_expose_placeholder_copy() {
 }
 
 #[test]
-fn fallback_docs_parse_signature_params() {
+fn inferred_docs_parse_signature_params() {
     let registration =
         StdlibFunctionRegistration::new("demo", "call", "demo::call(first_id: int, enabled: bool)");
-    let doc = fallback_stdlib_function_doc(registration);
+    let doc = inferred_stdlib_function_doc(registration);
 
     let names: Vec<_> = doc.params.iter().map(|param| param.name.as_str()).collect();
     assert_eq!(names, ["first_id", "enabled"]);
+}
+
+#[test]
+fn inferred_docs_use_domain_semantics_for_every_registered_module() {
+    let missing = registered_stdlib_function_registrations()
+        .iter()
+        .filter(|registration| semantic::module_display_name(registration.module).is_none())
+        .map(|registration| registration.module)
+        .collect::<BTreeSet<_>>();
+
+    assert!(
+        missing.is_empty(),
+        "missing stdlib module semantics: {missing:?}"
+    );
+}
+
+#[test]
+fn inferred_docs_do_not_expose_generic_registration_copy() {
+    let offenders = stdlib_function_docs()
+        .into_iter()
+        .filter(|doc| {
+            doc.description.contains("标准库接口")
+                || doc.description.contains("函数签名来自")
+                || doc.params.iter().any(|param| {
+                    param.description.contains("参数类型见函数签名")
+                        || param.description.contains("脚本接口参数")
+                })
+        })
+        .map(|doc| format!("{}::{}", doc.module, doc.name))
+        .collect::<Vec<_>>();
+
+    assert!(
+        offenders.is_empty(),
+        "generic stdlib documentation remains: {offenders:?}"
+    );
 }
 
 #[test]

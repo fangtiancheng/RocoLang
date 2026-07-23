@@ -3,8 +3,8 @@ use std::sync::{Arc, Mutex};
 use rhai::{Array, Module};
 
 use crate::stdlib::util::{
-    lock_stdlib, parse_i64_array, register_stdlib_fn_0, register_stdlib_fn_1, register_stdlib_fn_2,
-    to_array, to_rhai_error_in_context,
+    lock_stdlib, parse_i64_array_at, register_stdlib_fn_0, register_stdlib_fn_1,
+    register_stdlib_fn_2, to_array, to_rhai_error_in_context,
 };
 use crate::stdlib::RocoStdLib;
 
@@ -59,8 +59,10 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         module.set_native_fn(
             "query_nicknames",
             move |context: rhai::NativeCallContext, friend_uins: Array| {
+                let friend_uins =
+                    parse_i64_array_at("friend_uins[]", friend_uins, context.call_position())?;
                 let mut lib = lock_stdlib(&stdlib)?;
-                lib.friend_query_nicknames(parse_i64_array("friend_uins[]", friend_uins)?)
+                lib.friend_query_nicknames(friend_uins)
                     .map(|friends| to_array(&friends))
                     .map_err(|error| to_rhai_error_in_context(error, &context))
             },

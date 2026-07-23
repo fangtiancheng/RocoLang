@@ -1,10 +1,10 @@
 use std::sync::{Arc, Mutex};
 
-use rhai::Module;
+use rhai::{Module, NativeCallContext};
 
 use crate::stdlib::util::{
-    lock_stdlib, parse_i64_array, register_stdlib_fn_0, register_stdlib_fn_1, register_stdlib_fn_2,
-    to_array, to_rhai_error,
+    lock_stdlib, parse_i64_array_at, register_stdlib_fn_0, register_stdlib_fn_1,
+    register_stdlib_fn_2, to_array, to_rhai_error, to_rhai_error_in_context,
 };
 use crate::stdlib::RocoStdLib;
 
@@ -102,11 +102,16 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
-        module.set_native_fn("get_friend_details", move |friend_uins: rhai::Array| {
-            let mut lib = lock_stdlib(&stdlib)?;
-            lib.manor_get_friend_details(parse_i64_array("friend_uins[]", friend_uins)?)
-                .map(|friends| to_array(&friends))
-                .map_err(to_rhai_error)
-        });
+        module.set_native_fn(
+            "get_friend_details",
+            move |context: NativeCallContext, friend_uins: rhai::Array| {
+                let friend_uins =
+                    parse_i64_array_at("friend_uins[]", friend_uins, context.call_position())?;
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.manor_get_friend_details(friend_uins)
+                    .map(|friends| to_array(&friends))
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
     }
 }

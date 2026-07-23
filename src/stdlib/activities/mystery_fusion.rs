@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use rhai::{Array, Module, NativeCallContext};
 
 use crate::stdlib::util::{
-    lock_stdlib, parse_i64_array, register_stdlib_fn_0, register_stdlib_fn_1,
+    lock_stdlib, parse_i64_array_at, register_stdlib_fn_0, register_stdlib_fn_1,
     to_rhai_error_in_context,
 };
 use crate::stdlib::RocoStdLib;
@@ -43,13 +43,14 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
               recipe_index: i64,
               material_bag_indexes: Array,
               personality: i64| {
+            let material_bag_indexes = parse_i64_array_at(
+                "material_bag_indexes[]",
+                material_bag_indexes,
+                context.call_position(),
+            )?;
             let mut lib = lock_stdlib(&stdlib)?;
-            lib.mystery_fusion_fuse(
-                recipe_index,
-                parse_i64_array("material_bag_indexes[]", material_bag_indexes)?,
-                personality,
-            )
-            .map_err(|error| to_rhai_error_in_context(error, &context))
+            lib.mystery_fusion_fuse(recipe_index, material_bag_indexes, personality)
+                .map_err(|error| to_rhai_error_in_context(error, &context))
         },
     );
 }

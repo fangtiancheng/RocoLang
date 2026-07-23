@@ -1,9 +1,10 @@
 use std::sync::{Arc, Mutex};
 
-use rhai::Array;
-use rhai::Module;
+use rhai::{Array, Module, NativeCallContext};
 
-use crate::stdlib::util::{lock_stdlib, parse_i64_array, to_array, to_rhai_error};
+use crate::stdlib::util::{
+    lock_stdlib, parse_i64_array_at, to_array, to_rhai_error, to_rhai_error_in_context,
+};
 use crate::stdlib::RocoStdLib;
 
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
@@ -16,13 +17,16 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
-        module.set_native_fn("lookup_items_info", move |item_ids: Array| {
-            let item_ids = parse_i64_array("item_ids[]", item_ids)?;
-            let mut lib = lock_stdlib(&stdlib)?;
-            lib.lookup_items_info(item_ids)
-                .map(|infos| to_array(&infos))
-                .map_err(to_rhai_error)
-        });
+        module.set_native_fn(
+            "lookup_items_info",
+            move |context: NativeCallContext, item_ids: Array| {
+                let item_ids = parse_i64_array_at("item_ids[]", item_ids, context.call_position())?;
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.lookup_items_info(item_ids)
+                    .map(|infos| to_array(&infos))
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
     }
     {
         let stdlib = stdlib.clone();
@@ -124,13 +128,17 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
-        module.set_native_fn("lookup_skills_info", move |skill_ids: Array| {
-            let skill_ids = parse_i64_array("skill_ids[]", skill_ids)?;
-            let mut lib = lock_stdlib(&stdlib)?;
-            lib.lookup_skills_info(skill_ids)
-                .map(|infos| to_array(&infos))
-                .map_err(to_rhai_error)
-        });
+        module.set_native_fn(
+            "lookup_skills_info",
+            move |context: NativeCallContext, skill_ids: Array| {
+                let skill_ids =
+                    parse_i64_array_at("skill_ids[]", skill_ids, context.call_position())?;
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.lookup_skills_info(skill_ids)
+                    .map(|infos| to_array(&infos))
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
     }
     {
         let stdlib = stdlib.clone();
@@ -148,13 +156,17 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     }
     {
         let stdlib = stdlib.clone();
-        module.set_native_fn("lookup_spirits_info", move |spirit_ids: Array| {
-            let spirit_ids = parse_i64_array("spirit_ids[]", spirit_ids)?;
-            let mut lib = lock_stdlib(&stdlib)?;
-            lib.lookup_spirits_info(spirit_ids)
-                .map(|infos| to_array(&infos))
-                .map_err(to_rhai_error)
-        });
+        module.set_native_fn(
+            "lookup_spirits_info",
+            move |context: NativeCallContext, spirit_ids: Array| {
+                let spirit_ids =
+                    parse_i64_array_at("spirit_ids[]", spirit_ids, context.call_position())?;
+                let mut lib = lock_stdlib(&stdlib)?;
+                lib.lookup_spirits_info(spirit_ids)
+                    .map(|infos| to_array(&infos))
+                    .map_err(|error| to_rhai_error_in_context(error, &context))
+            },
+        );
     }
     {
         let stdlib = stdlib.clone();

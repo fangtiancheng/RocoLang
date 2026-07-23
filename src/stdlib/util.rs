@@ -46,16 +46,27 @@ pub fn named_id_array(items: &[(i64, &str)]) -> Array {
 }
 
 pub fn parse_i64_array(name: &str, values: Array) -> Result<Vec<i64>, Box<EvalAltResult>> {
+    parse_i64_array_at(name, values, Position::NONE)
+}
+
+pub fn parse_i64_array_at(
+    name: &str,
+    values: Array,
+    position: Position,
+) -> Result<Vec<i64>, Box<EvalAltResult>> {
     values
         .into_iter()
         .map(|value| {
             value.as_int().map_err(|error| {
-                to_rhai_error(RocoError::InvalidParam(
-                    crate::error::RocoInvalidParamError::RhaiTypeMismatch {
-                        name: name.to_string(),
-                        message: error.to_string(),
-                    },
-                ))
+                to_rhai_error_at(
+                    RocoError::InvalidParam(
+                        crate::error::RocoInvalidParamError::RhaiTypeMismatch {
+                            name: name.to_string(),
+                            message: error.to_string(),
+                        },
+                    ),
+                    position,
+                )
             })
         })
         .collect()
@@ -172,3 +183,25 @@ pub(crate) use register_stdlib_fn_3;
 pub(crate) use register_stdlib_fn_4;
 pub(crate) use register_stdlib_fn_5;
 pub(crate) use register_stdlib_fn_7;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_i64_array_accepts_dynamic_integer_elements() {
+        let values = vec![Dynamic::from(10_i64), Dynamic::from(20_i64)];
+
+        assert_eq!(parse_i64_array("values[]", values).unwrap(), [10, 20]);
+    }
+
+    #[test]
+    fn parse_i64_array_preserves_the_call_position_on_type_errors() {
+        let position = Position::new(3, 7);
+        let error = parse_i64_array_at("values[]", vec![Dynamic::from("not an integer")], position)
+            .expect_err("string element should be rejected");
+
+        assert_eq!(error.position(), position);
+        assert!(error.to_string().contains("values[]"));
+    }
+}

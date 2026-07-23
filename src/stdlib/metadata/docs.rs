@@ -71,6 +71,8 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(spirit::docs());
     details.extend(combat::docs());
     details.extend(lookup::docs());
+    details.extend(libra::docs());
+    details.extend(scorpio::docs());
     details.extend(spirit_book::docs());
     details.extend(star_tower::docs());
     details.extend(session::docs());

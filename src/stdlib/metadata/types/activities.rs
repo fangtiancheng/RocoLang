@@ -504,6 +504,18 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("left_fight_count", "int", "剩余战斗次数。"),
             ]
         }),
+        "LibraThirdStatusInfo" => ("天秤宫三阶状态。", {
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("light_num", "int", "当前光能数量。"),
+                field("tail_num", "int", "当前尾部资源数量。"),
+                field("exchange_count0", "int", "兑换项 0 次数。"),
+                field("exchange_count1", "int", "兑换项 1 次数。"),
+                field("boss_left_hp", "int", "首领剩余生命值。"),
+                field("left_fight_count", "int", "剩余战斗次数。"),
+            ]
+        }),
         "SummonInfo" => ("召唤活动返回信息。", {
             vec![
                 field("result_code", "int", "服务器返回结果码。"),

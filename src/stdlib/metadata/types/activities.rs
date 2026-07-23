@@ -2,6 +2,86 @@ use super::{bag_candidate_fields, exchange_display_item_fields, field, StdlibFie
 
 pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)> {
     Some(match type_name {
+        "ThreeStartersField" => (
+            "三主宠活动的键值字段。",
+            vec![
+                field("name", "string", "字段名称。"),
+                field("value", "string", "字段值。"),
+            ],
+        ),
+        "ThreeStartersCounter" => (
+            "三主宠活动的计数器。",
+            vec![
+                field("name", "string", "计数器名称。"),
+                field("current", "int", "当前计数。"),
+                field("limit", "int", "计数上限。"),
+            ],
+        ),
+        "FourSeasonsShopRewardInfo" => (
+            "四季活动商店奖励。",
+            vec![
+                field("reward_id", "int", "奖励 ID。"),
+                field("reward_kind", "int", "奖励类型。"),
+                field("count", "int", "奖励数量。"),
+            ],
+        ),
+        "FourSeasonsMonthlySpiritRewardInfo" => (
+            "四季活动月度宠物奖励。",
+            vec![
+                field("month", "int", "月份。"),
+                field("reward_index", "int", "奖励索引。"),
+                field("spirit_id", "int", "宠物 ID。"),
+                field("ticket_cost", "int", "兑换所需票数。"),
+            ],
+        ),
+        "IceCrystalBattleInfo" => (
+            "冰晶活动当前战斗信息。",
+            vec![
+                field("battle_index", "int", "战斗索引。"),
+                field("fight_id", "int", "战斗 ID。"),
+            ],
+        ),
+        "MultiEvolutionCandidate" => (
+            "多元进化候选宠物。",
+            vec![
+                field("candidate_index", "int", "候选项索引。"),
+                field("spirit_id", "int", "宠物 ID。"),
+                field("catch_time", "int", "捕获时间。"),
+                field("condition_code", "int", "进化条件代码。"),
+                field("condition_name", "string", "进化条件名称。"),
+            ],
+        ),
+        "CapricornTeamSnapshot" => (
+            "摩羯宫队伍快照。",
+            vec![
+                field("players", "CapricornTeamPlayer[]", "队伍成员列表。"),
+                field("ticks", "int", "队伍状态时间标记。"),
+            ],
+        ),
+        "CapricornSecondTask" => (
+            "摩羯宫二阶任务。",
+            vec![
+                field("task_type", "int", "任务类型。"),
+                field("data1", "int", "任务数据 1。"),
+                field("data2", "int", "任务数据 2。"),
+                field("step", "int", "任务步骤。"),
+                field("current", "int", "当前进度。"),
+            ],
+        ),
+        "StarTowerTop" => (
+            "星辰塔顶层挑战信息。",
+            vec![
+                field("star", "int", "星级。"),
+                field("refresh", "int", "刷新状态。"),
+                field("fight_desc", "string", "战斗说明。"),
+                field("task_desc", "string", "任务说明。"),
+                field("fight_id", "int", "战斗 ID。"),
+                field("tokens", "int[]", "令牌列表。"),
+                field("exchanges", "int[]", "兑换状态列表。"),
+                field("missions", "StarTowerTopMission[]", "顶层任务列表。"),
+                field("rewards", "StarTowerTopReward[]", "顶层奖励列表。"),
+            ],
+        ),
         "AdventureItem" => (
             "冒险系统奖励物品。",
             vec![

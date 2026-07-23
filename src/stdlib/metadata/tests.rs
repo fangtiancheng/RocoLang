@@ -75,6 +75,31 @@ fn stdlib_function_docs_do_not_contain_duplicates() {
 }
 
 #[test]
+fn stdlib_function_docs_do_not_expose_placeholder_copy() {
+    let placeholders = ["待补充", "取决于具体接口", "详细参数语义"];
+    let offenders = stdlib_function_docs()
+        .into_iter()
+        .filter(|doc| {
+            [&doc.description, &doc.returns].into_iter().any(|text| {
+                placeholders
+                    .iter()
+                    .any(|placeholder| text.contains(placeholder))
+            }) || doc.params.iter().any(|param| {
+                placeholders
+                    .iter()
+                    .any(|placeholder| param.description.contains(placeholder))
+            })
+        })
+        .map(|doc| format!("{}::{}", doc.module, doc.name))
+        .collect::<Vec<_>>();
+
+    assert!(
+        offenders.is_empty(),
+        "placeholder stdlib docs found: {offenders:?}"
+    );
+}
+
+#[test]
 fn fallback_docs_parse_signature_params() {
     let registration =
         StdlibFunctionRegistration::new("demo", "call", "demo::call(first_id: int, enabled: bool)");

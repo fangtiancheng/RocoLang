@@ -112,8 +112,10 @@ pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
     registration: StdlibFunctionRegistration,
 ) -> StdlibFunctionDoc {
     let call_signature = registration.signature.to_string();
-    let signature = generated_stdlib_return_type(registration.module, registration.name)
-        .filter(|return_type| types::has_complete_return_doc(return_type))
+    let generated_return_type =
+        generated_stdlib_return_type(registration.module, registration.name)
+            .filter(|return_type| types::has_complete_return_doc(return_type));
+    let signature = generated_return_type
         .map(|return_type| format!("{} -> {}", registration.signature, return_type))
         .unwrap_or_else(|| call_signature.clone());
     StdlibFunctionDoc {
@@ -121,7 +123,7 @@ pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
         name: registration.name.to_string(),
         signature: signature.clone(),
         description: format!(
-            "`{}` 模块的脚本接口。该接口已注册到 RocoLang；详细参数语义后续应补充为专门文档。",
+            "`{}` 模块的标准库接口。函数签名来自 Rust 标准库注册。",
             registration.module
         ),
         params: registration
@@ -129,10 +131,12 @@ pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
             .into_iter()
             .map(|name| StdlibParamDoc {
                 name,
-                description: "参数语义请参考接口名和调用场景；详细文档待补充。".to_string(),
+                description: "脚本接口参数；参数类型见函数签名。".to_string(),
             })
             .collect(),
-        returns: "返回值取决于具体接口；请结合脚本示例或调用结果使用。".to_string(),
+        returns: generated_return_type
+            .map(|return_type| format!("返回 {return_type}，字段说明见对应返回类型文档。"))
+            .unwrap_or_else(|| "返回服务端接口结果。".to_string()),
         return_doc: None,
         examples: vec![format!("let result = {};", call_signature)],
     }

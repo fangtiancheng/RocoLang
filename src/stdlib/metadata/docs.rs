@@ -78,6 +78,13 @@ fn detailed_stdlib_function_doc(
     registration: StdlibFunctionRegistration,
     details: StdlibFunctionDetails,
 ) -> StdlibFunctionDoc {
+    // A few adapters intentionally reshape a Rust return value before exposing it
+    // to Rhai (for example, fixed arrays become script arrays). Keep those explicit
+    // script-facing types; direct registrations are checked against the generated type.
+    let return_type = match generated_stdlib_return_type(registration.module, registration.name) {
+        Some(generated) if generated == details.return_type => generated.to_string(),
+        _ => details.return_type.to_string(),
+    };
     let expected_params = registration.parameter_names();
     let documented_params = details
         .params
@@ -92,7 +99,7 @@ fn detailed_stdlib_function_doc(
     StdlibFunctionDoc {
         module: registration.module.to_string(),
         name: registration.name.to_string(),
-        signature: format!("{} -> {}", registration.signature, details.return_type),
+        signature: format!("{} -> {}", registration.signature, return_type),
         description: details.description,
         params: details.params,
         returns: details.returns,
@@ -104,7 +111,11 @@ fn detailed_stdlib_function_doc(
 pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
     registration: StdlibFunctionRegistration,
 ) -> StdlibFunctionDoc {
-    let signature = registration.signature.to_string();
+    let call_signature = registration.signature.to_string();
+    let signature = generated_stdlib_return_type(registration.module, registration.name)
+        .filter(|return_type| types::has_complete_return_doc(return_type))
+        .map(|return_type| format!("{} -> {}", registration.signature, return_type))
+        .unwrap_or_else(|| call_signature.clone());
     StdlibFunctionDoc {
         module: registration.module.to_string(),
         name: registration.name.to_string(),
@@ -123,7 +134,7 @@ pub(in crate::stdlib::metadata) fn fallback_stdlib_function_doc(
             .collect(),
         returns: "返回值取决于具体接口；请结合脚本示例或调用结果使用。".to_string(),
         return_doc: None,
-        examples: vec![format!("let result = {};", signature)],
+        examples: vec![format!("let result = {};", call_signature)],
     }
 }
 

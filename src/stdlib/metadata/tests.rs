@@ -142,6 +142,23 @@ fn pet_egg_functions_expose_result_struct_docs() {
 }
 
 #[test]
+fn generated_rust_return_types_cover_pet_egg_registration() {
+    for (name, return_type) in [
+        ("query_info", "PetEggInfo"),
+        ("vip_speed_up", "PetEggSpeedUpResult"),
+        ("begin", "PetEggBeginResult"),
+        ("cancel", "PetEggCancelResult"),
+        ("preview", "PetEggPreviewResult"),
+    ] {
+        assert_eq!(
+            super::generated_stdlib_return_type("pet_egg", name),
+            Some(return_type),
+            "missing generated Rust return type for pet_egg::{name}"
+        );
+    }
+}
+
+#[test]
 fn type_docs_include_nested_types_without_direct_function_returns() {
     let docs = stdlib_type_docs();
     assert!(docs

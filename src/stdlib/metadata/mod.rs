@@ -30,6 +30,8 @@ pub use docs::{
 pub use model::{
     StdlibFieldDoc, StdlibFunctionDoc, StdlibFunctionRegistration, StdlibParamDoc, StdlibReturnDoc,
 };
+
+include!(concat!(env!("OUT_DIR"), "/roco_stdlib_return_types.rs"));
 use model::{StdlibFunctionDetails, StdlibFunctionKey};
 
 macro_rules! stdlib_doc {

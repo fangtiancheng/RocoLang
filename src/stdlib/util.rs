@@ -45,6 +45,22 @@ pub fn named_id_array(items: &[(i64, &str)]) -> Array {
         .collect()
 }
 
+pub fn parse_i64_array(name: &str, values: Array) -> Result<Vec<i64>, Box<EvalAltResult>> {
+    values
+        .into_iter()
+        .map(|value| {
+            value.as_int().map_err(|error| {
+                to_rhai_error(RocoError::InvalidParam(
+                    crate::error::RocoInvalidParamError::RhaiTypeMismatch {
+                        name: name.to_string(),
+                        message: error.to_string(),
+                    },
+                ))
+            })
+        })
+        .collect()
+}
+
 macro_rules! register_stdlib_fn_0 {
     ($module:expr, $stdlib:expr, $name:literal, $method:ident) => {{
         let stdlib = $stdlib.clone();

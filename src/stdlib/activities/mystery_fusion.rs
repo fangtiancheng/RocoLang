@@ -1,8 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use rhai::Module;
+use rhai::{Array, Module, NativeCallContext};
 
-use crate::stdlib::util::{register_stdlib_fn_0, register_stdlib_fn_1, register_stdlib_fn_3};
+use crate::stdlib::util::{
+    lock_stdlib, parse_i64_array, register_stdlib_fn_0, register_stdlib_fn_1,
+    to_rhai_error_in_context,
+};
 use crate::stdlib::RocoStdLib;
 
 // Index convention:
@@ -33,13 +36,20 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
         spirit_id: i64
     );
     register_stdlib_fn_0!(module, stdlib, "claim_reward", mystery_fusion_claim_reward);
-    register_stdlib_fn_3!(
-        module,
-        stdlib,
+    let stdlib = stdlib.clone();
+    module.set_native_fn(
         "fuse",
-        mystery_fusion_fuse,
-        recipe_index: i64,
-        material_bag_indexes: Vec<i64>,
-        personality: i64
+        move |context: NativeCallContext,
+              recipe_index: i64,
+              material_bag_indexes: Array,
+              personality: i64| {
+            let mut lib = lock_stdlib(&stdlib)?;
+            lib.mystery_fusion_fuse(
+                recipe_index,
+                parse_i64_array("material_bag_indexes[]", material_bag_indexes)?,
+                personality,
+            )
+            .map_err(|error| to_rhai_error_in_context(error, &context))
+        },
     );
 }

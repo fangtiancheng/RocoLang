@@ -3,17 +3,8 @@ use std::sync::{Arc, Mutex};
 use rhai::Array;
 use rhai::Module;
 
-use crate::stdlib::util::{lock_stdlib, to_array, to_rhai_error};
+use crate::stdlib::util::{lock_stdlib, parse_i64_array, to_array, to_rhai_error};
 use crate::stdlib::RocoStdLib;
-
-fn array_int_type_error(name: &str, message: impl ToString) -> Box<rhai::EvalAltResult> {
-    to_rhai_error(crate::error::RocoError::InvalidParam(
-        crate::error::RocoInvalidParamError::RhaiTypeMismatch {
-            name: name.to_string(),
-            message: message.to_string(),
-        },
-    ))
-}
 
 pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<T>>) {
     {
@@ -26,14 +17,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("lookup_items_info", move |item_ids: Array| {
-            let item_ids = item_ids
-                .into_iter()
-                .map(|value| {
-                    value
-                        .as_int()
-                        .map_err(|err| array_int_type_error("item_ids[]", err))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
+            let item_ids = parse_i64_array("item_ids[]", item_ids)?;
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_items_info(item_ids)
                 .map(|infos| to_array(&infos))
@@ -141,14 +125,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("lookup_skills_info", move |skill_ids: Array| {
-            let skill_ids = skill_ids
-                .into_iter()
-                .map(|value| {
-                    value
-                        .as_int()
-                        .map_err(|err| array_int_type_error("skill_ids[]", err))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
+            let skill_ids = parse_i64_array("skill_ids[]", skill_ids)?;
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_skills_info(skill_ids)
                 .map(|infos| to_array(&infos))
@@ -172,14 +149,7 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     {
         let stdlib = stdlib.clone();
         module.set_native_fn("lookup_spirits_info", move |spirit_ids: Array| {
-            let spirit_ids = spirit_ids
-                .into_iter()
-                .map(|value| {
-                    value
-                        .as_int()
-                        .map_err(|err| array_int_type_error("spirit_ids[]", err))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
+            let spirit_ids = parse_i64_array("spirit_ids[]", spirit_ids)?;
             let mut lib = lock_stdlib(&stdlib)?;
             lib.lookup_spirits_info(spirit_ids)
                 .map(|infos| to_array(&infos))

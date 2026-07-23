@@ -210,7 +210,7 @@ pub const FUNCTIONS: &[StdlibFunctionRegistration] = &[
     StdlibFunctionRegistration::new("friend", "delete", "friend::delete(friend_uin: int)"),
     StdlibFunctionRegistration::new("friend", "handle_application", "friend::handle_application(sender_uin: int, accept: bool)"),
     StdlibFunctionRegistration::new("friend", "query_initial_state", "friend::query_initial_state()"),
-    StdlibFunctionRegistration::new("friend", "query_nicknames", "friend::query_nicknames(friend_uins: int[])"),
+    StdlibFunctionRegistration::new("friend", "query_nicknames", "friend::query_nicknames(friend_uins: array)"),
     StdlibFunctionRegistration::new("friend", "query_online", "friend::query_online()"),
     StdlibFunctionRegistration::new("friend", "send_application", "friend::send_application(friend_uin: int)"),
     StdlibFunctionRegistration::new("friend", "send_chat", "friend::send_chat(friend_uin: int, message: string)"),

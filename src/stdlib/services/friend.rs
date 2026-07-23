@@ -57,12 +57,12 @@ pub fn register<T: RocoStdLib + 'static>(module: &mut Module, stdlib: Arc<Mutex<
     {
         let stdlib = stdlib.clone();
         module.set_native_fn(
-            "query_nicknames",
+            "query_details",
             move |context: rhai::NativeCallContext, friend_uins: Array| {
                 let friend_uins =
                     parse_i64_array_at("friend_uins[]", friend_uins, context.call_position())?;
                 let mut lib = lock_stdlib(&stdlib)?;
-                lib.friend_query_nicknames(friend_uins)
+                lib.friend_query_details(friend_uins)
                     .map(|friends| to_array(&friends))
                     .map_err(|error| to_rhai_error_in_context(error, &context))
             },

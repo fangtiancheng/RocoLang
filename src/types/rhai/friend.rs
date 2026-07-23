@@ -22,5 +22,14 @@ pub(super) fn register_rhai_getters(engine: &mut Engine) {
         |value: &mut FriendApplicationHandleResult| to_array(&value.applications),
     );
     register_getters!(engine, FriendOnlineStatus, uin, online_state, room_id);
-    register_getters!(engine, FriendNickname, uin, nickname);
+    register_getters!(
+        engine,
+        FriendDetail,
+        uin,
+        vip_level,
+        version,
+        roco_nickname,
+        qq_nickname,
+        qq_icon_url
+    );
 }

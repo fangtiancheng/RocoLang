@@ -23,7 +23,11 @@ pub struct FriendOnlineStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FriendNickname {
+pub struct FriendDetail {
     pub uin: i64,
-    pub nickname: String,
+    pub vip_level: i64,
+    pub version: i64,
+    pub roco_nickname: String,
+    pub qq_nickname: String,
+    pub qq_icon_url: String,
 }

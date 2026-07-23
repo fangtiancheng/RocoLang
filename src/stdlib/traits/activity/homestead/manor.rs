@@ -65,10 +65,4 @@ pub trait RocoManorActivityStdLib: Send {
     fn manor_get_friend_list(&mut self, _version: i64) -> Result<Vec<ManorFriendSummary>> {
         unsupported("manor::get_friend_list")
     }
-    fn manor_get_friend_details(
-        &mut self,
-        _friend_uins: Vec<i64>,
-    ) -> Result<Vec<ManorFriendDetail>> {
-        unsupported("manor::get_friend_details")
-    }
 }

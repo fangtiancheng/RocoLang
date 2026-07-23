@@ -174,14 +174,3 @@ pub struct ManorFriendSummary {
     pub score: i64,
     pub plant_score: i64,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ManorFriendDetail {
-    pub uin: i64,
-    pub vip_level: i64,
-    pub uin_code: String,
-    pub version: i64,
-    pub roco_nickname: String,
-    pub qq_nickname: String,
-    pub qq_icon_url: String,
-}

@@ -27,11 +27,15 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("room_id", "int", "所在房间 ID。"),
             ],
         ),
-        "FriendNickname" => (
-            "好友昵称。",
+        "FriendDetail" => (
+            "好友详细资料。",
             vec![
                 field("uin", "int", "好友 UIN。"),
-                field("nickname", "string", "好友昵称。"),
+                field("vip_level", "int", "VIP 等级。"),
+                field("version", "int", "资料版本。"),
+                field("roco_nickname", "string", "洛克昵称。"),
+                field("qq_nickname", "string", "QQ 昵称。"),
+                field("qq_icon_url", "string", "QQ 头像地址。"),
             ],
         ),
         _ => return None,

@@ -29,7 +29,7 @@ pub trait RocoFriendStdLib: Send {
         unsupported("friend::query_online")
     }
 
-    fn friend_query_nicknames(&mut self, _friend_uins: Vec<i64>) -> Result<Vec<FriendNickname>> {
-        unsupported("friend::query_nicknames")
+    fn friend_query_details(&mut self, _friend_uins: Vec<i64>) -> Result<Vec<FriendDetail>> {
+        unsupported("friend::query_details")
     }
 }

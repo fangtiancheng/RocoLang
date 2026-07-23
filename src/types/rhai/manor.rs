@@ -141,15 +141,4 @@ pub(super) fn register_rhai_getters(engine: &mut Engine) {
     register_getters!(engine, ManorFriendCocoTreeStatus, feed_type, level);
     register_getters!(engine, ManorFriendCocoTreeFeedResult, manor_exp);
     register_getters!(engine, ManorFriendSummary, uin, score, plant_score);
-    register_getters!(
-        engine,
-        ManorFriendDetail,
-        uin,
-        vip_level,
-        uin_code,
-        version,
-        roco_nickname,
-        qq_nickname,
-        qq_icon_url
-    );
 }

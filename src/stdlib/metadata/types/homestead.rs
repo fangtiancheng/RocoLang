@@ -239,18 +239,6 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("plant_score", "int", "种植积分。"),
             ],
         ),
-        "ManorFriendDetail" => (
-            "农场好友详细资料。",
-            vec![
-                field("uin", "int", "好友 UIN。"),
-                field("vip_level", "int", "VIP 等级。"),
-                field("uin_code", "string", "UIN 编码。"),
-                field("version", "int", "资料版本。"),
-                field("roco_nickname", "string", "洛克昵称。"),
-                field("qq_nickname", "string", "QQ 昵称。"),
-                field("qq_icon_url", "string", "QQ 头像地址。"),
-            ],
-        ),
         "ManorItemCount" => (
             "Manor seed information.",
             vec![

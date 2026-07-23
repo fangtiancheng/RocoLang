@@ -155,14 +155,5 @@ pub fn docs() -> Vec<StdlibFunctionDetails> {
             returns: "好友农场积分简表。",
             examples: ["let friends = manor::get_friend_list(0);"]
         ),
-        super::stdlib_doc!(
-            "manor",
-            "get_friend_details",
-            return_type: "ManorFriendDetail[]",
-            "批量查询好友详细资料。",
-            params: ["friend_uins" => "好友 UIN 列表。"],
-            returns: "好友详细资料列表。",
-            examples: ["let friends = manor::get_friend_details([123456]);"]
-        ),
     ]
 }

@@ -40,6 +40,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(alchemy_furnace::docs());
     details.extend(aquarius::docs());
     details.extend(aries::docs());
+    details.extend(cancer::docs());
     details.extend(dark_city::docs());
     details.extend(diamond_tear::docs());
     details.extend(system::docs());
@@ -47,6 +48,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(scene::docs());
     details.extend(remote_state::docs());
     details.extend(game::docs());
+    details.extend(gemini::docs());
     details.extend(role::docs());
     details.extend(home::docs());
     details.extend(ice_crystal::docs());

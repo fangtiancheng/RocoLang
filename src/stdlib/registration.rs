@@ -36,6 +36,7 @@ pub(crate) fn register_modules<T: RocoStdLib + 'static>(
     stdlib: Arc<Mutex<T>>,
 ) {
     register_stdlib_module!(engine, stdlib, scene);
+    register_stdlib_module!(engine, stdlib, friend);
     register_stdlib_module!(engine, stdlib, remote_state);
     register_stdlib_module!(engine, stdlib, session);
     register_stdlib_module!(engine, stdlib, memory);

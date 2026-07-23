@@ -2,6 +2,7 @@ mod adventure;
 mod combat;
 mod docs;
 mod enum_helpers;
+mod friend;
 mod game;
 mod home;
 mod lookup;

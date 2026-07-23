@@ -475,3 +475,4 @@ impl RocoCapricornActivityStdLib for MockStdLib {}
 impl RocoAdventureActivityStdLib for MockStdLib {}
 
 impl RocoSpiritBookStdLib for MockStdLib {}
+impl roco_lang::RocoFriendStdLib for MockStdLib {}

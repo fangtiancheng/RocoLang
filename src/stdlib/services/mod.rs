@@ -1,3 +1,4 @@
+pub mod friend;
 pub mod lookup;
 pub mod memory;
 pub mod profile;

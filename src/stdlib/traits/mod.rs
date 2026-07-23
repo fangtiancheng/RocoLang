@@ -1,5 +1,6 @@
 mod activity;
 mod combat;
+mod friend;
 mod incubative_machine;
 mod lookup;
 mod pet_egg;
@@ -17,6 +18,7 @@ use crate::types::*;
 
 pub use activity::*;
 pub use combat::*;
+pub use friend::*;
 pub use incubative_machine::*;
 pub use lookup::*;
 pub use pet_egg::*;

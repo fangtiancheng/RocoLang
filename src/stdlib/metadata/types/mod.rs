@@ -30,6 +30,7 @@ mod activities;
 mod core;
 mod error;
 mod extended;
+mod friend;
 mod gameplay;
 mod homestead;
 mod network;
@@ -46,6 +47,7 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
         .or_else(|| account::doc(&normalized))
         .or_else(|| spirit::doc(&normalized))
         .or_else(|| homestead::doc(&normalized))
+        .or_else(|| friend::doc(&normalized))
         .or_else(|| static_data::doc(&normalized))
         .or_else(|| extended::doc(&normalized));
     let Some((description, fields)) = document else {

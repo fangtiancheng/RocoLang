@@ -1865,6 +1865,7 @@ impl RocoEvolutionActivityStdLib for MockStdLib {
 impl RocoMagicPioneerActivityStdLib for MockStdLib {}
 
 impl RocoAdventureActivityStdLib for MockStdLib {}
+impl roco_lang::RocoFriendStdLib for MockStdLib {}
 
 impl RocoAriesActivityStdLib for MockStdLib {}
 impl RocoLibraActivityStdLib for MockStdLib {}

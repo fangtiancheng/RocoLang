@@ -44,6 +44,7 @@ fn detailed_stdlib_function_details() -> Vec<StdlibFunctionDetails> {
     details.extend(game::docs());
     details.extend(role::docs());
     details.extend(home::docs());
+    details.extend(friend::docs());
     details.extend(manor::docs());
     details.extend(memory::docs());
     details.extend(pet_training::docs());

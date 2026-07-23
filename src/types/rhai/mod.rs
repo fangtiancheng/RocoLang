@@ -75,6 +75,7 @@ mod action;
 mod activities;
 mod combat;
 mod common;
+mod friend;
 mod game;
 mod home;
 mod jump_machine;
@@ -101,6 +102,7 @@ pub(crate) fn register_rhai_getters(engine: &mut Engine) {
     combat::register_rhai_getters(engine);
     common::register_rhai_getters(engine);
     game::register_rhai_getters(engine);
+    friend::register_rhai_getters(engine);
     home::register_rhai_getters(engine);
     jump_machine::register_rhai_getters(engine);
     ladder::register_rhai_getters(engine);

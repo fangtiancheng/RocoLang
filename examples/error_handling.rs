@@ -398,3 +398,4 @@ impl RocoCapricornActivityStdLib for ErrorTestStdLib {}
 impl RocoAdventureActivityStdLib for ErrorTestStdLib {}
 
 impl RocoSpiritBookStdLib for ErrorTestStdLib {}
+impl roco_lang::RocoFriendStdLib for ErrorTestStdLib {}

@@ -53,7 +53,7 @@ pub use stdlib::{
     find_stdlib_function_doc, registered_stdlib_function_registrations, stdlib_function_docs,
     stdlib_type_docs, RocoActivityStdLib, RocoAdventureActivityStdLib, RocoAlchemyActivityStdLib,
     RocoAquariusActivityStdLib, RocoAriesActivityStdLib, RocoCancerActivityStdLib,
-    RocoCapricornActivityStdLib, RocoCombatStdLib, RocoEvolutionActivityStdLib,
+    RocoCapricornActivityStdLib, RocoCombatStdLib, RocoEvolutionActivityStdLib, RocoFriendStdLib,
     RocoGeminiActivityStdLib, RocoHomeActivityStdLib, RocoIncubativeMachineStdLib,
     RocoLeoActivityStdLib, RocoLibraActivityStdLib, RocoLookupStdLib,
     RocoMagicPioneerActivityStdLib, RocoManorActivityStdLib, RocoNewsActivityStdLib,

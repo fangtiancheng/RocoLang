@@ -133,6 +133,68 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("inherited", "bool", "是否为遗传技能。"),
             ],
         ),
+        "PetEggSpiritInfo" => (
+            "宠物培育协议中的宠物或宠物蛋信息。",
+            vec![
+                field("spirit_id", "int", "宠物 ID。"),
+                field("level", "int", "宠物等级。"),
+                field("exp_to_next_level", "int", "距离下一等级所需经验。"),
+                field("personality", "int", "性格数字。"),
+                field("hp", "int", "当前 HP。"),
+                field("max_hp", "int", "最大 HP。"),
+                field("caught_time", "int", "捕获时间。"),
+                field("caught_location", "int", "捕获地点 ID。"),
+                field("storage_time", "int", "入库时间。"),
+                field("skills", "SpiritSkillInfo[]", "技能列表。"),
+            ],
+        ),
+        "PetEggInfo" => (
+            "宠物培育室当前状态。",
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("current_egg_count", "int", "当前宠物蛋数量。"),
+                field("max_egg_count", "int", "最大宠物蛋容量。"),
+                field("vip_count", "int", "VIP 加速相关剩余次数。"),
+                field("male", "PetEggSpiritInfo", "当前父方宠物信息。"),
+                field("female", "PetEggSpiritInfo", "当前母方宠物信息。"),
+                field("egg", "PetEggSpiritInfo", "当前培育的宠物蛋信息。"),
+            ],
+        ),
+        "PetEggSpeedUpResult" => (
+            "宠物蛋 VIP 加速结果。",
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("current_egg_count", "int", "当前宠物蛋数量。"),
+                field("max_egg_count", "int", "最大宠物蛋容量。"),
+                field("vip_count", "int", "VIP 加速相关剩余次数。"),
+            ],
+        ),
+        "PetEggBeginResult" => (
+            "开始宠物蛋培育的结果。",
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("max_egg_count", "int", "最大宠物蛋容量。"),
+            ],
+        ),
+        "PetEggCancelResult" => (
+            "取消宠物蛋培育的结果。",
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("detail_code", "int", "服务端返回的详细结果码。"),
+            ],
+        ),
+        "PetEggPreviewResult" => (
+            "宠物蛋培育预览结果。",
+            vec![
+                field("result_code", "int", "服务器返回结果码。"),
+                field("message", "string", "服务器返回信息。"),
+                field("egg", "PetEggSpiritInfo", "预览生成的宠物蛋信息。"),
+            ],
+        ),
         "StorageSpiritInfo" => (
             "仓库精灵摘要。",
             vec![

@@ -10,6 +10,7 @@ mod manor;
 mod memory;
 mod model;
 mod news;
+mod pet_egg;
 mod pet_training;
 mod profile;
 mod registered;

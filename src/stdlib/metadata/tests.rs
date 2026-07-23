@@ -96,6 +96,31 @@ fn return_docs_are_inferred_from_registered_types() {
 }
 
 #[test]
+fn pet_egg_functions_expose_result_struct_docs() {
+    let docs = stdlib_function_docs();
+    let expected = [
+        ("query_info", "PetEggInfo"),
+        ("vip_speed_up", "PetEggSpeedUpResult"),
+        ("begin", "PetEggBeginResult"),
+        ("cancel", "PetEggCancelResult"),
+        ("preview", "PetEggPreviewResult"),
+    ];
+
+    for (name, return_type) in expected {
+        let doc = docs
+            .iter()
+            .find(|doc| doc.module == "pet_egg" && doc.name == name)
+            .unwrap_or_else(|| panic!("pet_egg::{name} should be documented"));
+        let return_doc = doc
+            .return_doc
+            .as_ref()
+            .unwrap_or_else(|| panic!("pet_egg::{name} should expose return docs"));
+        assert_eq!(return_doc.type_name, return_type);
+        assert!(!return_doc.fields.is_empty());
+    }
+}
+
+#[test]
 fn type_docs_include_nested_types_without_direct_function_returns() {
     let docs = stdlib_type_docs();
     assert!(docs

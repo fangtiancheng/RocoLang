@@ -18,7 +18,7 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
             ],
         ),
         "FourSeasonsShopRewardInfo" => (
-            "四季活动商店奖励。",
+            "四时邀约商店奖励。",
             vec![
                 field("reward_id", "int", "奖励 ID。"),
                 field("reward_kind", "int", "奖励类型。"),
@@ -26,7 +26,7 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
             ],
         ),
         "FourSeasonsMonthlySpiritRewardInfo" => (
-            "四季活动月度宠物奖励。",
+            "四时邀约月度宠物奖励。",
             vec![
                 field("month", "int", "月份。"),
                 field("reward_index", "int", "奖励索引。"),
@@ -405,7 +405,7 @@ pub(super) fn doc(type_name: &str) -> Option<(&'static str, Vec<StdlibFieldDoc>)
                 field("add", "RocoOptionalI64", "增量。"),
             ]
         }),
-        "FourSeasonsInfo" => ("四季活动返回信息。", {
+        "FourSeasonsInfo" => ("四时邀约活动返回信息。", {
             vec![
                 field("result_code", "int", "服务器返回结果码。"),
                 field("message", "string", "服务器返回信息。"),

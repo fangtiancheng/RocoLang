@@ -37,6 +37,8 @@ mod network;
 mod spirit;
 mod static_data;
 
+include!(concat!(env!("OUT_DIR"), "/roco_struct_docs.rs"));
+
 pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
     let normalized = normalize_type_name(type_name);
     let document = core::doc(&normalized)
@@ -49,7 +51,8 @@ pub fn return_doc_for(type_name: &str) -> Option<StdlibReturnDoc> {
         .or_else(|| homestead::doc(&normalized))
         .or_else(|| friend::doc(&normalized))
         .or_else(|| static_data::doc(&normalized))
-        .or_else(|| extended::doc(&normalized));
+        .or_else(|| extended::doc(&normalized))
+        .or_else(|| generated_struct_doc(&normalized));
     let Some((description, fields)) = document else {
         return fallback_return_doc_for(type_name, &normalized);
     };
